@@ -1,0 +1,41 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Nouveau Client</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/clients/saisie}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="nom" class="form-label">Nom <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="nom" name="nom" required 
+                            placeholder="Entrez le nom du client">
+                    </div>
+
+                    <div class="col-md-6">
+                        <label for="idGenre" class="form-label">Genre <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idGenre" name="idGenre" required>
+                            <option value="">-- Sélectionner un genre --</option>
+                            <option th:each="genre : ${genres}" 
+                                    th:value="${genre.idGenre}"
+                                    th:text="${genre.libelle}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Enregistrer
+                        </button>
+                        <a th:href="@{/clients/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,38 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Articles</h4>
+            <a th:href="@{/articles/liste}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-clockwise"></i> Rafraîchir
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID Article</th>
+                            <th>Libellé</th>
+                            <th>Catégories</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${articles.isEmpty()}">
+                            <td colspan="3" class="text-center">Aucun article disponible</td>
+                        </tr>
+                        <tr th:each="article : ${articles}">
+                            <td th:text="${'ART' + article.id}"></td>
+                            <td th:text="${article.libelle}"></td>
+                            <td>
+                                <span th:if="${#lists.isEmpty(article.categories)}">-</span>
+                                <span th:each="cat : ${article.categories}" class="badge bg-light text-dark me-1"
+                                      th:text="${cat.categorie.libelle}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

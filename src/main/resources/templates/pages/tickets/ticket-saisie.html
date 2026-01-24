@@ -1,0 +1,75 @@
+<section class="section" th:fragment="page">
+
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Saisie Ticket</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/tickets/saisie}" method="post" th:object="${ticketForm}">
+
+                <!-- Bloc -->
+                <div class="mb-3">
+                    <label class="form-label">Bloc</label>
+                    <select class="form-select" th:field="*{blocId}">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="bloc : ${blocs}" th:value="${bloc.idBloc}"
+                            th:text="${bloc.strId} + ' - ' + ${bloc.salle.strId}"></option>
+                    </select>
+                </div>
+
+                <!-- Film -->
+                <div class="mb-3">
+                    <label class="form-label">Film</label>
+                    <select class="form-select" th:field="*{idFilm}">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="film : ${films}" th:value="${film.idFilm}" th:text="${film.nom}"></option>
+                    </select>
+                </div>
+
+                <!-- Date Prévue -->
+                <div class="mb-3">
+                    <label class="form-label">Date Prévue</label>
+                    <input type="datetime-local" class="form-control" th:field="*{datePrevue}">
+                </div>
+
+                <!-- Nombre de places -->
+                <!-- <div class="mb-3">
+                    <label class="form-label">Nombre de places</label>
+                    <input type="number" class="form-control" th:field="*{nbrPlace}"
+                        placeholder="Entrer le nombre de places">
+                </div> -->
+
+                <!-- Numéro de places -->
+                <div class="mb-3">
+                    <label class="form-label">Numéro de places</label>
+                    <input type="text" class="form-control" name="numeroPlaceStr" placeholder="Ex: 1;2;4">
+                    <small class="form-text text-muted">Séparer les numéros par des point-virgules (;)</small>
+                </div>
+
+                <!-- Client -->
+                <div class="mb-3">
+                    <label class="form-label">Client</label>
+                    <select class="form-select" th:field="*{clientId}">
+                        <option value="">-- Sélectionner --</option>
+                        <option th:each="client : ${clients}" th:value="${client.idClient}"
+                            th:text="${client.strId}"></option>
+                    </select>
+                </div>
+
+                <!-- Boutons -->
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </button>
+
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save"></i> Enregistrer
+                    </button>
+                </div>
+
+            </form>
+        </div>
+    </div>
+
+</section>

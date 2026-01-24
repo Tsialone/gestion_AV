@@ -1,0 +1,44 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Liste des Réservations</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Réservation</th>
+                            <th>Date Réservation</th>
+                            <th>Client</th>
+                            <th>Place</th>
+                            <th>Montant</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="reservation : ${reservations}">
+                            <td th:text="${'RES' + reservation.idReservation}"></td>
+                            <td th:text="${#temporals.format(reservation.dateReservation, 'dd/MM/yyyy HH:mm')}"></td>
+
+                            <td th:text="${reservation.client != null ? reservation.client.nom : '—'}"></td>
+                            <td th:text="${reservation.nbrTicket}"></td>
+                            <td th:text="${reservation.montant} + ' AR'"></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-eye"></i> Voir</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

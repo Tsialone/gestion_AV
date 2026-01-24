@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ERP-JUICE</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CSS Bootstrap -->
+    <link rel="stylesheet" th:href="@{/assets/css/bootstrap.css}">
+
+    <!-- Perfect Scrollbar -->
+    <link rel="stylesheet" th:href="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.css}">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" th:href="@{/assets/vendors/bootstrap-icons/bootstrap-icons.css}">
+
+    <!-- App CSS -->
+    <link rel="stylesheet" th:href="@{/assets/css/app.css}">
+
+    <!-- Favicon -->
+    <link rel="icon" th:href="@{/assets/images/logo/logo.png}" type="image/png">
+</head>
+
+<body>
+    <div id="app">
+
+        <!-- Toast Messages -->
+        <div id="toastData" th:data-message="${toastMessage}" th:data-type="${toastType}" style="display:none"></div>
+
+        <!-- Sidebar -->
+        <div th:replace="fragments/sidebar :: sidebar"></div>
+
+        <!-- Main content -->
+        <div id="main" class="layout-navbar">
+            <!-- Header -->
+            <div th:replace="fragments/header :: header"></div>
+
+            <!-- Page content -->
+            <div id="main-content" class="container mt-4">
+                <div class="page-heading">
+                    <!-- Page title fragment -->
+                    <div th:replace="fragments/pagetitle :: pagetitle"></div>
+
+                    <!-- Injection du fragment spécifique de la page -->
+                    <div th:replace="~{${content} :: page}"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JS Scripts -->
+    <script th:src="@{/assets/vendors/perfect-scrollbar/perfect-scrollbar.min.js}"></script>
+    <script th:src="@{/assets/js/bootstrap.bundle.min.js}"></script>
+    <script th:src="@{/assets/js/main.js}"></script>
+
+    <!-- Toast JS -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const toastDiv = document.getElementById('toastData');
+        const msg = toastDiv.getAttribute('data-message');
+        const type = toastDiv.getAttribute('data-type');
+
+        if (msg) {
+            Swal.fire({
+                toast: true,
+                position: 'top',
+                showConfirmButton: false,
+                timer: 5000,
+                timerProgressBar: true,
+                icon: type,
+                title: msg
+            });
+        }
+    </script>
+
+    <script>
+        console.log("GLOBAL SCRIPT LOADED");
+
+        document.addEventListener("change", function (e) {
+
+            if (e.target && e.target.id === "checkAll") {
+                const checked = e.target.checked;
+                document.querySelectorAll(".place-checkbox").forEach(cb => {
+                    cb.checked = checked;
+                });
+            }
+
+            if (e.target && e.target.classList.contains("place-checkbox")) {
+                const all = document.querySelectorAll(".place-checkbox");
+                const checked = document.querySelectorAll(".place-checkbox:checked");
+                const checkAll = document.getElementById("checkAll");
+
+                if (checkAll) {
+                    checkAll.checked = (all.length === checked.length);
+                }
+            }
+        });
+    </script>
+
+</body>
+
+</html>

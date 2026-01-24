@@ -1,0 +1,3 @@
+scan juste all .java in the package models
+and create and generate IdClass of all composite table thanks
+

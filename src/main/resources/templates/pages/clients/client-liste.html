@@ -1,0 +1,46 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Liste des Clients</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <a th:href="@{/clients/saisie}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nouveau Client
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID Client</th>
+                            <th>Nom</th>
+                            <th>Genre</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="client : ${clients}">
+                            <td th:text="${client.getStrId()}"></td>
+                            <td th:text="${client.nom}"></td>
+                            <td th:text="${client.genre.libelle}"></td>
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-pencil"></i> Modifier</a></li>
+                                        <li><a class="dropdown-item" href="#"><i class="bi bi-trash"></i> Supprimer</a></li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
