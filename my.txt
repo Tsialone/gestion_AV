@@ -1,0 +1,45 @@
+- List<Lot> creerLots(Integer nombre> mapArticleNombre)  doneeeeeeeeeeeeee
+	-> inserer multiple dans la table lot pour chaque element de mapArticleNombre(on insere qtt et qttInitiale)
+	RG: qte >= 1 pour chaque lots
+	RG: inserer dans libelle nomArticle + idLot
+
+- List<MvtStockLot> creerListeMvtStockEntreeLot(Integer idMvtStock, List<Lot> listeLots)
+	-> insertion multiple dans la table mvt_stock_lot, mettre quantite de mvt_stock_lot la quantite dans chaque Lot dans listeLots
+
+- MvtStock creerMvtStockEntree(Date date, Boolean entrant, String descriptionQualite,String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable], Map<Integer idArticle, Integer nombre> mapArticleNombre)
+	-> Obtenir  List<Lot> listeLots avec creerLots(mapArticleNombre).
+	-> inserer dans la table mvt_stock = retourner Integer idMvtStock(mettre true dans le boolen entrant)
+	-> Insertion avec creerListeMvtStockEntreeLot(idMvtStock,listeLots]
+	
+- int getQttRestantDansLotApresSortie(Integer idLot, int nombre)
+- MvtStockLot faireSortirDansLot(Integer idLot, int nombre, Integer idMvtStock) 
+	-> int reste = getQttRestantDansLotApresSortie(idLot, nombre)
+	-> update qtt avec reste
+	-> insert dans la table mvt_stock_lot en utilisant idMvtStock
+	RG: - reste >= 0 
+		- mvtStock lie doit avoir rentrant = false
+- int  faireSortirMaxDansUnLotEtRetournerReste(Integer idLot, int nombreMax, Integer idMvtStock) 
+	-> nombreASortir = nombreMax
+	-> if(nombreASortir > lot.qtt) nombreASortir = lot.qtt
+	-> utiliser la foncion faireSortirDansLot(idLot,nombreMax,idMvtStock)
+	-> retourner nombreMax - nombreASortir
+
+- List<MvtStockLot> faireSortirDesProduitsLeLotImportePeu(Integer idArticle, int nombre, Integer idMvtStock)
+	-> Obtenir chaque lot avec idArticle = idArticle ou qtt > 0
+	-> pseudo code:
+		int resteASortir = nombre;	
+		for(int i = 0; i < listelot.length; i ++) {
+			resteASortir = 	faireSortirMaxDansUnLotEtRetournerReste(listeLot[i].getId, resteASortir,idMvtStock)
+		if(resteASortir == 0) {
+commit et return)
+}
+	// Onn a pas pu tout faire sortir:
+	rollback;
+	throw Exception("il manque " + resteASortir + " dans le stock)
+
+	-> fin pseudo code
+
+
+- MvtStock creeerMvtStockSortie(Date date, String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable],  Map<Integer idArticle, Integer nombre> mapArticleNombre)
+	-> inserer dans la table mvt_stock = retourner Integer idMvtStock(mettre false dans le boolen entrant, mettre null descriptionQualite)
+	-> pour chaque element du map, utiliser la fonction: faireSortirDesProduitsLeLotImportePeu(idArcitle,nombre,idMvtStock)
