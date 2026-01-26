@@ -19,6 +19,11 @@ public class CommandeEtat {
     @Column(name = "date_", nullable = false)
     private LocalDateTime date;
 
+    public CommandeEtat(Integer idCommande, Integer idEtat, LocalDateTime date) {
+        this.id = new CommandeEtatId(idCommande, idEtat);
+        this.date = date;
+    }
+
     @Embeddable
     @Data
     @NoArgsConstructor

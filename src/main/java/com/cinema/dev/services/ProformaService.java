@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-
 import java.util.List;
 
 @Service
@@ -59,13 +58,9 @@ public class ProformaService {
             proformaDetailRepository.save(detail);
         }
         
-        //* -- Insert proforma_etat (cree)
-        ProformaEtat proformaEtat = new ProformaEtat();
-        ProformaEtat.ProformaEtatId etatId = new ProformaEtat.ProformaEtatId();
-        etatId.setIdProforma(savedProforma.getIdProforma());
-        etatId.setIdEtat(1); // 1 is "cree" mayhaps
-        proformaEtat.setId(etatId);
-        proformaEtat.setDate(dateCreation != null ? dateCreation : LocalDateTime.now());
+        //* -- Insert proforma_etat (cree = 1)
+        LocalDateTime date = dateCreation != null ? dateCreation : LocalDateTime.now();
+        ProformaEtat proformaEtat = new ProformaEtat(savedProforma.getIdProforma(), 1, date);
         proformaEtatRepository.save(proformaEtat);
         
         return savedProforma;
@@ -73,13 +68,13 @@ public class ProformaService {
     
     @Transactional
     public ProformaEtat validerProforma(Integer idProforma, LocalDateTime dateValidation) {
-        //* -- Insert proforma_etat (valide)
-        ProformaEtat proformaEtat = new ProformaEtat();
-        ProformaEtat.ProformaEtatId etatId = new ProformaEtat.ProformaEtatId();
-        etatId.setIdProforma(idProforma);
-        etatId.setIdEtat(2); // 2 is "valide" me thinks
-        proformaEtat.setId(etatId);
-        proformaEtat.setDate(dateValidation != null ? dateValidation : LocalDateTime.now());
+        //* -- Check if proforma exists
+        proformaRepository.findById(idProforma)
+            .orElseThrow(() -> new IllegalArgumentException("Proforma not found"));
+        
+        //* -- Insert proforma_etat (valide = 2)
+        LocalDateTime date = dateValidation != null ? dateValidation : LocalDateTime.now();
+        ProformaEtat proformaEtat = new ProformaEtat(idProforma, 2, date);
         
         return proformaEtatRepository.save(proformaEtat);
     }

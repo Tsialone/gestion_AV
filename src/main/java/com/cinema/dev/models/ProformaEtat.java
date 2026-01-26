@@ -19,6 +19,11 @@ public class ProformaEtat {
     @Column(name = "date_", nullable = false)
     private LocalDateTime date;
 
+    public ProformaEtat(Integer idProforma, Integer idEtat, LocalDateTime date) {
+        this.id = new ProformaEtatId(idProforma, idEtat);
+        this.date = date;
+    }
+
     @Embeddable
     @Data
     @NoArgsConstructor

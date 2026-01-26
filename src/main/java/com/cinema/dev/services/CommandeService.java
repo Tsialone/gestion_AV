@@ -6,7 +6,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
-
 import java.util.List;
 
 @Service
@@ -43,11 +42,8 @@ public class CommandeService {
             throw new IllegalArgumentException("Proforma has expired");
         }
         
-        //* -- Proforma etat is valid
-        ProformaEtat.ProformaEtatId etatId = new ProformaEtat.ProformaEtatId();
-        etatId.setIdProforma(idProforma);
-        etatId.setIdEtat(2); // "valide"
-        if (!proformaEtatRepository.existsById(etatId)) {
+        //* -- Proforma etat is valid (etat = 2)
+        if (!proformaEtatRepository.existsByIdProformaAndIdEtat(idProforma, 2)) {
             throw new IllegalArgumentException("Proforma is not validated");
         }
         
@@ -64,13 +60,8 @@ public class CommandeService {
         //* -- Insert commande
         Commande savedCommande = commandeRepository.save(commande);
         
-        //* -- Insert commande_etat
-        CommandeEtat commandeEtat = new CommandeEtat();
-        CommandeEtat.CommandeEtatId cmdEtatId = new CommandeEtat.CommandeEtatId();
-        cmdEtatId.setIdCommande(savedCommande.getIdCommande());
-        cmdEtatId.setIdEtat(1); // "cree"
-        commandeEtat.setId(cmdEtatId);
-        commandeEtat.setDate(dateCmd);
+        //* -- Insert commande_etat (cree = 1)
+        CommandeEtat commandeEtat = new CommandeEtat(savedCommande.getIdCommande(), 1, dateCmd);
         commandeEtatRepository.save(commandeEtat);
         
         return savedCommande;
@@ -78,13 +69,13 @@ public class CommandeService {
     
     @Transactional
     public CommandeEtat validerCommande(Integer idCommande, LocalDateTime dateValidation) {
-        //* -- Insert commande_etat (valide)
-        CommandeEtat commandeEtat = new CommandeEtat();
-        CommandeEtat.CommandeEtatId etatId = new CommandeEtat.CommandeEtatId();
-        etatId.setIdCommande(idCommande);
-        etatId.setIdEtat(2); // "valide"
-        commandeEtat.setId(etatId);
-        commandeEtat.setDate(dateValidation != null ? dateValidation : LocalDateTime.now());
+        //* -- Check if commande exists
+        commandeRepository.findById(idCommande)
+            .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
+        
+        //* -- Insert commande_etat (valide = 2)
+        LocalDateTime date = dateValidation != null ? dateValidation : LocalDateTime.now();
+        CommandeEtat commandeEtat = new CommandeEtat(idCommande, 2, date);
         
         return commandeEtatRepository.save(commandeEtat);
     }

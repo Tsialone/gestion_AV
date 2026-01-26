@@ -31,18 +31,18 @@ public class PaiementService {
 
     @Transactional
     public Paiement payerCommande(Integer idCommande, String idCaisse, Paiement paiement, LocalDateTime dateMvtCaisse) {
-        //* -- Set idCommande
-        paiement.setIdCommande(idCommande);
-        
-        //* -- Insert paiement
-        Paiement savedPaiement = paiementRepository.save(paiement);
-        
         //* -- Get commande and proforma to check client/fournisseur
         Commande commande = commandeRepository.findById(idCommande)
             .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
         
         Proforma proforma = proformaRepository.findById(commande.getIdProforma())
             .orElseThrow(() -> new IllegalArgumentException("Proforma not found"));
+        
+        //* -- Set idCommande
+        paiement.setIdCommande(idCommande);
+        
+        //* -- Insert paiement
+        Paiement savedPaiement = paiementRepository.save(paiement);
         
         //* -- Create mvt_caisse
         MvtCaisse mvtCaisse = new MvtCaisse();
