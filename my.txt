@@ -1,9 +1,12 @@
+cp /home/tsialone/Documents/Mr_TOVO/site2.loo  .
+
+
 - List<Lot> creerLots(Integer nombre> mapArticleNombre)  doneeeeeeeeeeeeee
-	-> inserer multiple dans la table lot pour chaque element de mapArticleNombre(on insere qtt et qttInitiale)
+	-> inserer multiple dans la table lot pour chaque element de mapArticleNombre(on insere qte et qttInitiale)
 	RG: qte >= 1 pour chaque lots
 	RG: inserer dans libelle nomArticle + idLot
 
-- List<MvtStockLot> creerListeMvtStockEntreeLot(Integer idMvtStock, List<Lot> listeLots)
+- List<MvtStockLot> creerListeMvtStockEntreeLot(Integer idMvtStock, List<Lot> listeLots)  doneeeeeeeeeeeeee
 	-> insertion multiple dans la table mvt_stock_lot, mettre quantite de mvt_stock_lot la quantite dans chaque Lot dans listeLots
 
 - MvtStock creerMvtStockEntree(Date date, Boolean entrant, String descriptionQualite,String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable], Map<Integer idArticle, Integer nombre> mapArticleNombre)

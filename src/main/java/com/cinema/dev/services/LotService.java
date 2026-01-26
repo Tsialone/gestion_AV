@@ -6,9 +6,7 @@ import com.cinema.dev.repositories.ArticleRepository;
 import com.cinema.dev.repositories.LotRepository;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -39,6 +37,7 @@ public class LotService {
 
             lot.setIdArticle(idArticle);
             lot.setQte(qte);
+            lot.setQteInitiale(qte);
             lot.setLibelle(article.getLibelle() + " - Lot " + (i + 1));
             resp.add(lotRepository.save(lot));
         }
