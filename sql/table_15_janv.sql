@@ -1,3 +1,7 @@
+DROP DATABASE IF EXISTS gestion_db;
+CREATE DATABASE gestion_db;
+\c gestion_db;
+
 CREATE TABLE article(
    id_article SERIAL,
    libelle VARCHAR(255) ,
