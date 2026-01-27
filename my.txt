@@ -20,14 +20,24 @@
 	-> insert dans la table mvt_stock_lot en utilisant idMvtStock
 	RG: - reste >= 0 
 		- mvtStock lie doit avoir rentrant = false
-- int  faireSortirMaxDansUnLotEtRetournerReste(Integer idLot, int nombreMax, Integer idMvtStock) 
+
+
+
+
+
+
+
+
+
+
+- int  faireSortirMaxDansUnLotEtRetournerReste(Integer idLot, int nombreMax, Integer idMvtStock)  doneeeeeeeeeeeeeeee
 	-> nombreASortir = nombreMax
 	-> if(nombreASortir > lot.qtt) nombreASortir = lot.qtt
 	-> utiliser la foncion faireSortirDansLot(idLot,nombreMax,idMvtStock)
 	-> retourner nombreMax - nombreASortir
 
-- List<MvtStockLot> faireSortirDesProduitsLeLotImportePeu(Integer idArticle, int nombre, Integer idMvtStock)
-	-> Obtenir chaque lot avec idArticle = idArticle ou qtt > 0
+- List<MvtStockLot> faireSortirDesProduitsLeLotImportePeu(Integer idArticle, int nombre, Integer idMvtStock) doneeeeeeeeeeeeee
+	-> Obtenir chaque lot avecfaireSortirMaxDansUnLotEtRetournerReste idArticle = idArticle ou qtt > 0
 	-> pseudo code:
 		int resteASortir = nombre;	
 		for(int i = 0; i < listelot.length; i ++) {
@@ -42,6 +52,6 @@ commit et return)
 	-> fin pseudo code
 
 
-- MvtStock creeerMvtStockSortie(Date date, String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable],  Map<Integer idArticle, Integer nombre> mapArticleNombre)
+- MvtStock creeerMvtStockSortie(Date date, String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable],  Map<Integer idArticle, Integer nombre> mapArticleNombre) donneeeeeeeee
 	-> inserer dans la table mvt_stock = retourner Integer idMvtStock(mettre false dans le boolen entrant, mettre null descriptionQualite)
 	-> pour chaque element du map, utiliser la fonction: faireSortirDesProduitsLeLotImportePeu(idArcitle,nombre,idMvtStock)

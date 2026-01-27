@@ -26,9 +26,43 @@ public class MvtStockLotService {
     private final MvtStockLotRepository mvtStockLotRepository;
     private final MvtStockRepository mvtStockRepository;
     private final LotRepository lotRepository;
+
     private final LotService lotService;
 
-    @Transactional
+    public Integer faireSortirMaxDansUnLotEtRetournerReste(Integer idLot, Integer nombreMax, Integer idMvtStock)
+            throws Exception {
+        Integer nombreASortir = nombreMax;
+        Lot lot = lotRepository.findById(idLot)
+                .orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
+        if (nombreASortir > lot.getQte()) {
+            nombreASortir = lot.getQte();
+        }
+        faireSortirDansLot(idLot, nombreASortir, idMvtStock);
+        return nombreMax - nombreASortir;
+    }
+
+    @Transactional(rollbackOn = Exception.class)
+    public void faireSortirDesProduitsLeLotImportePeu(Integer idArticle, Integer nombre,
+            Integer idMvtStock) throws Exception {
+        List<Lot> lots = lotService.getLotsByArticleWithPositiveStock(idArticle);
+        // List<MvtStockLot> resp = new ArrayList<>();
+
+        Integer reste = nombre;
+        for (Lot lot : lots) {
+            if (reste <= 0) {
+                break;
+            }
+            Integer resteASortir = faireSortirMaxDansUnLotEtRetournerReste(lot.getIdLot(), reste,
+                    idMvtStock);
+            if (resteASortir != 0) {
+                throw new Exception("il manque " + resteASortir + " dans le stock");
+            } else {
+                return;
+            }
+        }
+    }
+
+    @Transactional(rollbackOn = Exception.class)
     public MvtStockLot faireSortirDansLot(Integer idLot, Integer nombre, Integer idMvtStock) throws Exception {
         Lot lot = lotRepository.findById(idLot)
                 .orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
@@ -38,12 +72,14 @@ public class MvtStockLotService {
         }
         lot.setQte(qteRestant);
         lotRepository.save(lot);
-        MvtStock mvtStock = mvtStockRepository.findById(idMvtStock).orElseThrow(() -> new Exception("MvtStock non trouvé: " + idMvtStock));
-        
-        if (mvtStock.getEntrant()){
-            throw new Exception("Le mouvement de stock doit être une sortie pour faire sortir des articles d'un lot: " + idMvtStock);
+        MvtStock mvtStock = mvtStockRepository.findById(idMvtStock)
+                .orElseThrow(() -> new Exception("MvtStock non trouvé: " + idMvtStock));
+
+        if (mvtStock.getEntrant()) {
+            throw new Exception("Le mouvement de stock doit être une sortie pour faire sortir des articles d'un lot: "
+                    + idMvtStock);
         }
-        
+
         MvtStockLot mvtStockLot = new MvtStockLot();
         mvtStockLot.setQte(nombre);
         MvtStockLotId mvtStockLotId = new MvtStockLotId();
