@@ -4,8 +4,11 @@ SELECT
     msl.id_lot,
     l.libelle AS libelle_lot,
     l.qte AS quantite_lot,
+    l.qte_initiale AS quantite_initiale_lot,
     a.id_article,
     a.libelle AS libelle_article,
+    c.id_categorie,
+    c.libelle AS libelle_categorie,
     ms.date_ AS date_mouvement,
     ms.description_qualite,
     ms.designation,
@@ -13,9 +16,9 @@ SELECT
     d.nom AS nom_depot,
     liv.id_livraison,
     liv.date_ AS date_livraison,
-    c.id_commande,
-    c.date_ AS date_commande,
-    c.remise,
+    cmd.id_commande,
+    cmd.date_ AS date_commande,
+    cmd.remise,
     p.id_proforma,
     p.date_debut AS date_debut_proforma,
     p.date_fin AS date_fin_proforma,
@@ -30,11 +33,12 @@ FROM
     mvt_stock_lot msl
     INNER JOIN lot l ON msl.id_lot = l.id_lot
     INNER JOIN article a ON l.id_article = a.id_article
+    INNER JOIN categorie c ON a.id_categorie = c.id_categorie
     INNER JOIN mvt_stock ms ON msl.id_mvt = ms.id_mvt
     INNER JOIN depot d ON ms.id_depot = d.id_depot
     LEFT JOIN livraison liv ON ms.id_livraison = liv.id_livraison
-    LEFT JOIN commande c ON liv.id_commande = c.id_commande
-    LEFT JOIN proforma p ON c.id_proforma = p.id_proforma
+    LEFT JOIN commande cmd ON liv.id_commande = cmd.id_commande
+    LEFT JOIN proforma p ON cmd.id_proforma = p.id_proforma
     LEFT JOIN proforma_detail pd ON (p.id_proforma = pd.id_proforma AND a.id_article = pd.id_article)
     LEFT JOIN fournisseur f ON p.id_fournisseur = f.id_fournisseur
     LEFT JOIN client cl ON p.id_client = cl.id_client
@@ -43,15 +47,21 @@ WHERE
 ORDER BY 
     ms.date_ DESC, msl.id_mvt, msl.id_lot;
 
-    
+
+
+
+-- Vue pour les mouvements de stock SORTANTS
 CREATE VIEW v_sortie_stock_lot AS
 SELECT 
     msl.id_mvt,
     msl.id_lot,
     l.libelle AS libelle_lot,
     l.qte AS quantite_lot,
+    l.qte_initiale AS quantite_initiale_lot,
     a.id_article,
     a.libelle AS libelle_article,
+    c.id_categorie,
+    c.libelle AS libelle_categorie,
     ms.date_ AS date_mouvement,
     ms.description_qualite,
     ms.designation,
@@ -61,6 +71,7 @@ FROM
     mvt_stock_lot msl
     INNER JOIN lot l ON msl.id_lot = l.id_lot
     INNER JOIN article a ON l.id_article = a.id_article
+    INNER JOIN categorie c ON a.id_categorie = c.id_categorie
     INNER JOIN mvt_stock ms ON msl.id_mvt = ms.id_mvt
     INNER JOIN depot d ON ms.id_depot = d.id_depot
 WHERE 

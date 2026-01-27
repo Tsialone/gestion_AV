@@ -50,7 +50,7 @@ CREATE TABLE lot(
    id_lot SERIAL,
    libelle VARCHAR(255) ,
    qte INTEGER,
-   qte_init INTEGER NOT NULL,
+   qte_initiale INTEGER NOT NULL,
    id_article INTEGER,
    PRIMARY KEY(id_lot),
    FOREIGN KEY(id_article) REFERENCES article(id_article)
@@ -134,13 +134,14 @@ CREATE TABLE commande(
 );
 
 CREATE TABLE livraison(
-   id_livraison VARCHAR(50) ,
+   id_livraison SERIAL,
    date_ TIMESTAMP NOT NULL,
    id_commande INTEGER NOT NULL,
    PRIMARY KEY(id_livraison),
    UNIQUE(id_commande),
    FOREIGN KEY(id_commande) REFERENCES commande(id_commande)
 );
+
 
 CREATE TABLE utilisateur(
    id_utilisateur SERIAL,
