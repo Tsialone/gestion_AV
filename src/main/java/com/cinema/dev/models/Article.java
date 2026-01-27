@@ -18,4 +18,7 @@ public class Article {
 
     @Column(name = "libelle", length = 255)
     private String libelle;
+
+    @Column(name = "id_categorie", length = 255)
+    private Integer idCategorie;
 }

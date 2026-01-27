@@ -34,4 +34,6 @@ public class Utilisateur {
 
     @Column(name = "id_dept", nullable = false)
     private Integer idDept;
+
+    
 }

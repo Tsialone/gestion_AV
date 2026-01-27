@@ -3,13 +3,10 @@ CREATE DATABASE gestion_db;
 \c gestion_db;
 
 CREATE TABLE article(
- id_article SERIAL,
+   id_article SERIAL,
    libelle VARCHAR(255) ,
-   id_categorie INTEGER NOT NULL,
-   PRIMARY KEY(id_article),
-   FOREIGN KEY(id_categorie) REFERENCES categorie(id_categorie)
+   PRIMARY KEY(id_article)
 );
-
 
 CREATE TABLE categorie(
    id_categorie SERIAL,
@@ -240,6 +237,14 @@ CREATE TABLE mvt_caisse(
    FOREIGN KEY(id_caisse) REFERENCES caisse(id_caisse)
 );
 
+CREATE TABLE article_categorie(
+   id_article INTEGER,
+   id_categorie INTEGER,
+   PRIMARY KEY(id_article, id_categorie),
+   FOREIGN KEY(id_article) REFERENCES article(id_article),
+   FOREIGN KEY(id_categorie) REFERENCES categorie(id_categorie)
+);
+
 CREATE TABLE proforma_detail(
    id_article INTEGER,
    id_proforma INTEGER,
@@ -300,3 +305,5 @@ CREATE TABLE restriction_fournisseur(
    FOREIGN KEY(id_fournisseur) REFERENCES fournisseur(id_fournisseur),
    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
+
+Creer une vue qui va lister les mvt_stock_lot avec la table lot, avec article
