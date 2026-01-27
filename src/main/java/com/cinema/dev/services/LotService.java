@@ -20,9 +20,12 @@ public class LotService {
     private final LotRepository lotRepository;
     private final ArticleRepository articleRepository;
 
+    public Integer getQttRestantDansLotApresSortie(Integer idLot, Integer qteSortie) throws Exception {
+        Lot lot = lotRepository.findById(idLot).orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
+        Integer qteRestant = lot.getQte() - qteSortie;
+        return qteRestant >= 0 ? qteRestant : 0;
+    }
 
-
-    
     public List<Lot> creeLots(Integer nombre, HashMap<Integer, Integer> articleQt) throws Exception {
 
         List<Lot> resp = new ArrayList<>();
@@ -30,13 +33,15 @@ public class LotService {
             Lot lot = new Lot();
             Integer idArticle = articleQt.keySet().iterator().next();
             Integer qte = articleQt.get(idArticle);
-            Article article =   articleRepository.findById(idArticle).orElseThrow(() -> new Exception("Article non trouvé: " + idArticle));
+            Article article = articleRepository.findById(idArticle)
+                    .orElseThrow(() -> new Exception("Article non trouvé: " + idArticle));
             if (qte <= 0) {
                 throw new Exception("Quantité invalide pour l'article: " + idArticle);
             }
 
             lot.setIdArticle(idArticle);
             lot.setQte(qte);
+            lot.setQteInitiale(qte);
             lot.setLibelle(article.getLibelle() + " - Lot " + (i + 1));
             resp.add(lotRepository.save(lot));
         }

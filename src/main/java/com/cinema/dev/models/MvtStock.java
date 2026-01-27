@@ -29,8 +29,8 @@ public class MvtStock {
     @Column(name = "designation", length = 200)
     private String designation;
 
-    @Column(name = "id_livraison", length = 50)
-    private String idLivraison;
+    @Column(name = "id_livraison")
+    private Integer idLivraison;
 
     @Column(name = "id_depot", nullable = false)
     private Integer idDepot;
