@@ -13,8 +13,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Livraison {
     @Id
-    @Column(name = "id_livraison", length = 50)
-    private String idLivraison;
+    @Column(name = "id_livraison")
+    private Integer idLivraison;
 
     @Column(name = "date_", nullable = false)
     private LocalDateTime date;

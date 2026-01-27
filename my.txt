@@ -1,4 +1,3 @@
-cp /home/tsialone/Documents/Mr_TOVO/site2.loo  .
 
 
 - List<Lot> creerLots(Integer nombre> mapArticleNombre)  doneeeeeeeeeeeeee
@@ -9,13 +8,13 @@ cp /home/tsialone/Documents/Mr_TOVO/site2.loo  .
 - List<MvtStockLot> creerListeMvtStockEntreeLot(Integer idMvtStock, List<Lot> listeLots)  doneeeeeeeeeeeeee
 	-> insertion multiple dans la table mvt_stock_lot, mettre quantite de mvt_stock_lot la quantite dans chaque Lot dans listeLots
 
-- MvtStock creerMvtStockEntree(Date date, Boolean entrant, String descriptionQualite,String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable], Map<Integer idArticle, Integer nombre> mapArticleNombre)
-	-> Obtenir  List<Lot> listeLots avec creerLots(mapArticleNombre).
+- MvtStock creerMvtStockEntree(Date date, Boolean entrant, String descriptionQualite,String designation, Integer idLivraison[nullable], idDepot[not null], Integer idAjustement[nullable], Map<Integer idArticle, Integer nombre> mapArticleNombre) done
+	-> Obtenir  List<Lot> listeLots avec creerLots(mapArticleNombre). doneeeeeeeeeeeeeeee
 	-> inserer dans la table mvt_stock = retourner Integer idMvtStock(mettre true dans le boolen entrant)
 	-> Insertion avec creerListeMvtStockEntreeLot(idMvtStock,listeLots]
 	
-- int getQttRestantDansLotApresSortie(Integer idLot, int nombre)
-- MvtStockLot faireSortirDansLot(Integer idLot, int nombre, Integer idMvtStock) 
+- int getQttRestantDansLotApresSortie(Integer idLot, int nombre) doneeeeeeeeeeeeee
+- MvtStockLot faireSortirDansLot(Integer idLot, int nombre, Integer idMvtStock)  doneeeeeeeeeeeeee
 	-> int reste = getQttRestantDansLotApresSortie(idLot, nombre)
 	-> update qtt avec reste
 	-> insert dans la table mvt_stock_lot en utilisant idMvtStock

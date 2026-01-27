@@ -124,7 +124,7 @@ CREATE TABLE commande(
 );
 
 CREATE TABLE livraison(
-   id_livraison VARCHAR(50) ,
+   id_livraison SERIAL,
    date_ TIMESTAMP NOT NULL,
    id_commande INTEGER NOT NULL,
    PRIMARY KEY(id_livraison),
@@ -174,7 +174,7 @@ CREATE TABLE mvt_stock(
    entrant BOOLEAN NOT NULL,
    description_qualite VARCHAR(200) ,
    designation VARCHAR(200) ,
-   id_livraison VARCHAR(50) ,
+   id_livraison INTEGER,
    id_depot INTEGER NOT NULL,
    PRIMARY KEY(id_mvt),
    UNIQUE(id_livraison),
@@ -307,3 +307,4 @@ CREATE TABLE restriction_fournisseur(
    FOREIGN KEY(id_fournisseur) REFERENCES fournisseur(id_fournisseur),
    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
+

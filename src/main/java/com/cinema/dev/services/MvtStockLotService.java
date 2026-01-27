@@ -10,6 +10,7 @@ import com.cinema.dev.repositories.LotRepository;
 import com.cinema.dev.repositories.MvtStockLotRepository;
 import com.cinema.dev.repositories.MvtStockRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
@@ -24,6 +25,35 @@ import java.util.Optional;
 public class MvtStockLotService {
     private final MvtStockLotRepository mvtStockLotRepository;
     private final MvtStockRepository mvtStockRepository;
+    private final LotRepository lotRepository;
+    private final LotService lotService;
+
+    @Transactional
+    public MvtStockLot faireSortirDansLot(Integer idLot, Integer nombre, Integer idMvtStock) throws Exception {
+        Lot lot = lotRepository.findById(idLot)
+                .orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
+        Integer qteRestant = lotService.getQttRestantDansLotApresSortie(idLot, nombre);
+        if (qteRestant <= 0) {
+            throw new Exception("Quantité insuffisante dans le lot: " + idLot);
+        }
+        lot.setQte(qteRestant);
+        lotRepository.save(lot);
+        MvtStock mvtStock = mvtStockRepository.findById(idMvtStock).orElseThrow(() -> new Exception("MvtStock non trouvé: " + idMvtStock));
+        
+        if (mvtStock.getEntrant()){
+            throw new Exception("Le mouvement de stock doit être une sortie pour faire sortir des articles d'un lot: " + idMvtStock);
+        }
+        
+        MvtStockLot mvtStockLot = new MvtStockLot();
+        mvtStockLot.setQte(nombre);
+        MvtStockLotId mvtStockLotId = new MvtStockLotId();
+        mvtStockLotId.setIdLot(idLot);
+        mvtStockLotId.setIdMvt(idMvtStock);
+
+        mvtStockLot.setIdMvtStockLot(mvtStockLotId);
+
+        return mvtStockLotRepository.save(mvtStockLot);
+    }
 
     public List<MvtStockLot> creerListeMvtStockEntreeLot(Integer idMvtStock, List<Lot> listeLots) throws Exception {
         List<MvtStockLot> resp = new ArrayList<>();
