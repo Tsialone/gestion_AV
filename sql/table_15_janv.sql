@@ -2,19 +2,18 @@ DROP DATABASE IF EXISTS gestion_db;
 CREATE DATABASE gestion_db;
 \c gestion_db;
 
+CREATE TABLE categorie(
+   id_categorie SERIAL,
+   libelle VARCHAR(255) ,
+   PRIMARY KEY(id_categorie)
+);
+
 CREATE TABLE article(
  id_article SERIAL,
    libelle VARCHAR(255) ,
    id_categorie INTEGER NOT NULL,
    PRIMARY KEY(id_article),
    FOREIGN KEY(id_categorie) REFERENCES categorie(id_categorie)
-);
-
-
-CREATE TABLE categorie(
-   id_categorie SERIAL,
-   libelle VARCHAR(255) ,
-   PRIMARY KEY(id_categorie)
 );
 
 CREATE TABLE client(
@@ -51,9 +50,18 @@ CREATE TABLE lot(
    id_lot SERIAL,
    libelle VARCHAR(255) ,
    qte INTEGER,
+   qte_init INTEGER NOT NULL,
    id_article INTEGER,
    PRIMARY KEY(id_lot),
    FOREIGN KEY(id_article) REFERENCES article(id_article)
+);
+
+CREATE TABLE demande_achat(
+   id_da SERIAL,
+   date_demande DATE NOT NULL,
+   id_client INTEGER,
+   PRIMARY KEY(id_da),
+   FOREIGN KEY(id_client) REFERENCES client(id_client)
 );
 
 CREATE TABLE demande_achat(

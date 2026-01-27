@@ -18,9 +18,13 @@ public class Lot {
 
     @Column(name = "libelle", length = 255)
     private String libelle;
-
+    
     @Column(name = "qte")
     private Integer qte;
+    
+    
+        @Column(name = "qte_init")
+        private Integer qteInit;
 
     @Column(name = "id_article")
     private Integer idArticle;

@@ -306,4 +306,4 @@ CREATE TABLE restriction_fournisseur(
    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
 
-Creer une vue qui va lister les mvt_stock_lot avec la table lot, avec article
+Creer une vue qui va lister les mvt_stock_lot join la table lot, join article, join mvtstock et la tu va prendre uniquement ce qui sont rentrant avec le booleen rentrant, join livraison, join commande, join proforma pour obtnir le prix de chaque lot, c'est a dire le prix de chaque ligne dans la table mvt_stock_lot, en effet, un mvt_stock_lot d'entree fait creer a chaque fois un lot, creer moi cette vue.

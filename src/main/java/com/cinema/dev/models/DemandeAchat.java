@@ -1,5 +1,7 @@
 package com.cinema.dev.models;
 
+import java.time.LocalDate;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,4 +20,8 @@ public class DemandeAchat {
 
     @Column(name = "id_client")
     private Integer idClient;
+
+        @Column(name = "date_demande")
+    private LocalDate dateDemande;
+
 }
