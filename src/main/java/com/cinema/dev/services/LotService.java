@@ -19,6 +19,23 @@ import java.util.Optional;
 public class LotService {
     private final LotRepository lotRepository;
     private final ArticleRepository articleRepository;
+    
+    // private final MvtStockLotService mvtStockLotService;
+    
+
+    public List<Lot>  getLotsByArticleWithPositiveStock(Integer idArticle) {
+        List<Lot> lots = lotRepository.findByIdArticle(idArticle);
+        List<Lot> filteredLots = new ArrayList<>();
+        for (Lot lot : lots) {
+            if (lot.getQte() != null && lot.getQte() > 0
+            ) {
+                filteredLots.add(lot);
+            }
+        }
+        return filteredLots;
+    }
+    
+   
 
     public Integer getQttRestantDansLotApresSortie(Integer idLot, Integer qteSortie) throws Exception {
         Lot lot = lotRepository.findById(idLot).orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
