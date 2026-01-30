@@ -29,7 +29,7 @@ CREATE TABLE depot(
 );
 
 CREATE TABLE caisse(
-   id_caisse VARCHAR(50) ,
+   id_caisse SERIAL ,
    lieu VARCHAR(255) ,
    PRIMARY KEY(id_caisse)
 );
