@@ -235,7 +235,7 @@ CREATE TABLE mvt_caisse(
    credit NUMERIC(15,2)  ,
    date_ TIMESTAMP NOT NULL,
    id_paiement INTEGER NOT NULL,
-   id_caisse VARCHAR(50)  NOT NULL,
+   id_caisse INTEGER  NOT NULL,
    PRIMARY KEY(id_mvtc),
    UNIQUE(id_paiement),
    FOREIGN KEY(id_paiement) REFERENCES paiement(id_paiement),
@@ -282,6 +282,7 @@ CREATE TABLE demande_achat_detail(
 CREATE TABLE mvt_stock_lot(
    id_mvt INTEGER,
    id_lot INTEGER,
+   qte INTEGER,
    PRIMARY KEY(id_mvt, id_lot),
    FOREIGN KEY(id_mvt) REFERENCES mvt_stock(id_mvt),
    FOREIGN KEY(id_lot) REFERENCES lot(id_lot)
