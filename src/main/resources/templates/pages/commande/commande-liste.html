@@ -25,7 +25,12 @@
                     </thead>
                     <tbody>
                         <tr th:each="commande : ${commandes}">
-                            <td th:text="${commande.idCommande}"></td>
+                            <td>
+                                <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#commandeModal"
+                                        th:data-id="${commande.idCommande}" th:data-date="${commande.date}" th:data-proforma="${commande.idProforma}">
+                                    <span th:text="${commande.idCommande}"></span>
+                                </button>
+                            </td>
                             <td th:text="${#temporals.format(commande.date, 'dd/MM/yyyy HH:mm')}"></td>
                             <td th:text="'Proforma ' + ${commande.idProforma}"></td>
                             <td>
@@ -59,4 +64,75 @@
             </div>
         </div>
     </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="commandeModal" tabindex="-1" aria-labelledby="commandeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commandeModalLabel">Détails de la Commande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>ID Commande:</strong> <span id="modalCommandeId">-</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Proforma:</strong> <span id="modalCommandeProforma">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date:</strong> <span id="modalCommandeDate">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Articles:</strong>
+                            <div id="modalCommandeArticles" class="mt-2">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('commandeModal').addEventListener('show.bs.modal', function(e) {
+            const button = e.relatedTarget;
+            const idCommande = button.getAttribute('data-id');
+            const dateCommande = button.getAttribute('data-date');
+            const idProforma = button.getAttribute('data-proforma');
+            
+            document.getElementById('modalCommandeId').textContent = idCommande || '-';
+            document.getElementById('modalCommandeDate').textContent = dateCommande || '-';
+            document.getElementById('modalCommandeProforma').textContent = 'Proforma ' + (idProforma || '-');
+            
+            // Fetch details from API
+            fetch('/api/commande/' + idCommande)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.details) {
+                        const articlesHtml = data.details.length > 0 
+                            ? '<ul class="list-group mt-2">' + 
+                              data.details.map(detail => 
+                                '<li class="list-group-item">' + detail.libelle + ' - Quantité: ' + detail.quantite + '</li>'
+                              ).join('') + 
+                              '</ul>'
+                            : '<p class="text-muted">Aucun article</p>';
+                        document.getElementById('modalCommandeArticles').innerHTML = articlesHtml;
+                    } else {
+                        document.getElementById('modalCommandeArticles').textContent = 'Erreur de chargement';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalCommandeArticles').textContent = 'Erreur de chargement';
+                });
+        });
+    </script>
 </section>

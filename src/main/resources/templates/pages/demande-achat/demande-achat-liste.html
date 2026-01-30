@@ -30,7 +30,12 @@
                             <td colspan="3" class="text-center">Aucune demande d'achat disponible</td>
                         </tr>
                         <tr th:each="demande : ${demandesAchat}">
-                            <td th:text="${'DA' + demande.idDa}"></td>
+                            <td>
+                                <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#demandeModal" 
+                                        th:data-id="${demande.idDa}" th:data-client="${demande.idClient}" th:data-date="${demande.dateDemande}">
+                                    <span th:text="${'DA' + demande.idDa}"></span>
+                                </button>
+                            </td>
                             <td>
                                 <span th:if="${demande.idClient != null}" th:text="${'ID: ' + demande.idClient}"></span>
                                 <span th:if="${demande.idClient == null}">-</span>
@@ -42,4 +47,75 @@
             </div>
         </div>
     </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="demandeModal" tabindex="-1" aria-labelledby="demandeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="demandeModalLabel">Détails de la Demande d'Achat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>ID Demande:</strong> <span id="modalDemandeId">-</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Client/Fournisseur ID:</strong> <span id="modalDemandeClient">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date:</strong> <span id="modalDemandeDate">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Articles:</strong>
+                            <div id="modalDemandeArticles" class="mt-2">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('demandeModal').addEventListener('show.bs.modal', function(e) {
+            const button = e.relatedTarget;
+            const idDa = button.getAttribute('data-id');
+            const idClient = button.getAttribute('data-client');
+            const dateDemande = button.getAttribute('data-date');
+            
+            document.getElementById('modalDemandeId').textContent = 'DA' + idDa;
+            document.getElementById('modalDemandeClient').textContent = idClient || '-';
+            document.getElementById('modalDemandeDate').textContent = dateDemande || '-';
+            
+            // Fetch details from API
+            fetch('/api/demande-achat/' + idDa)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.details) {
+                        const articlesHtml = data.details.length > 0 
+                            ? '<ul class="list-group mt-2">' + 
+                              data.details.map(detail => 
+                                '<li class="list-group-item">' + detail.libelle + ' - Quantité: ' + detail.quantite + '</li>'
+                              ).join('') + 
+                              '</ul>'
+                            : '<p class="text-muted">Aucun article</p>';
+                        document.getElementById('modalDemandeArticles').innerHTML = articlesHtml;
+                    } else {
+                        document.getElementById('modalDemandeArticles').textContent = 'Erreur de chargement';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalDemandeArticles').textContent = 'Erreur de chargement';
+                });
+        });
+    </script>
 </section>

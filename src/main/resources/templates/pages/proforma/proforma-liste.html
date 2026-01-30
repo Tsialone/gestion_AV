@@ -29,7 +29,12 @@
                     </thead>
                     <tbody>
                         <tr th:each="proforma : ${proformas}">
-                            <td th:text="${proforma.idProforma}"></td>
+                            <td>
+                                <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#proformaModal"
+                                        th:data-id="${proforma.idProforma}" th:data-dateDebut="${proforma.dateDebut}" th:data-dateFin="${proforma.dateFin}">
+                                    <span th:text="${proforma.idProforma}"></span>
+                                </button>
+                            </td>
                             <td th:text="${#temporals.format(proforma.dateDebut, 'dd/MM/yyyy HH:mm')}"></td>
                             <td th:text="${#temporals.format(proforma.dateFin, 'dd/MM/yyyy HH:mm')}"></td>
                             <td>
@@ -53,4 +58,75 @@
             </div>
         </div>
     </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="proformaModal" tabindex="-1" aria-labelledby="proformaModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="proformaModalLabel">Détails du Proforma</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>ID Proforma:</strong> <span id="modalProformaId">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date Début:</strong> <span id="modalProformaDateDebut">-</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Date Fin:</strong> <span id="modalProformaDateFin">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Détails:</strong>
+                            <div id="modalProformaDetails" class="mt-2">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('proformaModal').addEventListener('show.bs.modal', function(e) {
+            const button = e.relatedTarget;
+            const idProforma = button.getAttribute('data-id');
+            const dateDebut = button.getAttribute('data-dateDebut');
+            const dateFin = button.getAttribute('data-dateFin');
+            
+            document.getElementById('modalProformaId').textContent = idProforma || '-';
+            document.getElementById('modalProformaDateDebut').textContent = dateDebut || '-';
+            document.getElementById('modalProformaDateFin').textContent = dateFin || '-';
+            
+            // Fetch details from API
+            fetch('/api/proforma/' + idProforma)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.details) {
+                        const detailsHtml = data.details.length > 0 
+                            ? '<ul class="list-group mt-2">' + 
+                              data.details.map(detail => 
+                                '<li class="list-group-item">' + detail.libelle + ' - Prix: ' + detail.prix + ' - Quantité: ' + detail.quantite + '</li>'
+                              ).join('') + 
+                              '</ul>'
+                            : '<p class="text-muted">Aucun détail</p>';
+                        document.getElementById('modalProformaDetails').innerHTML = detailsHtml;
+                    } else {
+                        document.getElementById('modalProformaDetails').textContent = 'Erreur de chargement';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalProformaDetails').textContent = 'Erreur de chargement';
+                });
+        });
+    </script>
 </section>
