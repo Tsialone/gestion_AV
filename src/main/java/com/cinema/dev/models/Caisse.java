@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 public class Caisse {
     @Id
     @Column(name = "id_caisse", length = 50)
-    private String idCaisse;
+    private Integer idCaisse;
 
     @Column(name = "lieu", length = 255)
     private String lieu;

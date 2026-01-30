@@ -30,7 +30,7 @@ public class PaiementService {
     }
 
     @Transactional
-    public Paiement payerCommande(Integer idCommande, String idCaisse, Paiement paiement, LocalDateTime dateMvtCaisse) {
+    public Paiement payerCommande(Integer idCommande, Integer idCaisse, Paiement paiement, LocalDateTime dateMvtCaisse) {
         //* -- Get commande and proforma to check client/fournisseur
         Commande commande = commandeRepository.findById(idCommande)
             .orElseThrow(() -> new IllegalArgumentException("Commande not found"));

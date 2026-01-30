@@ -31,7 +31,7 @@ public class PaiementController {
     @PostMapping("/payer")
     public String payerCommande(
             @RequestParam Integer idCommande,
-            @RequestParam String idCaisse,
+            @RequestParam Integer idCaisse,
             @RequestParam(required = false) LocalDateTime dateMvtCaisse,
             @ModelAttribute Paiement paiement) {
         
