@@ -1,0 +1,62 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Liste des Commandes</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <a th:href="@{/commande/creer}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nouvelle Commande
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID Commande</th>
+                            <th>Date Commande</th>
+                            <th>Proforma</th>
+                            <th>État</th>
+                            <th>Livraison</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="commande : ${commandes}">
+                            <td th:text="${commande.idCommande}"></td>
+                            <td th:text="${#temporals.format(commande.date, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="'Proforma ' + ${commande.idProforma}"></td>
+                            <td>
+                                <span class="badge bg-warning" th:each="etat : ${commandeEtats}" 
+                                      th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 1}">Créée</span>
+                                <span class="badge bg-success" th:each="etat : ${commandeEtats}" 
+                                      th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 2}">Validée</span>
+                            </td>
+                            <td>
+                                <form class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post">
+                                    <div class="input-group input-group-sm">
+                                        <input type="date" class="form-control form-control-sm" name="dateLivraison" placeholder="Date livraison">
+                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-check-circle"></i> Livrer
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <form th:action="@{/commande/valider/{id}(id=${commande.idCommande})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-check-circle"></i> Valider
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

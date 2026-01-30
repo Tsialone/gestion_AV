@@ -1,6 +1,9 @@
 package com.cinema.dev.controllers;
 
 import com.cinema.dev.services.CommandeService;
+import com.cinema.dev.repositories.ProformaRepository;
+import com.cinema.dev.repositories.CaisseRepository;
+import com.cinema.dev.repositories.CommandeEtatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,10 +17,35 @@ public class CommandeController {
     @Autowired
     private CommandeService commandeService;
     
+    @Autowired
+    private ProformaRepository proformaRepository;
+    
+    @Autowired
+    private CaisseRepository caisseRepository;
+    
+    @Autowired
+    private CommandeEtatRepository commandeEtatRepository;
+    
     @GetMapping("/liste")
     public String getListe(Model model) {
         model.addAttribute("commandes", commandeService.findAll());
+        model.addAttribute("commandeEtats", commandeEtatRepository.findAll());
         model.addAttribute("content", "pages/commande/commande-liste");
+        return "admin-layout";
+    }
+    
+    @GetMapping("/creer")
+    public String getCreer(Model model) {
+        model.addAttribute("proformas", proformaRepository.findAll());
+        model.addAttribute("content", "pages/commande/creation-commande");
+        return "admin-layout";
+    }
+    
+    @GetMapping("/paiement")
+    public String getPaiement(Model model) {
+        model.addAttribute("commandes", commandeService.findAll());
+        model.addAttribute("caisses", caisseRepository.findAll());
+        model.addAttribute("content", "pages/commande/payement-commande");
         return "admin-layout";
     }
     

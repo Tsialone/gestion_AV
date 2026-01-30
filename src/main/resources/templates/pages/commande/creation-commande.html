@@ -1,0 +1,47 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Créer une Commande</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/commande/creer/{id}(id=__)}" method="post" id="commandeForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="idProforma" class="form-label">Proforma <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idProforma" name="idProforma" required onchange="updateFormAction(this.value)">
+                            <option value="">-- Sélectionner un proforma --</option>
+                            <option th:each="proforma : ${proformas}" 
+                                    th:value="${proforma.idProforma}"
+                                    th:text="'Proforma ' + ${proforma.idProforma} + ' (' + ${#temporals.format(proforma.dateFin, 'dd/MM/yyyy')} + ')'">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dateCommande" class="form-label">Date Commande <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="dateCommande" name="dateCommande" required>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer la Commande
+                        </button>
+                        <a th:href="@{/commande/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function updateFormAction(idProforma) {
+            if (idProforma) {
+                document.getElementById('commandeForm').action = '/commande/creer/' + idProforma;
+            }
+        }
+    </script>
+</section>
