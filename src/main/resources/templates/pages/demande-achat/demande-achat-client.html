@@ -1,0 +1,72 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Nouvelle Demande d'Achat - Client</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/demande-achat/effectuer}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="idClient" class="form-label">Client <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idClient" name="idClient" required>
+                            <option value="">-- Sélectionner un client --</option>
+                            <option th:each="client : ${clients}" 
+                                    th:value="${client.idClient}"
+                                    th:text="${client.nom}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5>Articles à commander</h5>
+                        <div id="articlesContainer">
+                            <div class="row mb-3 article-row">
+                                <div class="col-md-8">
+                                    <label class="form-label">Article <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="idArticles" required>
+                                        <option value="">-- Sélectionner un article --</option>
+                                        <option th:each="article : ${articles}" 
+                                                th:value="${article.idArticle}"
+                                                th:text="${article.libelle}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Quantité <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="quantites" min="1" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="addArticleRow()">
+                            <i class="bi bi-plus-circle"></i> Ajouter un article
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Effectuer la demande
+                        </button>
+                        <a th:href="@{/demande-achat/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function addArticleRow() {
+            const container = document.getElementById('articlesContainer');
+            const newRow = document.querySelector('.article-row').cloneNode(true);
+            newRow.querySelector('select').value = '';
+            newRow.querySelector('input').value = '';
+            container.appendChild(newRow);
+        }
+    </script>
+</section>
