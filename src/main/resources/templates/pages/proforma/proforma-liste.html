@@ -1,0 +1,56 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Liste des Proformas</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <div class="btn-group" role="group">
+                    <a th:href="@{/proforma/creer-client}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouveau Proforma - Client
+                    </a>
+                    <a th:href="@{/proforma/creer-fournisseur}" class="btn btn-primary">
+                        <i class="bi bi-plus-circle"></i> Nouveau Proforma - Fournisseur
+                    </a>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>ID Proforma</th>
+                            <th>Date Début</th>
+                            <th>Date Fin</th>
+                            <th>État</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="proforma : ${proformas}">
+                            <td th:text="${proforma.idProforma}"></td>
+                            <td th:text="${#temporals.format(proforma.dateDebut, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="${#temporals.format(proforma.dateFin, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <span class="badge bg-warning" th:each="etat : ${proformaEtats}" 
+                                      th:if="${etat.id.idProforma == proforma.idProforma && etat.id.idEtat == 1}">Créé</span>
+                                <span class="badge bg-success" th:each="etat : ${proformaEtats}" 
+                                      th:if="${etat.id.idProforma == proforma.idProforma && etat.id.idEtat == 2}">Validé</span>
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <form th:action="@{/proforma/valider/{id}(id=${proforma.idProforma})}" method="post" style="display:inline;">
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-check-circle"></i> Valider
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

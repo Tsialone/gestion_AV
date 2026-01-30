@@ -3,6 +3,11 @@ package com.cinema.dev.controllers;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.models.ProformaDetail;
 import com.cinema.dev.services.ProformaService;
+import com.cinema.dev.repositories.ClientRepository;
+import com.cinema.dev.repositories.FournisseurRepository;
+import com.cinema.dev.repositories.ArticleRepository;
+import com.cinema.dev.repositories.DemandeAchatRepository;
+import com.cinema.dev.repositories.ProformaEtatRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,10 +22,44 @@ public class ProformaController {
     @Autowired
     private ProformaService proformaService;
     
+    @Autowired
+    private ClientRepository clientRepository;
+    
+    @Autowired
+    private FournisseurRepository fournisseurRepository;
+    
+    @Autowired
+    private ArticleRepository articleRepository;
+    
+    @Autowired
+    private DemandeAchatRepository demandeAchatRepository;
+    
+    @Autowired
+    private ProformaEtatRepository proformaEtatRepository;
+    
     @GetMapping("/liste")
     public String getListe(Model model) {
         model.addAttribute("proformas", proformaService.findAll());
+        model.addAttribute("proformaEtats", proformaEtatRepository.findAll());
         model.addAttribute("content", "pages/proforma/proforma-liste");
+        return "admin-layout";
+    }
+    
+    @GetMapping("/creer-client")
+    public String getCreerClient(Model model) {
+        model.addAttribute("clients", clientRepository.findAll());
+        model.addAttribute("articles", articleRepository.findAll());
+        model.addAttribute("demandesAchat", demandeAchatRepository.findAll());
+        model.addAttribute("content", "pages/proforma/creer-proforma-client");
+        return "admin-layout";
+    }
+    
+    @GetMapping("/creer-fournisseur")
+    public String getCreerFournisseur(Model model) {
+        model.addAttribute("fournisseurs", fournisseurRepository.findAll());
+        model.addAttribute("articles", articleRepository.findAll());
+        model.addAttribute("demandesAchat", demandeAchatRepository.findAll());
+        model.addAttribute("content", "pages/proforma/creer-proforma-fournisseur");
         return "admin-layout";
     }
     

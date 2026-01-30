@@ -1,0 +1,96 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Créer Proforma - Fournisseur</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/proforma/creer}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="idDemandeAchat" class="form-label">Demande d'Achat <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idDemandeAchat" name="idDemandeAchat" required>
+                            <option value="">-- Sélectionner une demande --</option>
+                            <option th:each="da : ${demandesAchat}" 
+                                    th:value="${da.idDa}"
+                                    th:text="'DA ' + ${da.idDa}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="idFournisseur" class="form-label">Fournisseur <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idFournisseur" name="idFournisseur" required>
+                            <option value="">-- Sélectionner un fournisseur --</option>
+                            <option th:each="fournisseur : ${fournisseurs}" 
+                                    th:value="${fournisseur.idFournisseur}"
+                                    th:text="${fournisseur.nom}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label for="dateDebut" class="form-label">Date Début <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="dateDebut" name="dateDebut" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dateFin" class="form-label">Date Fin <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="dateFin" name="dateFin" required>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5>Articles du Proforma</h5>
+                        <div id="articlesContainer">
+                            <div class="row mb-3 article-row">
+                                <div class="col-md-5">
+                                    <label class="form-label">Article <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="idArticles" required>
+                                        <option value="">-- Sélectionner un article --</option>
+                                        <option th:each="article : ${articles}" 
+                                                th:value="${article.idArticle}"
+                                                th:text="${article.libelle}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Quantité <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="quantites" min="1" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">P.U. <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" name="prix" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="addArticleRow()">
+                            <i class="bi bi-plus-circle"></i> Ajouter un article
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer Proforma
+                        </button>
+                        <a th:href="@{/proforma/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function addArticleRow() {
+            const container = document.getElementById('articlesContainer');
+            const newRow = document.querySelector('.article-row').cloneNode(true);
+            newRow.querySelectorAll('input, select').forEach(el => el.value = '');
+            container.appendChild(newRow);
+        }
+    </script>
+</section>
