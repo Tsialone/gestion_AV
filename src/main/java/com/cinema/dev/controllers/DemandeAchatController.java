@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import java.time.LocalDate;
 
 @Controller
 @RequestMapping("/demande-achat")
@@ -57,8 +58,9 @@ public class DemandeAchatController {
     }
     
     @PostMapping("/effectuer")
-    public String effectuerDemandeAchat(
+        public String effectuerDemandeAchat(
             @RequestParam(required = false) Integer idClient,
+            @RequestParam(required = false) Integer idFournisseur,
             @ModelAttribute DemandeAchat demandeAchat,
             @RequestParam Integer[] idArticles,
             @RequestParam Integer[] quantites) {
@@ -73,6 +75,10 @@ public class DemandeAchatController {
             details[i] = detail;
         }
         
+        if (demandeAchat.getDateDemande() == null) {
+            demandeAchat.setDateDemande(LocalDate.now());
+        }
+
         demandeAchatService.effectuerDemandeAchat(idClient, demandeAchat, details);
         return "redirect:/demande-achat/liste";
     }

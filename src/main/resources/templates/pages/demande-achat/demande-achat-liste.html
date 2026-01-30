@@ -23,13 +23,11 @@
                             <th>ID</th>
                             <th>Client / Fournisseur</th>
                             <th>Date</th>
-                            <th>Nombre de lignes</th>
-                            <th>Etat</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${demandesAchat == null or #lists.isEmpty(demandesAchat)}">
-                            <td colspan="5" class="text-center">Aucune demande d'achat disponible</td>
+                            <td colspan="3" class="text-center">Aucune demande d'achat disponible</td>
                         </tr>
                         <tr th:each="demande : ${demandesAchat}">
                             <td th:text="${'DA' + demande.idDa}"></td>
@@ -37,9 +35,7 @@
                                 <span th:if="${demande.idClient != null}" th:text="${'ID: ' + demande.idClient}"></span>
                                 <span th:if="${demande.idClient == null}">-</span>
                             </td>
-                            <td th:text="${demande.dateDemande != null ? #dates.format(demande.dateDemande, 'yyyy-MM-dd') : '-'}"></td>
-                            <td th:text="${demande.details != null ? demande.details.size() : 0}"></td>
-                            <td th:text="${demande.etat != null ? demande.etat.libelle : '-'}"></td>
+                            <td th:text="${demande.dateDemande != null ? demande.dateDemande : '-'}"></td>
                         </tr>
                     </tbody>
                 </table>
