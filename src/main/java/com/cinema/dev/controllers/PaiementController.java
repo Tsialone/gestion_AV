@@ -29,12 +29,8 @@ public class PaiementController {
     }
     
     @PostMapping("/payer")
-    public String payerCommande(
-            @RequestParam Integer idCommande,
-            @RequestParam Integer idCaisse,
-            @RequestParam(required = false) LocalDateTime dateMvtCaisse,
-            @ModelAttribute Paiement paiement) {
-        
+    public String payerCommande(@RequestParam Integer idCommande, @RequestParam Integer idCaisse, 
+                                @RequestParam(required = false) LocalDateTime dateMvtCaisse, @ModelAttribute Paiement paiement) {
         paiementService.payerCommande(idCommande, idCaisse, paiement, dateMvtCaisse);
         return "redirect:/paiement/liste";
     }

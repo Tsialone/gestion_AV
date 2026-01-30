@@ -25,6 +25,9 @@ public class PaiementService {
     @Autowired
     private ProformaRepository proformaRepository;
     
+    @Autowired
+    private ProformaDetailRepository proformaDetailRepository;
+    
     public List<Paiement> findAll() {
         return paiementRepository.findAll();
     }
@@ -38,9 +41,19 @@ public class PaiementService {
         Proforma proforma = proformaRepository.findById(commande.getIdProforma())
             .orElseThrow(() -> new IllegalArgumentException("Proforma not found"));
         
+        //* -- Validate montant against remaining to pay
+        LocalDateTime checkDate = dateMvtCaisse != null ? dateMvtCaisse : LocalDateTime.now();
+        BigDecimal reste = getMontantTotalPourUneCommande(idCommande, checkDate);
+        if (paiement.getMontant() == null) {
+            throw new IllegalArgumentException("Paiement montant is null");
+        }
+        if (paiement.getMontant().compareTo(reste) > 0) {
+            throw new IllegalArgumentException("Montant du paiement dépasse le reste à payer: reste=" + reste);
+        }
+
         //* -- Set idCommande
         paiement.setIdCommande(idCommande);
-        
+
         //* -- Insert paiement
         Paiement savedPaiement = paiementRepository.save(paiement);
         
@@ -63,5 +76,30 @@ public class PaiementService {
         mvtCaisseRepository.save(mvtCaisse);
         
         return savedPaiement;
+    }
+
+    public BigDecimal getMontantTotalPourUneCommande(Integer idCommande, LocalDateTime date) {
+        // Sum total amount of the related proforma (prix * quantite)
+        Commande commande = commandeRepository.findById(idCommande)
+            .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
+
+        Integer idProforma = commande.getIdProforma();
+        if (idProforma == null) {
+            throw new IllegalArgumentException("Commande has no proforma linked");
+        }
+
+        BigDecimal totalProforma = proformaDetailRepository.sumTotalByProforma(idProforma);
+        if (totalProforma == null) {
+            totalProforma = BigDecimal.ZERO;
+        }
+
+        LocalDateTime effectiveDate = date != null ? date : LocalDateTime.now();
+        BigDecimal sommePaiements = paiementRepository.sumMontantByIdCommandeBeforeDate(idCommande, effectiveDate);
+        if (sommePaiements == null) {
+            sommePaiements = BigDecimal.ZERO;
+        }
+
+        BigDecimal reste = totalProforma.subtract(sommePaiements);
+        return reste.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : reste;
     }
 }
