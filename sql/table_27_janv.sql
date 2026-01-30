@@ -1,6 +1,5 @@
-   DROP DATABASE IF EXISTS gestion_db;
-   CREATE DATABASE gestion_db;
-   \c gestion_db;
+   DROP SCHEMA IF EXISTS public CASCADE;
+   CREATE SCHEMA public;
 
    CREATE TABLE categorie(
       id_categorie SERIAL,
