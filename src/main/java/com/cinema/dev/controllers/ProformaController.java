@@ -38,9 +38,20 @@ public class ProformaController {
     private ProformaEtatRepository proformaEtatRepository;
     
     @GetMapping("/liste")
-    public String getListe(Model model) {
-        model.addAttribute("proformas", proformaService.findAll());
+    public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, 
+                           @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate, Model model) {
+        
+        LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
+        LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
+        
+        model.addAttribute("proformas", proformaService.findWithFilters(idClient, idFournisseur, start, end));
+        model.addAttribute("clients", clientRepository.findAll());
+        model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("proformaEtats", proformaEtatRepository.findAll());
+        model.addAttribute("filterIdClient", idClient);
+        model.addAttribute("filterIdFournisseur", idFournisseur);
+        model.addAttribute("filterStartDate", startDate);
+        model.addAttribute("filterEndDate", endDate);
         model.addAttribute("content", "pages/proforma/proforma-liste");
         return "admin-layout";
     }

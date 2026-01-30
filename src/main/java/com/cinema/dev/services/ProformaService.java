@@ -27,6 +27,10 @@ public class ProformaService {
         return proformaRepository.findAll();
     }
     
+    public List<Proforma> findWithFilters(Integer idClient, Integer idFournisseur, LocalDateTime startDate, LocalDateTime endDate) {
+        return proformaRepository.findWithFilters(idClient, idFournisseur, startDate, endDate);
+    }
+    
     @Transactional
     public Proforma creerProforma(Integer idDemandeAchat, Integer idClient, Integer idFournisseur, 
                                   Proforma proforma, ProformaDetail[] proformaDetails, LocalDateTime dateCreation) {

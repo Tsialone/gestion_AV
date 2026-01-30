@@ -15,6 +15,35 @@
             </div>
         </div>
 
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/demande-achat/liste}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="filterIdClient" class="form-label">Client</label>
+                    <select id="filterIdClient" name="idClient" class="form-select">
+                        <option value="">Tous les clients</option>
+                        <option th:each="client : ${clients}" 
+                                th:value="${client.idClient}" 
+                                th:text="${client.nom}"
+                                th:selected="${filterIdClient != null and filterIdClient == client.idClient}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="date" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="date" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
         <div class="card-body">
             <div class="table-responsive">
                 <table class="table table-striped align-middle">
@@ -23,11 +52,12 @@
                             <th>ID</th>
                             <th>Client / Fournisseur</th>
                             <th>Date</th>
+                            <th>Actions</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr th:if="${demandesAchat == null or #lists.isEmpty(demandesAchat)}">
-                            <td colspan="3" class="text-center">Aucune demande d'achat disponible</td>
+                            <td colspan="4" class="text-center">Aucune demande d'achat disponible</td>
                         </tr>
                         <tr th:each="demande : ${demandesAchat}">
                             <td>
@@ -41,6 +71,12 @@
                                 <span th:if="${demande.idClient == null}">-</span>
                             </td>
                             <td th:text="${demande.dateDemande != null ? demande.dateDemande : '-'}"></td>
+                            <td>
+                                <a th:href="${demande.idClient != null ? '/proforma/creer-client?idDa=' + demande.idDa : '/proforma/creer-fournisseur?idDa=' + demande.idDa}" 
+                                   class="btn btn-sm btn-info">
+                                    <i class="bi bi-file-earmark-plus"></i> Créer Proforma
+                                </a>
+                            </td>
                         </tr>
                     </tbody>
                 </table>

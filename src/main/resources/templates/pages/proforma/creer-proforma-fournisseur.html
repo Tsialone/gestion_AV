@@ -86,6 +86,76 @@
     </div>
 
     <script>
+        // Get idDa from URL params if present
+        const urlParams = new URLSearchParams(window.location.search);
+        const idDaParam = urlParams.get('idDa');
+        
+        // Auto-fill on page load if idDa is in URL
+        window.addEventListener('load', function() {
+            if (idDaParam) {
+                document.getElementById('idDemandeAchat').value = idDaParam;
+                populateProformaForm(parseInt(idDaParam));
+            }
+        });
+        
+        // Listen to DA selection changes
+        document.getElementById('idDemandeAchat').addEventListener('change', function(e) {
+            if (e.target.value) {
+                populateProformaForm(parseInt(e.target.value));
+            }
+        });
+        
+        function populateProformaForm(idDa) {
+            // Fetch demande details from API
+            fetch('/api/demande-achat/' + idDa)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Note: For fournisseur form, idClient is not set since this is a fournisseur-based demande
+                        
+                        // Clear existing article rows
+                        const container = document.getElementById('articlesContainer');
+                        container.innerHTML = '';
+                        
+                        // Populate articles from demande details
+                        if (data.details && data.details.length > 0) {
+                            data.details.forEach((detail, index) => {
+                                if (index === 0) {
+                                    // Use the first existing row
+                                    const firstRow = document.querySelector('.article-row');
+                                    const articleSelect = firstRow.querySelector('select[name="idArticles"]');
+                                    const quantityInput = firstRow.querySelector('input[name="quantites"]');
+                                    
+                                    // Find article by libelle (name)
+                                    const allOptions = Array.from(articleSelect.options);
+                                    const matchingOption = allOptions.find(opt => opt.textContent.trim() === detail.libelle);
+                                    if (matchingOption) {
+                                        articleSelect.value = matchingOption.value;
+                                    }
+                                    quantityInput.value = detail.quantite || '';
+                                } else {
+                                    // Add new rows for additional articles
+                                    addArticleRow();
+                                    const rows = document.querySelectorAll('.article-row');
+                                    const newRow = rows[rows.length - 1];
+                                    const articleSelect = newRow.querySelector('select[name="idArticles"]');
+                                    const quantityInput = newRow.querySelector('input[name="quantites"]');
+                                    
+                                    // Find article by libelle (name)
+                                    const allOptions = Array.from(articleSelect.options);
+                                    const matchingOption = allOptions.find(opt => opt.textContent.trim() === detail.libelle);
+                                    if (matchingOption) {
+                                        articleSelect.value = matchingOption.value;
+                                    }
+                                    quantityInput.value = detail.quantite || '';
+                                }
+                            });
+                        }
+                    }
+                })
+                .catch(error => console.error('Error fetching demande details:', error));
+        }
+        
         function addArticleRow() {
             const container = document.getElementById('articlesContainer');
             const newRow = document.querySelector('.article-row').cloneNode(true);

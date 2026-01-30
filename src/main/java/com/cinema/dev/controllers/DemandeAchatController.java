@@ -29,8 +29,17 @@ public class DemandeAchatController {
     private ArticleRepository articleRepository;
     
     @GetMapping("/liste")
-    public String getListe(Model model) {
-        model.addAttribute("demandesAchat", demandeAchatService.findAll());
+    public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) String startDate, 
+                          @RequestParam(required = false) String endDate, Model model) {
+        
+        LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
+        LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
+        
+        model.addAttribute("demandesAchat", demandeAchatService.findWithFilters(idClient, start, end));
+        model.addAttribute("clients", clientRepository.findAll());
+        model.addAttribute("filterIdClient", idClient);
+        model.addAttribute("filterStartDate", startDate);
+        model.addAttribute("filterEndDate", endDate);
         model.addAttribute("content", "pages/demande-achat/demande-achat-liste");
         return "admin-layout";
     }

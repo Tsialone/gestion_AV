@@ -26,6 +26,10 @@ public class CommandeService {
     public List<Commande> findAll() {
         return commandeRepository.findAll();
     }
+    
+    public List<Commande> findWithFilters(Integer idProforma, LocalDateTime startDate, LocalDateTime endDate) {
+        return commandeRepository.findWithFilters(idProforma, startDate, endDate);
+    }
 
     @Transactional
     public Commande creerCommande(Integer idProforma, LocalDateTime dateCommande) {

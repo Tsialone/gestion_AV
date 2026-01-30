@@ -27,9 +27,18 @@ public class CommandeController {
     private CommandeEtatRepository commandeEtatRepository;
     
     @GetMapping("/liste")
-    public String getListe(Model model) {
-        model.addAttribute("commandes", commandeService.findAll());
+    public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) String startDate, 
+                           @RequestParam(required = false) String endDate, Model model) {
+        
+        LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
+        LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
+        
+        model.addAttribute("commandes", commandeService.findWithFilters(idProforma, start, end));
+        model.addAttribute("proformas", proformaRepository.findAll());
         model.addAttribute("commandeEtats", commandeEtatRepository.findAll());
+        model.addAttribute("filterIdProforma", idProforma);
+        model.addAttribute("filterStartDate", startDate);
+        model.addAttribute("filterEndDate", endDate);
         model.addAttribute("content", "pages/commande/commande-liste");
         return "admin-layout";
     }

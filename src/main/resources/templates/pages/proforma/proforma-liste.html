@@ -4,6 +4,45 @@
             <h4 class="card-title">Liste des Proformas</h4>
         </div>
 
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/proforma/liste}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filterIdClient" class="form-label">Client</label>
+                    <select id="filterIdClient" name="idClient" class="form-select">
+                        <option value="">Tous les clients</option>
+                        <option th:each="client : ${clients}" 
+                                th:value="${client.idClient}" 
+                                th:text="${client.nom}"
+                                th:selected="${filterIdClient != null and filterIdClient == client.idClient}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterIdFournisseur" class="form-label">Fournisseur</label>
+                    <select id="filterIdFournisseur" name="idFournisseur" class="form-select">
+                        <option value="">Tous les fournisseurs</option>
+                        <option th:each="fournisseur : ${fournisseurs}" 
+                                th:value="${fournisseur.idFournisseur}" 
+                                th:text="${fournisseur.nom}"
+                                th:selected="${filterIdFournisseur != null and filterIdFournisseur == fournisseur.idFournisseur}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="datetime-local" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="datetime-local" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
         <div class="card-body">
             <div class="mb-3">
                 <div class="btn-group" role="group">

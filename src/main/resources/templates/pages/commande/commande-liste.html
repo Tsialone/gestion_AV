@@ -4,6 +4,35 @@
             <h4 class="card-title">Liste des Commandes</h4>
         </div>
 
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/commande/liste}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="filterIdProforma" class="form-label">Proforma</label>
+                    <select id="filterIdProforma" name="idProforma" class="form-select">
+                        <option value="">Tous les proformas</option>
+                        <option th:each="proforma : ${proformas}" 
+                                th:value="${proforma.idProforma}" 
+                                th:text="${'Proforma ' + proforma.idProforma}"
+                                th:selected="${filterIdProforma != null and filterIdProforma == proforma.idProforma}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="datetime-local" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-3">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="datetime-local" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
         <div class="card-body">
             <div class="mb-3">
                 <a th:href="@{/commande/creer}" class="btn btn-primary">
