@@ -2,6 +2,8 @@ package com.cinema.dev.controllers;
 
 import com.cinema.dev.models.Paiement;
 import com.cinema.dev.services.PaiementService;
+import com.cinema.dev.repositories.CommandeRepository;
+import com.cinema.dev.repositories.CaisseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +17,12 @@ public class PaiementController {
     @Autowired
     private PaiementService paiementService;
     
+    @Autowired
+    private CommandeRepository commandeRepository;
+    
+    @Autowired
+    private CaisseRepository caisseRepository;
+    
     @GetMapping("/liste")
     public String getListe(Model model) {
         model.addAttribute("paiements", paiementService.findAll());
@@ -24,7 +32,9 @@ public class PaiementController {
     
     @GetMapping("/saisie")
     public String getSaisie(Model model) {
-        model.addAttribute("content", "pages/paiement/paiement-saisie");
+        model.addAttribute("commandes", commandeRepository.findAll());
+        model.addAttribute("caisses", caisseRepository.findAll());
+        model.addAttribute("content", "pages/commande/payement-commande");
         return "admin-layout";
     }
     
