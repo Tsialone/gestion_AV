@@ -1,0 +1,41 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Paiements</h4>
+            <div>
+                <a th:href="@{/paiement/saisie}" class="btn btn-sm btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Nouveau paiement
+                </a>
+                <a th:href="@{/paiement/liste}" class="btn btn-outline-primary btn-sm">
+                    <i class="bi bi-arrow-clockwise"></i> Rafraîchir
+                </a>
+            </div>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID Paiement</th>
+                            <th>ID Commande</th>
+                            <th>Montant</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${paiements == null or #lists.isEmpty(paiements)}">
+                            <td colspan="4" class="text-center">Aucun paiement disponible</td>
+                        </tr>
+                        <tr th:each="p : ${paiements}">
+                            <td th:text="${p.idPaiement}"></td>
+                            <td th:text="${p.idCommande}"></td>
+                            <td th:text="${p.montant}"></td>
+                            <td th:text="${p.date != null ? #dates.format(p.date, 'yyyy-MM-dd HH:mm') : '-'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
