@@ -16,7 +16,13 @@
         <div class="sidebar-menu">
             <ul class="menu">
                 <li class="sidebar-title">Menu</li>
-               
+
+                <li class="sidebar-item">
+                    <a th:href="@{/}" class='sidebar-link'>
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
 
                 <li class="sidebar-item  has-sub">
                     <a href="#" class='sidebar-link'>
@@ -28,8 +34,27 @@
                             <a th:href="@{/articles/liste}">Liste</a>
                         </li>
                     </ul>
+                </li>
 
-
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-bag-fill"></i>
+                        <span>Achats</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/liste}">Demandes Achat</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/liste}">Proformas</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/commande/liste}">Commandes</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/paiement/liste}">Paiements</a>
+                        </li>
+                    </ul>
                 </li>
 
 
