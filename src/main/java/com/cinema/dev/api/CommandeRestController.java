@@ -1,9 +1,13 @@
 package com.cinema.dev.api;
 
 import com.cinema.dev.models.Commande;
+import com.cinema.dev.models.Proforma;
 import com.cinema.dev.models.ProformaDetail;
 import com.cinema.dev.repositories.CommandeRepository;
 import com.cinema.dev.repositories.ProformaDetailRepository;
+import com.cinema.dev.repositories.ProformaRepository;
+import com.cinema.dev.repositories.ClientRepository;
+import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.services.PaiementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,49 @@ public class CommandeRestController {
     
     @Autowired
     private ProformaDetailRepository proformaDetailRepository;
+    
+    @Autowired
+    private ProformaRepository proformaRepository;
+    
+    @Autowired
+    private ClientRepository clientRepository;
+    
+    @Autowired
+    private FournisseurRepository fournisseurRepository;
+    
+    @GetMapping("/proforma/{idProforma}")
+    public ResponseEntity<Map<String, Object>> getProformaDetails(@PathVariable Integer idProforma) {
+        try {
+            Proforma proforma = proformaRepository.findById(idProforma)
+                .orElseThrow(() -> new IllegalArgumentException("Proforma not found"));
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("idProforma", proforma.getIdProforma());
+            response.put("dateDebut", proforma.getDateDebut());
+            response.put("dateFin", proforma.getDateFin());
+            response.put("idClient", proforma.getIdClient());
+            response.put("idFournisseur", proforma.getIdFournisseur());
+            
+            // Fetch client or fournisseur name
+            if (proforma.getIdClient() != null) {
+                clientRepository.findById(proforma.getIdClient()).ifPresent(client -> {
+                    response.put("clientName", client.getNom());
+                });
+            } else if (proforma.getIdFournisseur() != null) {
+                fournisseurRepository.findById(proforma.getIdFournisseur()).ifPresent(fournisseur -> {
+                    response.put("fournisseurName", fournisseur.getNom());
+                });
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", false);
+            response.put("message", e.getMessage());
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
     
     @GetMapping("/{idCommande}/reste")
     public ResponseEntity<Map<String, Object>> getResteCommande(@PathVariable Integer idCommande) {
