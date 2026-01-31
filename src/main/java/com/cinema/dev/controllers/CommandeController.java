@@ -8,6 +8,7 @@ import com.cinema.dev.repositories.CommandeEtatRepository;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ProformaEtatRepository;
+import com.cinema.dev.repositories.LivraisonRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -17,6 +18,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/commande")
@@ -43,6 +46,9 @@ public class CommandeController {
     @Autowired
     private FournisseurRepository fournisseurRepository;
     
+    @Autowired
+    private LivraisonRepository livraisonRepository;
+    
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, @RequestParam(required = false) String startDate, 
                            @RequestParam(required = false) String endDate, Model model) {
@@ -50,7 +56,17 @@ public class CommandeController {
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
         
-        model.addAttribute("commandes", commandeService.findWithFilters(idProforma, start, end));
+        var commandes = commandeService.findWithFilters(idProforma, start, end);
+        model.addAttribute("commandes", commandes);
+        
+        // Create a map of commande ID to livraison for easy lookup in template
+        Map<Integer, Boolean> commandeLivraisons = commandes.stream()
+            .collect(Collectors.toMap(
+                c -> c.getIdCommande(),
+                c -> livraisonRepository.findByIdCommande(c.getIdCommande()).isPresent()
+            ));
+        model.addAttribute("commandeLivraisons", commandeLivraisons);
+        
         model.addAttribute("proformas", proformaRepository.findAll());
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());

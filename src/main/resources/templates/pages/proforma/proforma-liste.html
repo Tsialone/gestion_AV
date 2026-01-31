@@ -94,6 +94,11 @@
                                             <i class="bi bi-check-circle"></i> Valider
                                         </button>
                                     </form>
+                                    <!-- Show Créer Commande button only if validated (etat == 2) -->
+                                    <a th:href="@{/commande/creer(idProforma=${proforma.idProforma})}" class="btn btn-primary"
+                                       th:if="${proformaEtats.?[id.idProforma == __${proforma.idProforma}__ && id.idEtat == 2].size() > 0}">
+                                        <i class="bi bi-cart-plus"></i> Créer Commande
+                                    </a>
                                 </div>
                             </td>
                         </tr>

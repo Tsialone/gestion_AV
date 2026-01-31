@@ -125,9 +125,9 @@ public class DemandeAchatController {
                 demandeAchat.setDateDemande(LocalDate.now());
             }
 
-            // normalize: if idClient is null but idFournisseur provided, store fournisseur id in the same field
-            Integer partyId = (idClient != null) ? idClient : idFournisseur;
-            demandeAchatService.effectuerDemandeAchat(partyId, demandeAchat, details);
+            // For fournisseur demandes, idClient should remain null
+            // Only pass idClient when it's actually a client demande
+            demandeAchatService.effectuerDemandeAchat(idClient, demandeAchat, details);
             redirectAttributes.addFlashAttribute("toastMessage", "Demande d'achat créée avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
         } catch (IllegalArgumentException e) {

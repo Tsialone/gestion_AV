@@ -4,6 +4,7 @@ import com.cinema.dev.models.Paiement;
 import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.services.PaiementService;
+import com.cinema.dev.utils.BreadcrumbItem;
 import com.cinema.dev.repositories.CommandeRepository;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.ProformaRepository;
@@ -15,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -87,6 +89,13 @@ public class PaiementController {
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
         model.addAttribute("content", "pages/paiement/paiement-liste");
+
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Gestion Paiements");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Paiement", "/paiement/liste")
+        ));
+
         return "admin-layout";
     }
     
@@ -95,6 +104,12 @@ public class PaiementController {
         model.addAttribute("commandes", commandeRepository.findAll());
         model.addAttribute("caisses", caisseRepository.findAll());
         model.addAttribute("content", "pages/commande/payement-commande");
+
+        model.addAttribute("pageTitle", "Paiements Saisie");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Paiement", "/paiement/saisie")
+        ));
+
         return "admin-layout";
     }
     
