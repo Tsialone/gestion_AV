@@ -2,10 +2,13 @@ package com.cinema.dev.controllers;
 
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.repositories.ProformaRepository;
+import com.cinema.dev.models.Proforma;
+import com.cinema.dev.models.ProformaEtat;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.CommandeEtatRepository;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
+import com.cinema.dev.repositories.ProformaEtatRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -13,6 +16,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/commande")
@@ -23,6 +27,9 @@ public class CommandeController {
     
     @Autowired
     private ProformaRepository proformaRepository;
+
+    @Autowired
+    private ProformaEtatRepository proformaEtatRepository;
     
     @Autowired
     private CaisseRepository caisseRepository;
@@ -67,8 +74,13 @@ public class CommandeController {
     
     @GetMapping("/creer")
     public String getCreer(Model model) {
-        model.addAttribute("proformas", proformaRepository.findAll());
-        
+        List<Proforma> validatedP = proformaRepository.findAll().stream()
+            .filter(p -> proformaEtatRepository.existsByIdProformaAndIdEtat(p.getIdProforma(), 2) 
+                      && !proformaEtatRepository.existsByIdProformaAndIdEtat(p.getIdProforma(), 3))
+            .toList();
+
+        model.addAttribute("proformas", validatedP);
+
         // Page title and breadcrumbs
         model.addAttribute("pageTitle", "Nouvelle Commande");
         model.addAttribute("pageSubtitle", "Créer une nouvelle commande");

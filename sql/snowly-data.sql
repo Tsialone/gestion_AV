@@ -31,4 +31,5 @@ INSERT INTO caisse (id_caisse, lieu) VALUES
 INSERT INTO etat (libelle) VALUES
 ('Cree'),
 ('Valide'),
+('Commandee'),
 ('Payee');
