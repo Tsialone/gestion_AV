@@ -63,6 +63,19 @@
     </div>
 
     <script>
+        // Auto-select proforma from URL parameter on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const idProformaParam = urlParams.get('idProforma');
+            
+            if (idProformaParam) {
+                const selectElement = document.getElementById('idProforma');
+                selectElement.value = idProformaParam;
+                // Trigger the change event to load details
+                loadProformaDetails(idProformaParam);
+            }
+        });
+        
         function formatDateTimeForInput(dateString) {
             // dateString is in format: 2025-12-01T10:30:00
             // We need to format it as: 2025-12-01T10:30
