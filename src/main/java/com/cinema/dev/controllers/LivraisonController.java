@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/livraison")
@@ -44,6 +45,8 @@ public class LivraisonController {
                           @RequestParam(required = false) String type,
                           @RequestParam(required = false) String startDate,
                           @RequestParam(required = false) String endDate,
+                          @RequestParam(required = false, defaultValue = "idLivraison") String sortBy,
+                          @RequestParam(required = false, defaultValue = "desc") String sortDir,
                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
@@ -118,7 +121,30 @@ public class LivraisonController {
             }
         }
         
+        // Apply sorting
+        Comparator<Livraison> comparator = null;
+        switch (sortBy) {
+            case "idLivraison":
+                comparator = Comparator.comparing(Livraison::getIdLivraison);
+                break;
+            case "date":
+                comparator = Comparator.comparing(Livraison::getDate, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+            case "idCommande":
+                comparator = Comparator.comparing(Livraison::getIdCommande, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            filteredLivraisons.sort(comparator);
+        }
+        
         model.addAttribute("livraisons", filteredLivraisons);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("commandes", commandeRepository.findAll());
         model.addAttribute("livraisonTypes", livraisonTypes);
         model.addAttribute("partenaireNames", partenaireNames);

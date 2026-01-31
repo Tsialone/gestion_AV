@@ -8,5 +8,6 @@ import java.util.Optional;
 
 @Repository
 public interface LivraisonRepository extends JpaRepository<Livraison, Integer> {
+    boolean existsByIdCommande(Integer idCommande);
     Optional<Livraison> findByIdCommande(Integer idCommande);
 }

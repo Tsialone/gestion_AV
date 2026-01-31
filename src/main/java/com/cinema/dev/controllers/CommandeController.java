@@ -2,6 +2,8 @@ package com.cinema.dev.controllers;
 
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.repositories.ProformaRepository;
+import com.cinema.dev.models.Commande;
+import com.cinema.dev.models.Livraison;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.CommandeEtatRepository;
@@ -19,7 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/commande")
@@ -51,20 +53,58 @@ public class CommandeController {
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, @RequestParam(required = false) String startDate, 
-                           @RequestParam(required = false) String endDate, Model model) {
+                           @RequestParam(required = false) String endDate,
+                           @RequestParam(required = false, defaultValue = "idCommande") String sortBy,
+                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
         
         var commandes = commandeService.findWithFilters(idProforma, start, end);
+        
+        // Apply sorting
+        Comparator<Commande> comparator = null;
+        switch (sortBy) {
+            case "idCommande":
+                comparator = Comparator.comparing(Commande::getIdCommande);
+                break;
+            case "date":
+                comparator = Comparator.comparing(Commande::getDate, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+            case "idProforma":
+                comparator = Comparator.comparing(Commande::getIdProforma, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            commandes.sort(comparator);
+        }
+        
         model.addAttribute("commandes", commandes);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         
         // Create a map of commande ID to livraison object for easy lookup in template
-        Map<Integer, com.cinema.dev.models.Livraison> commandeLivraisons = commandes.stream()
-            .collect(Collectors.toMap(
-                c -> c.getIdCommande(),
-                c -> livraisonRepository.findByIdCommande(c.getIdCommande()).orElse(null)
-            ));
+        // Build map manually to handle null values properly
+        Map<Integer, Livraison> commandeLivraisons = new java.util.HashMap<>();
+        for (var commande : commandes) {
+            if (commande.getIdCommande() != null) {
+                commandeLivraisons.put(
+                    commande.getIdCommande(), 
+                    livraisonRepository.findByIdCommande(commande.getIdCommande()).orElse(null)
+                );
+            }
+        }
+
+        // Print map for debugging
+        for(var entry : commandeLivraisons.entrySet()) {
+            System.out.println("Commande ID: " + entry.getKey() + " => Livraison: " + entry.getValue());
+        }
+
         model.addAttribute("commandeLivraisons", commandeLivraisons);
         
         model.addAttribute("proformas", proformaRepository.findAll());

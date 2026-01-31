@@ -17,6 +17,8 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/proforma")
@@ -42,12 +44,40 @@ public class ProformaController {
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, 
-                           @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate, Model model) {
+                           @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
+                           @RequestParam(required = false, defaultValue = "idProforma") String sortBy,
+                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
         
-        model.addAttribute("proformas", proformaService.findWithFilters(idClient, idFournisseur, start, end));
+        List<Proforma> proformas = proformaService.findWithFilters(idClient, idFournisseur, start, end);
+        
+        // Apply sorting
+        Comparator<Proforma> comparator = null;
+        switch (sortBy) {
+            case "idProforma":
+                comparator = Comparator.comparing(Proforma::getIdProforma);
+                break;
+            case "dateDebut":
+                comparator = Comparator.comparing(Proforma::getDateDebut, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+            case "dateFin":
+                comparator = Comparator.comparing(Proforma::getDateFin, Comparator.nullsLast(Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            proformas.sort(comparator);
+        }
+        
+        model.addAttribute("proformas", proformas);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("proformaEtats", proformaEtatRepository.findAll());
