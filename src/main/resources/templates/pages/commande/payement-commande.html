@@ -127,6 +127,10 @@
                                 }
                                 const formattedDate = dateObj.toLocaleDateString('fr-FR') + ' ' + dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
                                 document.getElementById('commandeDate').textContent = formattedDate;
+                                
+                                // Set Date Paiement to commande date
+                                const isoDate = dateObj.toISOString().slice(0, 16);
+                                document.getElementById('datePaiement').value = isoDate;
                             }
                             
                             document.getElementById('proformaNum').textContent = data.idProforma || '-';

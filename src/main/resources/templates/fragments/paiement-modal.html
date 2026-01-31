@@ -135,11 +135,6 @@
             document.getElementById('modalPaiementReste').textContent = '-';
             document.getElementById('modalPaiementMaxAmount').textContent = '-';
             
-            // Set default date to now
-            const now = new Date();
-            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
-            document.getElementById('modalPaiementDatePaiement').value = now.toISOString().slice(0, 16);
-            
             // Fetch commande info
             fetch('/api/commande/proforma-by-commande/' + idCommande)
                 .then(response => response.json())
@@ -159,6 +154,10 @@
                             }
                             const formattedDate = dateObj.toLocaleDateString('fr-FR') + ' ' + dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
                             document.getElementById('modalPaiementCommandeDate').textContent = formattedDate;
+                            
+                            // Set Date Paiement to commande date
+                            const isoDate = dateObj.toISOString().slice(0, 16);
+                            document.getElementById('modalPaiementDatePaiement').value = isoDate;
                         }
                         
                         document.getElementById('modalPaiementProformaNum').textContent = data.idProforma || '-';
