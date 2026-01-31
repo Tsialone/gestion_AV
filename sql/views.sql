@@ -1,3 +1,5 @@
+\c gestion_db;
+
 CREATE OR REPLACE VIEW v_entree_stock_lot AS
 SELECT 
     msl.id_mvt,
