@@ -1,0 +1,124 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Créer une Commande</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/commande/creer/{id}(id=__)}" method="post" id="commandeForm">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="idProforma" class="form-label">Proforma <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idProforma" name="idProforma" required onchange="loadProformaDetails(this.value)">
+                            <option value="">-- Sélectionner un proforma --</option>
+                            <option th:each="proforma : ${proformas}" 
+                                    th:value="${proforma.idProforma}"
+                                    th:text="'Proforma ' + ${proforma.idProforma} + ' (' + ${#temporals.format(proforma.dateFin, 'dd/MM/yyyy')} + ')'">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dateCommande" class="form-label">Date Commande <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="dateCommande" name="dateCommande" required>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer la Commande
+                        </button>
+                        <a th:href="@{/commande/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Proforma Details Card -->
+    <div class="card mt-4" id="proformaDetailsCard" style="display: none;">
+        <div class="card-header">
+            <h4 class="card-title">Détails du Proforma</h4>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <strong>ID Proforma:</strong> <span id="detailIdProforma">-</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>Date Début:</strong> <span id="detailDateDebut">-</span>
+                </div>
+                <div class="col-md-4">
+                    <strong>Date Fin:</strong> <span id="detailDateFin">-</span>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-12">
+                    <strong>Partie:</strong> <span id="detailParty">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function formatDateTimeForInput(dateString) {
+            // dateString is in format: 2025-12-01T10:30:00
+            // We need to format it as: 2025-12-01T10:30
+            if (!dateString) return '';
+            return dateString.substring(0, 16);
+        }
+
+        function formatDateTimeForDisplay(dateString) {
+            // dateString is in format: 2025-12-01T10:30:00
+            // Format as: 01/12/2025 10:30
+            if (!dateString) return '-';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('fr-FR') + ' ' + date.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function loadProformaDetails(idProforma) {
+            if (!idProforma) {
+                document.getElementById('proformaDetailsCard').style.display = 'none';
+                document.getElementById('dateCommande').value = '';
+                return;
+            }
+
+            // Update form action
+            document.getElementById('commandeForm').action = '/commande/creer/' + idProforma;
+
+            // Fetch proforma details from API
+            fetch('/api/commande/proforma/' + idProforma)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Display details card
+                        document.getElementById('detailIdProforma').textContent = data.idProforma;
+                        document.getElementById('detailDateDebut').textContent = formatDateTimeForDisplay(data.dateDebut);
+                        document.getElementById('detailDateFin').textContent = formatDateTimeForDisplay(data.dateFin);
+                        
+                        // Display client or fournisseur name with ID
+                        let partyText = '-';
+                        if (data.clientName) {
+                            partyText = data.clientName + ' (Client_ID: ' + data.idClient + ')';
+                        } else if (data.fournisseurName) {
+                            partyText = data.fournisseurName + ' (Fournisseur_ID: ' + data.idFournisseur + ')';
+                        }
+                        document.getElementById('detailParty').textContent = partyText;
+                        document.getElementById('proformaDetailsCard').style.display = 'block';
+
+                        // Auto-fill date commande with dateDebut
+                        document.getElementById('dateCommande').value = formatDateTimeForInput(data.dateDebut);
+                    } else {
+                        console.error('Error loading proforma:', data.message);
+                        document.getElementById('proformaDetailsCard').style.display = 'none';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('proformaDetailsCard').style.display = 'none';
+                });
+        }
+    </script>
+</section>

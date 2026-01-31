@@ -1,0 +1,84 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Paiements</h4>
+            <div>
+                <a th:href="@{/paiement/saisie}" class="btn btn-sm btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Nouveau paiement
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/paiement/liste}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filterIdCommande" class="form-label">Commande</label>
+                    <select id="filterIdCommande" name="idCommande" class="form-select">
+                        <option value="">Toutes les commandes</option>
+                        <option th:each="commande : ${commandes}" 
+                                th:value="${commande.idCommande}" 
+                                th:text="'Commande ' + ${commande.idCommande}"
+                                th:selected="${filterIdCommande != null and filterIdCommande == commande.idCommande}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterType" class="form-label">Type</label>
+                    <select id="filterType" name="type" class="form-select">
+                        <option value="">Tous les types</option>
+                        <option value="client" th:selected="${filterType == 'client'}">Client</option>
+                        <option value="fournisseur" th:selected="${filterType == 'fournisseur'}">Fournisseur</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="datetime-local" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="datetime-local" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID Paiement</th>
+                            <th>ID Commande</th>
+                            <th>Type</th>
+                            <th>Partenaire</th>
+                            <th>Montant</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${paiements == null or #lists.isEmpty(paiements)}">
+                            <td colspan="6" class="text-center">Aucun paiement disponible</td>
+                        </tr>
+                        <tr th:each="p : ${paiements}">
+                            <td th:text="${p.idPaiement}"></td>
+                            <td>
+                                <a th:href="@{/commande/liste(idCommande=${p.idCommande})}" th:text="'Commande ' + ${p.idCommande}"></a>
+                            </td>
+                            <td>
+                                <span th:if="${paiementTypes[p.idPaiement] == 'client'}" class="badge bg-primary">Client</span>
+                                <span th:if="${paiementTypes[p.idPaiement] == 'fournisseur'}" class="badge bg-info">Fournisseur</span>
+                            </td>
+                            <td th:text="${partenaireNames[p.idPaiement] != null ? partenaireNames[p.idPaiement] : '-'}"></td>
+                            <td th:text="${p.montant} + ' Ar'"></td>
+                            <td th:text="${p.date != null ? #temporals.format(p.date, 'dd/MM/yyyy HH:mm') : '-'}"></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

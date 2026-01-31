@@ -1,0 +1,211 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Demandes d'Achat</h4>
+            <div>
+                <a th:href="@{/demande-achat/saisie-client}" class="btn btn-sm btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Faire demande (Client)
+                </a>
+                <a th:href="@{/demande-achat/saisie-fournisseur}" class="btn btn-sm btn-success me-2">
+                    <i class="bi bi-plus-circle"></i> Faire demande (Fournisseur)
+                </a>
+            </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/demande-achat/liste}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filterIdClient" class="form-label">Client</label>
+                    <select id="filterIdClient" name="idClient" class="form-select">
+                        <option value="">Tous les clients</option>
+                        <option th:each="client : ${clients}" 
+                                th:value="${client.idClient}" 
+                                th:text="${client.nom}"
+                                th:selected="${filterIdClient != null and filterIdClient == client.idClient}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterType" class="form-label">Type</label>
+                    <select id="filterType" class="form-select">
+                        <option value="">Tous les types</option>
+                        <option value="client">Client</option>
+                        <option value="fournisseur">Fournisseur</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="date" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="date" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Client</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${demandesAchat == null or #lists.isEmpty(demandesAchat)}">
+                            <td colspan="4" class="text-center">Aucune demande d'achat disponible</td>
+                        </tr>
+                        <tr th:each="demande : ${demandesAchat}">
+                            <td>
+                                <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#demandeModal" 
+                                        th:data-id="${demande.idDa}" th:data-client="${demande.idClient}" th:data-date="${demande.dateDemande}">
+                                    <span th:text="${'DA' + demande.idDa}"></span>
+                                </button>
+                            </td>
+                            <td>
+                                <span th:if="${demande.idClient != null and clientsMap.containsKey(demande.idClient)}"
+                                      th:text="${clientsMap[demande.idClient]}"></span>
+                                <span th:if="${demande.idClient == null or !clientsMap.containsKey(demande.idClient)}">-</span>
+                            </td>
+                            <td>
+                                <span th:if="${demande.idClient != null and clientsMap.containsKey(demande.idClient)}" class="badge bg-primary">Client</span>
+                                <span th:if="${demande.idClient == null or !clientsMap.containsKey(demande.idClient)}" class="badge bg-secondary">Fournisseur</span>
+                            </td>
+                            <td th:text="${demande.dateDemande != null ? demande.dateDemande : '-'}"></td>
+                            <td>
+                                <a th:href="${demande.idClient != null ? '/proforma/creer-client?idDa=' + demande.idDa : '/proforma/creer-fournisseur?idDa=' + demande.idDa}" 
+                                   class="btn btn-sm btn-info">
+                                    <i class="bi bi-file-earmark-plus"></i> Créer Proforma
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="demandeModal" tabindex="-1" aria-labelledby="demandeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="demandeModalLabel">Détails de la Demande d'Achat</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>ID Demande:</strong> <span id="modalDemandeId">-</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Client/Fournisseur ID:</strong> <span id="modalDemandeClient">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date:</strong> <span id="modalDemandeDate">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Articles:</strong>
+                            <div id="modalDemandeArticles" class="mt-2">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var clientsMap = /*[[${clientsMap}]]*/ {};
+        /*]]>*/
+    </script>
+
+    <script>
+        const filterTypeSelect = document.getElementById('filterType');
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        filterTypeSelect.addEventListener('change', function() {
+            const selectedType = this.value;
+            tableRows.forEach(row => {
+                if (row.querySelector('td:nth-child(3)') === null) {
+                    // Skip the empty message row
+                    return;
+                }
+                const typeCell = row.querySelector('td:nth-child(3)');
+                if (!typeCell) return;
+                
+                const typeBadge = typeCell.querySelector('.badge');
+                if (!typeBadge) return;
+                
+                const isClient = typeBadge.textContent.trim() === 'Client';
+                
+                if (selectedType === '') {
+                    row.style.display = '';
+                } else if (selectedType === 'client' && isClient) {
+                    row.style.display = '';
+                } else if (selectedType === 'fournisseur' && !isClient) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
+
+    <script>
+        document.getElementById('demandeModal').addEventListener('show.bs.modal', function(e) {
+            const button = e.relatedTarget;
+            const idDa = button.getAttribute('data-id');
+            const idClient = button.getAttribute('data-client');
+            const dateDemande = button.getAttribute('data-date');
+            
+            document.getElementById('modalDemandeId').textContent = 'DA' + idDa;
+            // resolve name from maps
+            let name = '-';
+            if (idClient) {
+                const clientId = parseInt(idClient);
+                name = (clientsMap.hasOwnProperty(clientId)) ? clientsMap[clientId] : '-';
+            }
+            document.getElementById('modalDemandeClient').textContent = name;
+            document.getElementById('modalDemandeDate').textContent = dateDemande || '-';
+            
+            // Fetch details from API
+            fetch('/api/demande-achat/' + idDa)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.details) {
+                        const articlesHtml = data.details.length > 0 
+                            ? '<ul class="list-group mt-2">' + 
+                              data.details.map(detail => 
+                                '<li class="list-group-item">' + detail.libelle + ' - Quantité: ' + detail.quantite + '</li>'
+                              ).join('') + 
+                              '</ul>'
+                            : '<p class="text-muted">Aucun article</p>';
+                        document.getElementById('modalDemandeArticles').innerHTML = articlesHtml;
+                    } else {
+                        document.getElementById('modalDemandeArticles').textContent = 'Erreur de chargement';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalDemandeArticles').textContent = 'Erreur de chargement';
+                });
+        });
+    </script>
+</section>

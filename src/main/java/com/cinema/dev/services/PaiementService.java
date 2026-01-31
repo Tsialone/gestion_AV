@@ -31,6 +31,32 @@ public class PaiementService {
     public List<Paiement> findAll() {
         return paiementRepository.findAll();
     }
+    
+    public List<Paiement> findWithFilters(Integer idCommande, String type, LocalDateTime startDate, LocalDateTime endDate) {
+        List<Paiement> allPaiements = paiementRepository.findWithFilters(idCommande, startDate, endDate);
+        
+        if (type == null || type.isEmpty()) {
+            return allPaiements;
+        }
+        
+        // Filter by type (client or fournisseur)
+        return allPaiements.stream()
+            .filter(p -> {
+                Commande cmd = commandeRepository.findById(p.getIdCommande()).orElse(null);
+                if (cmd == null || cmd.getIdProforma() == null) return false;
+                
+                Proforma proforma = proformaRepository.findById(cmd.getIdProforma()).orElse(null);
+                if (proforma == null) return false;
+                
+                if ("client".equals(type)) {
+                    return proforma.getIdClient() != null;
+                } else if ("fournisseur".equals(type)) {
+                    return proforma.getIdFournisseur() != null;
+                }
+                return true;
+            })
+            .toList();
+    }
 
     @Transactional
     public Paiement payerCommande(Integer idCommande, Integer idCaisse, Paiement paiement, LocalDateTime dateMvtCaisse) {
@@ -93,13 +119,32 @@ public class PaiementService {
             totalProforma = BigDecimal.ZERO;
         }
 
-        LocalDateTime effectiveDate = date != null ? date : LocalDateTime.now();
-        BigDecimal sommePaiements = paiementRepository.sumMontantByIdCommandeBeforeDate(idCommande, effectiveDate);
+        BigDecimal sommePaiements;
+        if (date != null) {
+            // Use date filter only if explicitly provided
+            sommePaiements = paiementRepository.sumMontantByIdCommandeBeforeDate(idCommande, date);
+        } else {
+            // Default: sum all payments regardless of date
+            sommePaiements = paiementRepository.sumMontantByIdCommande(idCommande);
+        }
         if (sommePaiements == null) {
             sommePaiements = BigDecimal.ZERO;
         }
 
         BigDecimal reste = totalProforma.subtract(sommePaiements);
         return reste.compareTo(BigDecimal.ZERO) < 0 ? BigDecimal.ZERO : reste;
+    }
+
+    public BigDecimal getTotalProforma(Integer idProforma) {
+        if (idProforma == null) {
+            return BigDecimal.ZERO;
+        }
+        BigDecimal total = proformaDetailRepository.sumTotalByProforma(idProforma);
+        return total != null ? total : BigDecimal.ZERO;
+    }
+
+    public BigDecimal getSommePaiements(Integer idCommande) {
+        BigDecimal sommePaiements = paiementRepository.sumMontantByIdCommande(idCommande);
+        return sommePaiements != null ? sommePaiements : BigDecimal.ZERO;
     }
 }

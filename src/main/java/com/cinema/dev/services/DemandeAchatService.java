@@ -5,6 +5,7 @@ import com.cinema.dev.models.DemandeAchatDetail;
 import com.cinema.dev.repositories.DemandeAchatRepository;
 import com.cinema.dev.repositories.DemandeAchatDetailRepository;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +23,10 @@ public class DemandeAchatService {
     
     public List<DemandeAchat> findAll() {
         return demandeAchatRepository.findAll();
+    }
+    
+    public List<DemandeAchat> findWithFilters(Integer idClient, LocalDate startDate, LocalDate endDate) {
+        return demandeAchatRepository.findWithFilters(idClient, startDate, endDate);
     }
 
     @Transactional

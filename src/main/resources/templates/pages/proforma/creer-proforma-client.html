@@ -1,0 +1,172 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Créer Proforma - Client</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/proforma/creer}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="idDemandeAchat" class="form-label">Demande d'Achat <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idDemandeAchat" name="idDemandeAchat" required>
+                            <option value="">-- Sélectionner une demande --</option>
+                            <option th:each="da : ${demandesAchat}" 
+                                    th:value="${da.idDa}"
+                                    th:text="'DA ' + ${da.idDa}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="idClient" class="form-label">Client <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idClient" name="idClient" required>
+                            <option value="">-- Sélectionner un client --</option>
+                            <option th:each="client : ${clients}" 
+                                    th:value="${client.idClient}"
+                                    th:text="${client.nom}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label for="dateDebut" class="form-label">Date Début <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="dateDebut" name="dateDebut" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="dateFin" class="form-label">Date Fin <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="dateFin" name="dateFin" required>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5>Articles du Proforma</h5>
+                        <div id="articlesContainer">
+                            <div class="row mb-3 article-row">
+                                <div class="col-md-5">
+                                    <label class="form-label">Article <span class="text-danger">*</span></label>
+                                    <select class="form-select" name="idArticles" required>
+                                        <option value="">-- Sélectionner un article --</option>
+                                        <option th:each="article : ${articles}" 
+                                                th:value="${article.idArticle}"
+                                                th:text="${article.libelle}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label">Quantité <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control" name="quantites" min="1" required>
+                                </div>
+                                <div class="col-md-3">
+                                    <label class="form-label">P.U. <span class="text-danger">*</span></label>
+                                    <input type="number" step="0.01" class="form-control" name="prix" min="0" required>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-sm btn-secondary" onclick="addArticleRow()">
+                            <i class="bi bi-plus-circle"></i> Ajouter un article
+                        </button>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Créer Proforma
+                        </button>
+                        <a th:href="@{/proforma/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Store template row before any modifications
+        let articleRowTemplate;
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            // Save the original template
+            articleRowTemplate = document.querySelector('.article-row').cloneNode(true);
+            
+            // Get idDa from URL params if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const idDaParam = urlParams.get('idDa');
+            
+            // Auto-fill on page load if idDa is in URL
+            if (idDaParam) {
+                document.getElementById('idDemandeAchat').value = idDaParam;
+                populateProformaForm(parseInt(idDaParam));
+            }
+            
+            // Listen to DA selection changes
+            document.getElementById('idDemandeAchat').addEventListener('change', function(e) {
+                if (e.target.value) {
+                    populateProformaForm(parseInt(e.target.value));
+                }
+            });
+        });
+        
+        function createArticleRow() {
+            const newRow = articleRowTemplate.cloneNode(true);
+            newRow.querySelectorAll('input, select').forEach(el => el.value = '');
+            return newRow;
+        }
+        
+        function populateProformaForm(idDa) {
+            // Fetch demande details from API
+            fetch('/api/demande-achat/' + idDa)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Set client
+                        document.getElementById('idClient').value = data.idClient || '';
+                        
+                        // Clear existing article rows
+                        const container = document.getElementById('articlesContainer');
+                        container.innerHTML = '';
+                        
+                        // Populate articles from demande details
+                        if (data.details && data.details.length > 0) {
+                            data.details.forEach((detail) => {
+                                // Create a new row
+                                const newRow = createArticleRow();
+                                const articleSelect = newRow.querySelector('select[name="idArticles"]');
+                                const quantityInput = newRow.querySelector('input[name="quantites"]');
+                                
+                                // Find article by libelle (name)
+                                const allOptions = Array.from(articleSelect.options);
+                                const matchingOption = allOptions.find(opt => opt.textContent.trim() === detail.libelle);
+                                if (matchingOption) {
+                                    articleSelect.value = matchingOption.value;
+                                }
+                                quantityInput.value = detail.quantite || '';
+                                
+                                container.appendChild(newRow);
+                            });
+                        } else {
+                            // If no details, add empty row
+                            container.appendChild(createArticleRow());
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching demande details:', error);
+                    // Restore at least one empty row on error
+                    const container = document.getElementById('articlesContainer');
+                    if (container.children.length === 0) {
+                        container.appendChild(createArticleRow());
+                    }
+                });
+        }
+        
+        function addArticleRow() {
+            const container = document.getElementById('articlesContainer');
+            container.appendChild(createArticleRow());
+        }
+    </script>
+</section>

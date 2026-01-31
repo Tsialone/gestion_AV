@@ -1,0 +1,87 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Livraisons</h4>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/livraison/liste}" class="row g-3">
+                <div class="col-md-4">
+                    <label for="filterIdCommande" class="form-label">Commande</label>
+                    <select id="filterIdCommande" name="idCommande" class="form-select">
+                        <option value="">Toutes les commandes</option>
+                        <option th:each="commande : ${commandes}" 
+                                th:value="${commande.idCommande}" 
+                                th:text="'Commande ' + ${commande.idCommande}"
+                                th:selected="${filterIdCommande != null and filterIdCommande == commande.idCommande}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterType" class="form-label">Type</label>
+                    <select id="filterType" name="type" class="form-select">
+                        <option value="">Tous les types</option>
+                        <option value="client" th:selected="${filterType == 'client'}">Client</option>
+                        <option value="fournisseur" th:selected="${filterType == 'fournisseur'}">Fournisseur</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="datetime-local" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="datetime-local" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>ID Livraison</th>
+                            <th>Commande</th>
+                            <th>Type</th>
+                            <th>Partenaire</th>
+                            <th>Date Livraison</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${livraisons == null or #lists.isEmpty(livraisons)}">
+                            <td colspan="6" class="text-center">Aucune livraison disponible</td>
+                        </tr>
+                        <tr th:each="liv : ${livraisons}">
+                            <td th:text="${liv.idLivraison}"></td>
+                            <td>
+                                <a th:href="@{/commande/liste}" th:text="'Commande ' + ${commandeIds[liv.idLivraison]}"></a>
+                            </td>
+                            <td>
+                                <span th:if="${livraisonTypes[liv.idLivraison] == 'client'}" class="badge bg-primary">Client</span>
+                                <span th:if="${livraisonTypes[liv.idLivraison] == 'fournisseur'}" class="badge bg-info">Fournisseur</span>
+                            </td>
+                            <td th:text="${partenaireNames[liv.idLivraison] != null ? partenaireNames[liv.idLivraison] : '-'}"></td>
+                            <td>
+                                <i class="bi bi-truck text-success"></i>
+                                <span th:text="${liv.date != null ? #temporals.format(liv.date, 'dd/MM/yyyy HH:mm') : '-'}"></span>
+                            </td>
+                            <td>
+                                <a th:href="@{/commande/liste(idCommande=${commandeIds[liv.idLivraison]})}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="bi bi-eye"></i> Voir Commande
+                                </a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
