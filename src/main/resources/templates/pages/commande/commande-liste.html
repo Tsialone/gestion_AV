@@ -58,6 +58,9 @@
                             <th>Date Commande</th>
                             <th>Proforma</th>
                             <th>État</th>
+                            <th>Total à Payer</th>
+                            <th>Déjà Payé</th>
+                            <th>Reste à Payer</th>
                             <th>Livraison</th>
                             <th>Action</th>
                         </tr>
@@ -78,10 +81,13 @@
                                 <span class="badge bg-success" th:each="etat : ${commandeEtats}" 
                                       th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 2}">Validée</span>
                             </td>
+                            <td class="montant-total" th:data-commande-id="${commande.idCommande}">...</td>
+                            <td class="montant-paye" th:data-commande-id="${commande.idCommande}">...</td>
+                            <td class="montant-reste" th:data-commande-id="${commande.idCommande}">...</td>
                             <td>
                                 <form class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post">
                                     <div class="input-group input-group-sm">
-                                        <input type="date" class="form-control form-control-sm" name="dateLivraison" placeholder="Date livraison">
+                                        <input type="datetime-local" class="form-control form-control-sm" name="dateLivraison" placeholder="Date livraison">
                                         <button type="submit" class="btn btn-outline-success btn-sm">
                                             <i class="bi bi-check-circle"></i> Livrer
                                         </button>
@@ -90,11 +96,16 @@
                             </td>
                             <td>
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <form th:action="@{/commande/valider/{id}(id=${commande.idCommande})}" method="post" style="display:inline;">
-                                        <button type="submit" class="btn btn-success">
+                                    <!-- Only show Valider button if not already validated (etat != 2) -->
+                                    <form th:action="@{/commande/valider/{id}(id=${commande.idCommande})}" method="post" style="display:inline;"
+                                          th:unless="${commandeEtats.?[id.idCommande == __${commande.idCommande}__ && id.idEtat == 2].size() > 0}">
+                                        <button type="submit" class="btn btn-success btn-sm">
                                             <i class="bi bi-check-circle"></i> Valider
                                         </button>
                                     </form>
+                                    <a th:href="@{/paiement/saisie(idCommande=${commande.idCommande})}" class="btn btn-primary btn-sm">
+                                        <i class="bi bi-cash"></i> Payer
+                                    </a>
                                 </div>
                             </td>
                         </tr>
@@ -141,6 +152,23 @@
     </div>
 
     <script>
+        // Load payment info for all commandes
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.montant-total').forEach(cell => {
+                const commandeId = cell.getAttribute('data-commande-id');
+                fetch('/api/commande/' + commandeId + '/paiement-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.querySelector(`.montant-total[data-commande-id="${commandeId}"]`).textContent = data.total + ' Ar';
+                            document.querySelector(`.montant-paye[data-commande-id="${commandeId}"]`).textContent = data.paye + ' Ar';
+                            document.querySelector(`.montant-reste[data-commande-id="${commandeId}"]`).textContent = data.reste + ' Ar';
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    
         document.getElementById('commandeModal').addEventListener('show.bs.modal', function(e) {
             const button = e.relatedTarget;
             const idCommande = button.getAttribute('data-id');
