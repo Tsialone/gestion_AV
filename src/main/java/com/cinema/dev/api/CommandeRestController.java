@@ -2,11 +2,13 @@ package com.cinema.dev.api;
 
 import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Proforma;
+import com.cinema.dev.models.Livraison;
 import com.cinema.dev.repositories.CommandeRepository;
 import com.cinema.dev.repositories.ProformaDetailRepository;
 import com.cinema.dev.repositories.ProformaRepository;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
+import com.cinema.dev.repositories.LivraisonRepository;
 import com.cinema.dev.services.PaiementService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -38,6 +40,9 @@ public class CommandeRestController {
     
     @Autowired
     private FournisseurRepository fournisseurRepository;
+    
+    @Autowired
+    private LivraisonRepository livraisonRepository;
     
     @GetMapping("/proforma/{idProforma}")
     public ResponseEntity<Map<String, Object>> getProformaDetails(@PathVariable Integer idProforma) {
@@ -198,6 +203,37 @@ public class CommandeRestController {
                         });
                     }
                 }
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+    
+    @GetMapping("/{idCommande}/livraison-info")
+    public ResponseEntity<Map<String, Object>> getLivraisonInfo(@PathVariable Integer idCommande) {
+        try {
+            // Find livraison by idCommande
+            List<Livraison> livraisons = livraisonRepository.findAll().stream()
+                .filter(l -> l.getIdCommande().equals(idCommande))
+                .toList();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            
+            if (!livraisons.isEmpty()) {
+                Livraison livraison = livraisons.get(0);
+                Map<String, Object> livraisonData = new HashMap<>();
+                livraisonData.put("idLivraison", livraison.getIdLivraison());
+                livraisonData.put("date", livraison.getDate());
+                livraisonData.put("idCommande", livraison.getIdCommande());
+                response.put("livraison", livraisonData);
+            } else {
+                response.put("livraison", null);
             }
             
             return ResponseEntity.ok(response);

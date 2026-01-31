@@ -82,12 +82,21 @@
                             <td class="montant-total" th:data-commande-id="${commande.idCommande}">...</td>
                             <td class="montant-paye" th:data-commande-id="${commande.idCommande}">...</td>
                             <td class="montant-reste" th:data-commande-id="${commande.idCommande}">...</td>
-                            <td>
-                                <form class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post">
+                            <td class="livraison-cell" th:data-commande-id="${commande.idCommande}">
+                                <span class="livraison-date-display" style="display: none;">
+                                    <i class="bi bi-check-circle text-success"></i> 
+                                    <span class="date-text">-</span>
+                                </span>
+                                <form class="livraison-form d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post">
                                     <div class="input-group input-group-sm">
-                                        <input type="datetime-local" class="form-control form-control-sm" name="dateLivraison" placeholder="Date livraison">
+                                        <input type="datetime-local" 
+                                               class="form-control form-control-sm livraison-date-input" 
+                                               name="dateLivraison" 
+                                               th:min="${commande.date}"
+                                               th:value="${commande.date}"
+                                               required>
                                         <button type="submit" class="btn btn-outline-success btn-sm">
-                                            <i class="bi bi-check-circle"></i> Livrer
+                                            <i class="bi bi-truck"></i> Livrer
                                         </button>
                                     </div>
                                 </form>
@@ -164,6 +173,30 @@
                         }
                     })
                     .catch(error => console.error('Error:', error));
+            });
+            
+            // Load livraison status for all commandes
+            document.querySelectorAll('.livraison-cell').forEach(cell => {
+                const commandeId = cell.getAttribute('data-commande-id');
+                fetch('/api/commande/' + commandeId + '/livraison-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success && data.livraison) {
+                            // Livraison exists - show date, hide form
+                            const dateDisplay = cell.querySelector('.livraison-date-display');
+                            const form = cell.querySelector('.livraison-form');
+                            const dateText = cell.querySelector('.date-text');
+                            
+                            // Format date
+                            const dateLivraison = new Date(data.livraison.date);
+                            dateText.textContent = dateLivraison.toLocaleDateString('fr-FR') + ' ' + 
+                                                   dateLivraison.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                            
+                            dateDisplay.style.display = 'inline';
+                            form.style.display = 'none';
+                        }
+                    })
+                    .catch(error => console.error('Error loading livraison:', error));
             });
         });
     

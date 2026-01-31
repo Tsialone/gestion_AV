@@ -94,6 +94,7 @@ public class CommandeService {
     @Transactional
     public Livraison livrerCommande(Integer idCommande, LocalDateTime dateLivraison) {
         //* -- Check if commande exists
+        @SuppressWarnings("unused")
         Commande commande = commandeRepository.findById(idCommande)
             .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
         
