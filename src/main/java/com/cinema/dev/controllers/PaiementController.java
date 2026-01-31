@@ -4,12 +4,14 @@ import com.cinema.dev.models.Paiement;
 import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.services.PaiementService;
+import com.cinema.dev.services.SessionService;
 import com.cinema.dev.utils.BreadcrumbItem;
 import com.cinema.dev.repositories.CommandeRepository;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.ProformaRepository;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,6 +45,9 @@ public class PaiementController {
     
     @Autowired
     private FournisseurRepository fournisseurRepository;
+    
+    @Autowired
+    private SessionService sessionService;
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idCommande,
@@ -143,13 +148,18 @@ public class PaiementController {
     }
     
     @PostMapping("/payer")
-    public String payerCommande(@RequestParam Integer idCommande, @RequestParam Integer idCaisse, 
+    public String payerCommande(HttpSession session,
+                                @RequestParam Integer idCommande, @RequestParam Integer idCaisse, 
                                 @RequestParam(required = false) LocalDateTime dateMvtCaisse, @ModelAttribute Paiement paiement,
                                 RedirectAttributes redirectAttributes) {
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         try {
-            paiementService.payerCommande(idCommande, idCaisse, paiement, dateMvtCaisse);
+            paiementService.payerCommande(idUtilisateur, idCommande, idCaisse, paiement, dateMvtCaisse);
             redirectAttributes.addFlashAttribute("toastMessage", "Paiement enregistré avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");

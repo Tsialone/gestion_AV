@@ -37,36 +37,67 @@
                         </ul>
                     </li>
                 </ul>
-                <div class="dropdown">
+                <!-- User Menu with Quick Switch -->
+                <div class="dropdown" th:if="${currentUser != null}">
                     <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="user-menu d-flex">
                             <div class="user-name text-end me-3">
-                                <h6 class="mb-0 text-gray-600">John Ducky</h6>
-                                <p class="mb-0 text-sm text-gray-600">Administrator</p>
+                                <h6 class="mb-0 text-gray-600" th:text="${currentUser.nom}">Utilisateur</h6>
+                                <p class="mb-0 text-sm text-gray-600" th:text="${currentUser.roleDisplay}">Role - Dept</p>
                             </div>
                             <div class="user-img d-flex align-items-center">
                                 <div class="avatar avatar-md">
-                                    <img th:src="@{assets/images/faces/1.jpg}">
+                                    <span class="avatar-content bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                          style="width: 40px; height: 40px; font-weight: 600;"
+                                          th:text="${currentUser.nom != null ? currentUser.nom.substring(0, 1).toUpperCase() : 'U'}">U</span>
                                 </div>
                             </div>
                         </div>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton">
+                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">
                         <li>
-                            <h6 class="dropdown-header">Hello, John!</h6>
+                            <h6 class="dropdown-header">
+                                <i class="bi bi-person-circle me-2"></i>
+                                <span th:text="'Connecté: ' + ${currentUser.nom}">Utilisateur</span>
+                            </h6>
                         </li>
-                        <li><a class="dropdown-item" href="#"><i class="icon-mid bi bi-person me-2"></i> My
-                                Profile</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="icon-mid bi bi-gear me-2"></i>
-                                Settings</a></li>
-                        <li><a class="dropdown-item" href="#"><i class="icon-mid bi bi-wallet me-2"></i>
-                                Wallet</a></li>
                         <li>
-                            <hr class="dropdown-divider">
+                            <span class="dropdown-item-text small text-muted">
+                                <i class="bi bi-briefcase me-1"></i> <span th:text="${currentUser.roleNom}">Role</span>
+                                <br>
+                                <i class="bi bi-building me-1"></i> <span th:text="${currentUser.deptNom}">Dept</span>
+                                <br>
+                                <i class="bi bi-bar-chart me-1"></i> Niveau: <span th:text="${currentUser.roleNiveau}">0</span>
+                            </span>
                         </li>
-                        <li><a class="dropdown-item" th:href="@{/logout}"><i class="icon-mid bi bi-box-arrow-left me-2"></i>
-                                Logout</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <h6 class="dropdown-header">
+                                <i class="bi bi-arrow-repeat me-2"></i>Changer d'utilisateur
+                            </h6>
+                        </li>
+                        <li th:each="user : ${allUtilisateurs}" th:if="${user.idUtilisateur != currentUser.idUtilisateur}">
+                            <form th:action="@{/switch-user}" method="post" class="d-inline w-100">
+                                <input type="hidden" name="idUtilisateur" th:value="${user.idUtilisateur}">
+                                <button type="submit" class="dropdown-item">
+                                    <i class="bi bi-person me-2"></i>
+                                    <span th:text="${user.nom}">Nom</span>
+                                </button>
+                            </form>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item text-danger" th:href="@{/logout}">
+                                <i class="bi bi-box-arrow-left me-2"></i>Déconnexion
+                            </a>
+                        </li>
                     </ul>
+                </div>
+                <!-- Not logged in state -->
+                <div th:if="${currentUser == null}">
+                    <a th:href="@{/login}" class="btn btn-outline-primary btn-sm">
+                        <i class="bi bi-box-arrow-in-right me-1"></i>Se connecter
+                    </a>
                 </div>
             </div>
         </div>

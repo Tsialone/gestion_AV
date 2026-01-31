@@ -3,10 +3,12 @@ package com.cinema.dev.controllers;
 import com.cinema.dev.models.DemandeAchat;
 import com.cinema.dev.models.DemandeAchatDetail;
 import com.cinema.dev.services.DemandeAchatService;
+import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ArticleRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -34,6 +36,9 @@ public class DemandeAchatController {
     
     @Autowired
     private ArticleRepository articleRepository;
+    
+    @Autowired
+    private SessionService sessionService;
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) String startDate, 
@@ -133,12 +138,15 @@ public class DemandeAchatController {
     
     @PostMapping("/effectuer")
         public String effectuerDemandeAchat(
+            HttpSession session,
             @RequestParam(required = false) Integer idClient,
             @RequestParam(required = false) Integer idFournisseur,
             @ModelAttribute DemandeAchat demandeAchat,
             @RequestParam Integer[] idArticles,
             @RequestParam Integer[] quantites,
             RedirectAttributes redirectAttributes) {
+        
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         
         try {
             DemandeAchatDetail[] details = new DemandeAchatDetail[idArticles.length];
@@ -157,17 +165,21 @@ public class DemandeAchatController {
 
             // For fournisseur demandes, idClient should remain null
             // Only pass idClient when it's actually a client demande
-            demandeAchatService.effectuerDemandeAchat(idClient, demandeAchat, details);
+            demandeAchatService.effectuerDemandeAchat(idUtilisateur, idClient, demandeAchat, details);
             redirectAttributes.addFlashAttribute("toastMessage", "Demande d'achat créée avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return idClient != null ? "redirect:/demande-achat/saisie-client" : "redirect:/demande-achat/saisie-fournisseur";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");
-            return "redirect:/demande-achat/saisie-client";
+            return idClient != null ? "redirect:/demande-achat/saisie-client" : "redirect:/demande-achat/saisie-fournisseur";
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");
-            return "redirect:/demande-achat/saisie-client";
+            return idClient != null ? "redirect:/demande-achat/saisie-client" : "redirect:/demande-achat/saisie-fournisseur";
         }
         return "redirect:/demande-achat/liste";
     }
