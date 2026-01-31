@@ -3,7 +3,6 @@ package com.cinema.dev.controllers;
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.repositories.ProformaRepository;
 import com.cinema.dev.models.Proforma;
-import com.cinema.dev.models.ProformaEtat;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.CommandeEtatRepository;
 import com.cinema.dev.repositories.ClientRepository;
@@ -14,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
@@ -111,14 +111,36 @@ public class CommandeController {
     }
     
     @PostMapping("/creer/{idProforma}")
-    public String creerCommande(@PathVariable Integer idProforma, @RequestParam(required = false) LocalDateTime dateCommande) {
-        commandeService.creerCommande(idProforma, dateCommande);
+    public String creerCommande(@PathVariable Integer idProforma, @RequestParam(required = false) LocalDateTime dateCommande,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            commandeService.creerCommande(idProforma, dateCommande);
+            redirectAttributes.addFlashAttribute("toastMessage", "Commande créée avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
         return "redirect:/commande/liste";
     }
     
     @PostMapping("/valider/{idCommande}")
-    public String validerCommande(@PathVariable Integer idCommande, @RequestParam(required = false) LocalDateTime dateValidation) {
-        commandeService.validerCommande(idCommande, dateValidation);
+    public String validerCommande(@PathVariable Integer idCommande, @RequestParam(required = false) LocalDateTime dateValidation,
+                                  RedirectAttributes redirectAttributes) {
+        try {
+            commandeService.validerCommande(idCommande, dateValidation);
+            redirectAttributes.addFlashAttribute("toastMessage", "Commande validée avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
         return "redirect:/commande/liste";
     }
 }

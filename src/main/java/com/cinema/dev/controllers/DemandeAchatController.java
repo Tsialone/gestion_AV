@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Map;
@@ -106,25 +107,38 @@ public class DemandeAchatController {
             @RequestParam(required = false) Integer idFournisseur,
             @ModelAttribute DemandeAchat demandeAchat,
             @RequestParam Integer[] idArticles,
-            @RequestParam Integer[] quantites) {
+            @RequestParam Integer[] quantites,
+            RedirectAttributes redirectAttributes) {
         
-        DemandeAchatDetail[] details = new DemandeAchatDetail[idArticles.length];
-        for (int i = 0; i < idArticles.length; i++) {
-            DemandeAchatDetail detail = new DemandeAchatDetail();
-            DemandeAchatDetail.DemandeAchatDetailId id = new DemandeAchatDetail.DemandeAchatDetailId();
-            id.setIdArticle(idArticles[i]);
-            detail.setId(id);
-            detail.setQuantite(quantites[i]);
-            details[i] = detail;
-        }
-        
-        if (demandeAchat.getDateDemande() == null) {
-            demandeAchat.setDateDemande(LocalDate.now());
-        }
+        try {
+            DemandeAchatDetail[] details = new DemandeAchatDetail[idArticles.length];
+            for (int i = 0; i < idArticles.length; i++) {
+                DemandeAchatDetail detail = new DemandeAchatDetail();
+                DemandeAchatDetail.DemandeAchatDetailId id = new DemandeAchatDetail.DemandeAchatDetailId();
+                id.setIdArticle(idArticles[i]);
+                detail.setId(id);
+                detail.setQuantite(quantites[i]);
+                details[i] = detail;
+            }
+            
+            if (demandeAchat.getDateDemande() == null) {
+                demandeAchat.setDateDemande(LocalDate.now());
+            }
 
-        // normalize: if idClient is null but idFournisseur provided, store fournisseur id in the same field
-        Integer partyId = (idClient != null) ? idClient : idFournisseur;
-        demandeAchatService.effectuerDemandeAchat(partyId, demandeAchat, details);
+            // normalize: if idClient is null but idFournisseur provided, store fournisseur id in the same field
+            Integer partyId = (idClient != null) ? idClient : idFournisseur;
+            demandeAchatService.effectuerDemandeAchat(partyId, demandeAchat, details);
+            redirectAttributes.addFlashAttribute("toastMessage", "Demande d'achat créée avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/demande-achat/saisie-client";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/demande-achat/saisie-client";
+        }
         return "redirect:/demande-achat/liste";
     }
 }

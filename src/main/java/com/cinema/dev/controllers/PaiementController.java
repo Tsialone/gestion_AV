@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 
 @Controller
@@ -40,8 +41,19 @@ public class PaiementController {
     
     @PostMapping("/payer")
     public String payerCommande(@RequestParam Integer idCommande, @RequestParam Integer idCaisse, 
-                                @RequestParam(required = false) LocalDateTime dateMvtCaisse, @ModelAttribute Paiement paiement) {
-        paiementService.payerCommande(idCommande, idCaisse, paiement, dateMvtCaisse);
+                                @RequestParam(required = false) LocalDateTime dateMvtCaisse, @ModelAttribute Paiement paiement,
+                                RedirectAttributes redirectAttributes) {
+        try {
+            paiementService.payerCommande(idCommande, idCaisse, paiement, dateMvtCaisse);
+            redirectAttributes.addFlashAttribute("toastMessage", "Paiement enregistré avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
         return "redirect:/paiement/liste";
     }
 }

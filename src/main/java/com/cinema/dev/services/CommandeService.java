@@ -43,7 +43,7 @@ public class CommandeService {
         //? === RG: Validation ===
         //* -- Date proforma still valid (current < date_fin)
         if (dateCmd.isAfter(proforma.getDateFin())) {
-            throw new IllegalArgumentException("Proforma has expired");
+            throw new IllegalArgumentException("Proforma expires at " + proforma.getDateFin() + ". Input: " + dateCommande);
         }
         
         //* -- Proforma etat is valid (etat = 2)

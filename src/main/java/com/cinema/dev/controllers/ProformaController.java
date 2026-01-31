@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Arrays;
@@ -121,28 +122,52 @@ public class ProformaController {
             @ModelAttribute Proforma proforma,
             @RequestParam Integer[] idArticles,
             @RequestParam BigDecimal[] prix,
-            @RequestParam Integer[] quantites) {
+            @RequestParam Integer[] quantites,
+            RedirectAttributes redirectAttributes) {
         
-        ProformaDetail[] details = new ProformaDetail[idArticles.length];
-        for (int i = 0; i < idArticles.length; i++) {
-            ProformaDetail detail = new ProformaDetail();
-            ProformaDetail.ProformaDetailId id = new ProformaDetail.ProformaDetailId();
-            id.setIdArticle(idArticles[i]);
-            detail.setId(id);
-            detail.setPrix(prix[i]);
-            detail.setQuantite(quantites[i]);
-            details[i] = detail;
+        try {
+            ProformaDetail[] details = new ProformaDetail[idArticles.length];
+            for (int i = 0; i < idArticles.length; i++) {
+                ProformaDetail detail = new ProformaDetail();
+                ProformaDetail.ProformaDetailId id = new ProformaDetail.ProformaDetailId();
+                id.setIdArticle(idArticles[i]);
+                detail.setId(id);
+                detail.setPrix(prix[i]);
+                detail.setQuantite(quantites[i]);
+                details[i] = detail;
+            }
+            
+            proformaService.creerProforma(idDemandeAchat, idClient, idFournisseur, proforma, details, dateCreation);
+            redirectAttributes.addFlashAttribute("toastMessage", "Proforma créé avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return idClient != null ? "redirect:/proforma/creer-client" : "redirect:/proforma/creer-fournisseur";
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return idClient != null ? "redirect:/proforma/creer-client" : "redirect:/proforma/creer-fournisseur";
         }
-        
-        proformaService.creerProforma(idDemandeAchat, idClient, idFournisseur, proforma, details, dateCreation);
         return "redirect:/proforma/liste";
     }
     
     @PostMapping("/valider/{idProforma}")
     public String validerProforma(
             @PathVariable Integer idProforma,
-            @RequestParam(required = false) LocalDateTime dateValidation) {
-        proformaService.validerProforma(idProforma, dateValidation);
+            @RequestParam(required = false) LocalDateTime dateValidation,
+            RedirectAttributes redirectAttributes) {
+        try {
+            proformaService.validerProforma(idProforma, dateValidation);
+            redirectAttributes.addFlashAttribute("toastMessage", "Proforma validé avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
         return "redirect:/proforma/liste";
     }
 }
