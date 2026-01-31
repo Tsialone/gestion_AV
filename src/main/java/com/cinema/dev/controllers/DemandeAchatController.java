@@ -6,11 +6,13 @@ import com.cinema.dev.services.DemandeAchatService;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ArticleRepository;
+import com.cinema.dev.utils.BreadcrumbItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,14 @@ public class DemandeAchatController {
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Demandes d'Achat");
+        model.addAttribute("pageSubtitle", "Gestion des demandes d'achat clients et fournisseurs");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Demandes d'Achat", "/demande-achat/liste")
+        ));
+        
         model.addAttribute("content", "pages/demande-achat/demande-achat-liste");
         return "admin-layout";
     }
@@ -54,6 +64,15 @@ public class DemandeAchatController {
     public String getSaisieClient(Model model) {
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Nouvelle Demande d'Achat");
+        model.addAttribute("pageSubtitle", "Créer une nouvelle demande d'achat depuis un client");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Demandes d'Achat", "/demande-achat/liste"),
+            new BreadcrumbItem("Nouvelle (Client)", "/demande-achat/saisie-client")
+        ));
+        
         model.addAttribute("content", "pages/demande-achat/demande-achat-client");
         return "admin-layout";
     }
@@ -62,6 +81,15 @@ public class DemandeAchatController {
     public String getSaisieFournisseur(Model model) {
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Nouvelle Demande d'Achat");
+        model.addAttribute("pageSubtitle", "Créer une nouvelle demande d'achat depuis un fournisseur");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Demandes d'Achat", "/demande-achat/liste"),
+            new BreadcrumbItem("Nouvelle (Fournisseur)", "/demande-achat/saisie-fournisseur")
+        ));
+        
         model.addAttribute("content", "pages/demande-achat/demande-achat-fournisseur");
         return "admin-layout";
     }

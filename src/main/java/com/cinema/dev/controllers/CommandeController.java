@@ -6,11 +6,13 @@ import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.CommandeEtatRepository;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
+import com.cinema.dev.utils.BreadcrumbItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/commande")
@@ -51,6 +53,14 @@ public class CommandeController {
         model.addAttribute("filterIdFournisseur", idFournisseur);
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Commandes");
+        model.addAttribute("pageSubtitle", "Gestion des commandes");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Commandes", "/commande/liste")
+        ));
+        
         model.addAttribute("content", "pages/commande/commande-liste");
         return "admin-layout";
     }
@@ -58,6 +68,15 @@ public class CommandeController {
     @GetMapping("/creer")
     public String getCreer(Model model) {
         model.addAttribute("proformas", proformaRepository.findAll());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Nouvelle Commande");
+        model.addAttribute("pageSubtitle", "Créer une nouvelle commande");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Commandes", "/commande/liste"),
+            new BreadcrumbItem("Nouvelle", "/commande/creer")
+        ));
+        
         model.addAttribute("content", "pages/commande/creation-commande");
         return "admin-layout";
     }
@@ -66,6 +85,15 @@ public class CommandeController {
     public String getPaiement(Model model) {
         model.addAttribute("commandes", commandeService.findAll());
         model.addAttribute("caisses", caisseRepository.findAll());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Paiement Commandes");
+        model.addAttribute("pageSubtitle", "Gérer les paiements des commandes");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Commandes", "/commande/liste"),
+            new BreadcrumbItem("Paiement", "/commande/paiement")
+        ));
+        
         model.addAttribute("content", "pages/commande/payement-commande");
         return "admin-layout";
     }

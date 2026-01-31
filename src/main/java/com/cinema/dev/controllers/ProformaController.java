@@ -8,12 +8,14 @@ import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ArticleRepository;
 import com.cinema.dev.repositories.DemandeAchatRepository;
 import com.cinema.dev.repositories.ProformaEtatRepository;
+import com.cinema.dev.utils.BreadcrumbItem;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
+import java.util.Arrays;
 
 @Controller
 @RequestMapping("/proforma")
@@ -52,6 +54,14 @@ public class ProformaController {
         model.addAttribute("filterIdFournisseur", idFournisseur);
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Proformas");
+        model.addAttribute("pageSubtitle", "Gestion des proformas");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Proformas", "/proforma/liste")
+        ));
+        
         model.addAttribute("content", "pages/proforma/proforma-liste");
         return "admin-layout";
     }
@@ -63,6 +73,15 @@ public class ProformaController {
         model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
             .filter(da -> da.getIdClient() != null)
             .toList());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Nouveau Proforma");
+        model.addAttribute("pageSubtitle", "Créer un proforma pour un client");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Proformas", "/proforma/liste"),
+            new BreadcrumbItem("Nouveau (Client)", "/proforma/creer-client")
+        ));
+        
         model.addAttribute("content", "pages/proforma/creer-proforma-client");
         return "admin-layout";
     }
@@ -74,6 +93,15 @@ public class ProformaController {
         model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
             .filter(da -> da.getIdClient() == null)
             .toList());
+        
+        // Page title and breadcrumbs
+        model.addAttribute("pageTitle", "Nouveau Proforma");
+        model.addAttribute("pageSubtitle", "Créer un proforma pour un fournisseur");
+        model.addAttribute("breadcrumbs", Arrays.asList(
+            new BreadcrumbItem("Proformas", "/proforma/liste"),
+            new BreadcrumbItem("Nouveau (Fournisseur)", "/proforma/creer-fournisseur")
+        ));
+        
         model.addAttribute("content", "pages/proforma/creer-proforma-fournisseur");
         return "admin-layout";
     }
