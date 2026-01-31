@@ -59,11 +59,11 @@ public class CommandeController {
         var commandes = commandeService.findWithFilters(idProforma, start, end);
         model.addAttribute("commandes", commandes);
         
-        // Create a map of commande ID to livraison for easy lookup in template
-        Map<Integer, Boolean> commandeLivraisons = commandes.stream()
+        // Create a map of commande ID to livraison object for easy lookup in template
+        Map<Integer, com.cinema.dev.models.Livraison> commandeLivraisons = commandes.stream()
             .collect(Collectors.toMap(
                 c -> c.getIdCommande(),
-                c -> livraisonRepository.findByIdCommande(c.getIdCommande()).isPresent()
+                c -> livraisonRepository.findByIdCommande(c.getIdCommande()).orElse(null)
             ));
         model.addAttribute("commandeLivraisons", commandeLivraisons);
         

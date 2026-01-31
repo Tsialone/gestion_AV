@@ -84,7 +84,7 @@
                             <td class="montant-reste" th:data-commande-id="${commande.idCommande}">...</td>
                             <td>
                                 <!-- Show livraison form only if livraison doesn't exist yet (backend check) -->
-                                <form th:if="${!commandeLivraisons[commande.idCommande]}" class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post" style="display: inline;">
+                                <form th:if="${commandeLivraisons[commande.idCommande] == null}" class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post" style="display: inline;">
                                     <div class="input-group input-group-sm">
                                         <input type="datetime-local" 
                                                class="form-control form-control-sm" 
@@ -97,9 +97,10 @@
                                         </button>
                                     </div>
                                 </form>
-                                <!-- Show checkmark if livraison already exists -->
-                                <span th:if="${commandeLivraisons[commande.idCommande]}">
-                                    <i class="bi bi-check-circle text-success"></i> Livré
+                                <!-- Show 'Livré' with date if livraison already exists -->
+                                <span th:if="${commandeLivraisons[commande.idCommande] != null}" class="text-success">
+                                    <i class="bi bi-check-circle"></i> Livré 
+                                    (<span th:text="${#temporals.format(commandeLivraisons[commande.idCommande].date, 'dd/MM/yyyy HH:mm')}"></span>)
                                 </span>
                             </td>
                             <td>
@@ -111,7 +112,7 @@
                                             <i class="bi bi-check-circle"></i> Valider
                                         </button>
                                     </form>
-                                    <button type="button" class="btn btn-primary btn-sm" th:onclick="'openPaiementModal(' + ${commande.idCommande} + ')'">
+                                    <button type="button" class="btn btn-primary btn-sm btn-payer" th:data-commande-id="${commande.idCommande}" th:onclick="'openPaiementModal(' + ${commande.idCommande} + ')'">
                                         <i class="bi bi-cash"></i> Payer
                                     </button>
                                 </div>
@@ -171,6 +172,12 @@
                             document.querySelector(`.montant-total[data-commande-id="${commandeId}"]`).textContent = data.total + ' Ar';
                             document.querySelector(`.montant-paye[data-commande-id="${commandeId}"]`).textContent = data.paye + ' Ar';
                             document.querySelector(`.montant-reste[data-commande-id="${commandeId}"]`).textContent = data.reste + ' Ar';
+                            
+                            // Hide Payer button if reste is 0
+                            if (data.reste == 0) {
+                                const payerBtn = document.querySelector(`.btn-payer[data-commande-id="${commandeId}"]`);
+                                if (payerBtn) payerBtn.style.display = 'none';
+                            }
                         }
                     })
                     .catch(error => console.error('Error:', error));
