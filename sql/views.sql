@@ -1,9 +1,10 @@
-CREATE VIEW v_entree_stock_lot AS
+CREATE OR REPLACE VIEW v_entree_stock_lot AS
 SELECT 
     msl.id_mvt,
     msl.id_lot,
+    msl.qte AS quantite_mouvement, -- La quantité entrée lors de ce mouvement
     l.libelle AS libelle_lot,
-    l.qte AS quantite_lot,
+    l.qte AS stock_actuel_lot,      -- Ce qu'il reste aujourd'hui dans le lot
     l.qte_initiale AS quantite_initiale_lot,
     a.id_article,
     a.libelle AS libelle_article,
@@ -24,7 +25,7 @@ SELECT
     p.date_fin AS date_fin_proforma,
     pd.prix AS prix_unitaire,
     pd.quantite AS quantite_proforma,
-    (pd.prix * l.qte) AS prix_total_lot,
+    (pd.prix * msl.qte) AS prix_total_mouvement, -- Calculé sur le flux entrant
     f.id_fournisseur,
     f.nom AS nom_fournisseur,
     cl.id_client,
@@ -45,19 +46,17 @@ FROM
 WHERE 
     ms.entrant = TRUE
 ORDER BY 
-    ms.date_ DESC, msl.id_mvt, msl.id_lot;
+    ms.date_ ASC;
 
 
-
-
--- Vue pour les mouvements de stock SORTANTS
-CREATE VIEW v_sortie_stock_lot AS
+    CREATE OR REPLACE VIEW v_sortie_stock_lot AS
 SELECT 
     msl.id_mvt,
     msl.id_lot,
+    msl.qte AS quantite_sortie,    -- La quantité déduite lors de cette vente
     l.libelle AS libelle_lot,
-    l.qte AS quantite_lot,
-    l.qte_initiale AS quantite_initiale_lot,
+    l.qte AS stock_restant_lot,     -- Le stock restant dans le lot d'origine
+    l.qte_initiale AS quantite_initiale_lot, -- La taille du lot à sa création
     a.id_article,
     a.libelle AS libelle_article,
     c.id_categorie,
@@ -77,4 +76,4 @@ FROM
 WHERE 
     ms.entrant = FALSE
 ORDER BY 
-    ms.date_ DESC, msl.id_mvt, msl.id_lot;
+    ms.date_ ASC;
