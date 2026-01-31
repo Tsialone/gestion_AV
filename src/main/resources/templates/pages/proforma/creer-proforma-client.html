@@ -86,24 +86,36 @@
     </div>
 
     <script>
-        // Get idDa from URL params if present
-        const urlParams = new URLSearchParams(window.location.search);
-        const idDaParam = urlParams.get('idDa');
+        // Store template row before any modifications
+        let articleRowTemplate;
         
-        // Auto-fill on page load if idDa is in URL
-        window.addEventListener('load', function() {
+        window.addEventListener('DOMContentLoaded', function() {
+            // Save the original template
+            articleRowTemplate = document.querySelector('.article-row').cloneNode(true);
+            
+            // Get idDa from URL params if present
+            const urlParams = new URLSearchParams(window.location.search);
+            const idDaParam = urlParams.get('idDa');
+            
+            // Auto-fill on page load if idDa is in URL
             if (idDaParam) {
                 document.getElementById('idDemandeAchat').value = idDaParam;
                 populateProformaForm(parseInt(idDaParam));
             }
+            
+            // Listen to DA selection changes
+            document.getElementById('idDemandeAchat').addEventListener('change', function(e) {
+                if (e.target.value) {
+                    populateProformaForm(parseInt(e.target.value));
+                }
+            });
         });
         
-        // Listen to DA selection changes
-        document.getElementById('idDemandeAchat').addEventListener('change', function(e) {
-            if (e.target.value) {
-                populateProformaForm(parseInt(e.target.value));
-            }
-        });
+        function createArticleRow() {
+            const newRow = articleRowTemplate.cloneNode(true);
+            newRow.querySelectorAll('input, select').forEach(el => el.value = '');
+            return newRow;
+        }
         
         function populateProformaForm(idDa) {
             // Fetch demande details from API
@@ -120,48 +132,41 @@
                         
                         // Populate articles from demande details
                         if (data.details && data.details.length > 0) {
-                            data.details.forEach((detail, index) => {
-                                if (index === 0) {
-                                    // Use the first existing row
-                                    const firstRow = document.querySelector('.article-row');
-                                    const articleSelect = firstRow.querySelector('select[name="idArticles"]');
-                                    const quantityInput = firstRow.querySelector('input[name="quantites"]');
-                                    
-                                    // Find article by libelle (name)
-                                    const allOptions = Array.from(articleSelect.options);
-                                    const matchingOption = allOptions.find(opt => opt.textContent.trim() === detail.libelle);
-                                    if (matchingOption) {
-                                        articleSelect.value = matchingOption.value;
-                                    }
-                                    quantityInput.value = detail.quantite || '';
-                                } else {
-                                    // Add new rows for additional articles
-                                    addArticleRow();
-                                    const rows = document.querySelectorAll('.article-row');
-                                    const newRow = rows[rows.length - 1];
-                                    const articleSelect = newRow.querySelector('select[name="idArticles"]');
-                                    const quantityInput = newRow.querySelector('input[name="quantites"]');
-                                    
-                                    // Find article by libelle (name)
-                                    const allOptions = Array.from(articleSelect.options);
-                                    const matchingOption = allOptions.find(opt => opt.textContent.trim() === detail.libelle);
-                                    if (matchingOption) {
-                                        articleSelect.value = matchingOption.value;
-                                    }
-                                    quantityInput.value = detail.quantite || '';
+                            data.details.forEach((detail) => {
+                                // Create a new row
+                                const newRow = createArticleRow();
+                                const articleSelect = newRow.querySelector('select[name="idArticles"]');
+                                const quantityInput = newRow.querySelector('input[name="quantites"]');
+                                
+                                // Find article by libelle (name)
+                                const allOptions = Array.from(articleSelect.options);
+                                const matchingOption = allOptions.find(opt => opt.textContent.trim() === detail.libelle);
+                                if (matchingOption) {
+                                    articleSelect.value = matchingOption.value;
                                 }
+                                quantityInput.value = detail.quantite || '';
+                                
+                                container.appendChild(newRow);
                             });
+                        } else {
+                            // If no details, add empty row
+                            container.appendChild(createArticleRow());
                         }
                     }
                 })
-                .catch(error => console.error('Error fetching demande details:', error));
+                .catch(error => {
+                    console.error('Error fetching demande details:', error);
+                    // Restore at least one empty row on error
+                    const container = document.getElementById('articlesContainer');
+                    if (container.children.length === 0) {
+                        container.appendChild(createArticleRow());
+                    }
+                });
         }
         
         function addArticleRow() {
             const container = document.getElementById('articlesContainer');
-            const newRow = document.querySelector('.article-row').cloneNode(true);
-            newRow.querySelectorAll('input, select').forEach(el => el.value = '');
-            container.appendChild(newRow);
+            container.appendChild(createArticleRow());
         }
     </script>
 </section>
