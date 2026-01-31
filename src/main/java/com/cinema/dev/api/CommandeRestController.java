@@ -2,7 +2,6 @@ package com.cinema.dev.api;
 
 import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Proforma;
-import com.cinema.dev.models.ProformaDetail;
 import com.cinema.dev.repositories.CommandeRepository;
 import com.cinema.dev.repositories.ProformaDetailRepository;
 import com.cinema.dev.repositories.ProformaRepository;
@@ -105,10 +104,10 @@ public class CommandeRestController {
             response.put("date", commande.get().getDate());
             response.put("idProforma", commande.get().getIdProforma());
             
-            // Fetch proforma details using the commande's idProforma
+            // Fetch proforma details with article names using the commande's idProforma
             Integer idProforma = commande.get().getIdProforma();
             if (idProforma != null) {
-                List<ProformaDetail> details = proformaDetailRepository.findByIdProforma(idProforma);
+                List<Map<String, Object>> details = proformaDetailRepository.findDetailsWithArticleNames(idProforma);
                 response.put("details", details);
             } else {
                 response.put("details", List.of());
