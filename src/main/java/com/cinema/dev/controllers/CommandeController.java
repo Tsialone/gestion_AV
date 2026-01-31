@@ -143,4 +143,30 @@ public class CommandeController {
         }
         return "redirect:/commande/liste";
     }
+    
+    @PostMapping("/livrer/{idCommande}")
+    public String livrerCommande(@PathVariable Integer idCommande, @RequestParam(required = false) LocalDateTime dateLivraison,
+                                 RedirectAttributes redirectAttributes) {
+        try {
+            if (!commandeEtatRepository.existsByIdCommandeAndIdEtat(idCommande, 2)) {
+                String message = "La commande doit être validée avant de pouvoir être livrée";
+                redirectAttributes.addFlashAttribute("toastMessage", message);
+                redirectAttributes.addFlashAttribute("toastType", "error");
+                return "redirect:/commande/liste";
+            }
+            
+            // TODO: Implement actual delivery logic
+            // For now, just a placeholder that will be implemented later
+            
+            redirectAttributes.addFlashAttribute("toastMessage", "Commande livrée avec succès");
+            redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (IllegalArgumentException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Une erreur est survenue: " + e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+        }
+        return "redirect:/commande/liste";
+    }
 }
