@@ -18,7 +18,7 @@
         <!-- Filter Form -->
         <div class="card-body border-bottom">
             <form method="get" th:action="@{/demande-achat/liste}" class="row g-3">
-                <div class="col-md-4">
+                <div class="col-md-3">
                     <label for="filterIdClient" class="form-label">Client</label>
                     <select id="filterIdClient" name="idClient" class="form-select">
                         <option value="">Tous les clients</option>
@@ -29,11 +29,19 @@
                     </select>
                 </div>
                 <div class="col-md-3">
+                    <label for="filterType" class="form-label">Type</label>
+                    <select id="filterType" class="form-select">
+                        <option value="">Tous les types</option>
+                        <option value="client">Client</option>
+                        <option value="fournisseur">Fournisseur</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
                     <label for="filterStartDate" class="form-label">Date Début</label>
                     <input type="date" id="filterStartDate" name="startDate" class="form-control" 
                            th:value="${filterStartDate}">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <label for="filterEndDate" class="form-label">Date Fin</label>
                     <input type="date" id="filterEndDate" name="endDate" class="form-control" 
                            th:value="${filterEndDate}">
@@ -50,7 +58,8 @@
                     <thead>
                         <tr>
                             <th>ID</th>
-                            <th>Client / Fournisseur</th>
+                            <th>Client</th>
+                            <th>Type</th>
                             <th>Date</th>
                             <th>Actions</th>
                         </tr>
@@ -67,8 +76,13 @@
                                 </button>
                             </td>
                             <td>
-                                <span th:if="${demande.idClient != null}" th:text="${'ID: ' + demande.idClient}"></span>
-                                <span th:if="${demande.idClient == null}">-</span>
+                                <span th:if="${demande.idClient != null and clientsMap.containsKey(demande.idClient)}"
+                                      th:text="${clientsMap[demande.idClient]}"></span>
+                                <span th:if="${demande.idClient == null or !clientsMap.containsKey(demande.idClient)}">-</span>
+                            </td>
+                            <td>
+                                <span th:if="${demande.idClient != null and clientsMap.containsKey(demande.idClient)}" class="badge bg-primary">Client</span>
+                                <span th:if="${demande.idClient == null or !clientsMap.containsKey(demande.idClient)}" class="badge bg-secondary">Fournisseur</span>
                             </td>
                             <td th:text="${demande.dateDemande != null ? demande.dateDemande : '-'}"></td>
                             <td>
@@ -119,6 +133,43 @@
             </div>
         </div>
     </div>
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        var clientsMap = /*[[${clientsMap}]]*/ {};
+        /*]]>*/
+    </script>
+
+    <script>
+        const filterTypeSelect = document.getElementById('filterType');
+        const tableRows = document.querySelectorAll('tbody tr');
+        
+        filterTypeSelect.addEventListener('change', function() {
+            const selectedType = this.value;
+            tableRows.forEach(row => {
+                if (row.querySelector('td:nth-child(3)') === null) {
+                    // Skip the empty message row
+                    return;
+                }
+                const typeCell = row.querySelector('td:nth-child(3)');
+                if (!typeCell) return;
+                
+                const typeBadge = typeCell.querySelector('.badge');
+                if (!typeBadge) return;
+                
+                const isClient = typeBadge.textContent.trim() === 'Client';
+                
+                if (selectedType === '') {
+                    row.style.display = '';
+                } else if (selectedType === 'client' && isClient) {
+                    row.style.display = '';
+                } else if (selectedType === 'fournisseur' && !isClient) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+    </script>
 
     <script>
         document.getElementById('demandeModal').addEventListener('show.bs.modal', function(e) {
@@ -128,7 +179,13 @@
             const dateDemande = button.getAttribute('data-date');
             
             document.getElementById('modalDemandeId').textContent = 'DA' + idDa;
-            document.getElementById('modalDemandeClient').textContent = idClient || '-';
+            // resolve name from maps
+            let name = '-';
+            if (idClient) {
+                const clientId = parseInt(idClient);
+                name = (clientsMap.hasOwnProperty(clientId)) ? clientsMap[clientId] : '-';
+            }
+            document.getElementById('modalDemandeClient').textContent = name;
             document.getElementById('modalDemandeDate').textContent = dateDemande || '-';
             
             // Fetch details from API

@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import java.time.LocalDate;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/demande-achat")
@@ -37,9 +39,13 @@ public class DemandeAchatController {
         
         model.addAttribute("demandesAchat", demandeAchatService.findWithFilters(idClient, start, end));
         model.addAttribute("clients", clientRepository.findAll());
+        Map<Integer, String> clientsMap = clientRepository.findAll()
+            .stream().collect(Collectors.toMap(c -> c.getIdClient(), c -> c.getNom()));
+        model.addAttribute("clientsMap", clientsMap);
         model.addAttribute("filterIdClient", idClient);
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
+        model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("content", "pages/demande-achat/demande-achat-liste");
         return "admin-layout";
     }
@@ -88,7 +94,9 @@ public class DemandeAchatController {
             demandeAchat.setDateDemande(LocalDate.now());
         }
 
-        demandeAchatService.effectuerDemandeAchat(idClient, demandeAchat, details);
+        // normalize: if idClient is null but idFournisseur provided, store fournisseur id in the same field
+        Integer partyId = (idClient != null) ? idClient : idFournisseur;
+        demandeAchatService.effectuerDemandeAchat(partyId, demandeAchat, details);
         return "redirect:/demande-achat/liste";
     }
 }

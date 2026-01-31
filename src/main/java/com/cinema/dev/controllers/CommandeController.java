@@ -4,6 +4,8 @@ import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.repositories.ProformaRepository;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.CommandeEtatRepository;
+import com.cinema.dev.repositories.ClientRepository;
+import com.cinema.dev.repositories.FournisseurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,8 +28,14 @@ public class CommandeController {
     @Autowired
     private CommandeEtatRepository commandeEtatRepository;
     
+    @Autowired
+    private ClientRepository clientRepository;
+    
+    @Autowired
+    private FournisseurRepository fournisseurRepository;
+    
     @GetMapping("/liste")
-    public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) String startDate, 
+    public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, @RequestParam(required = false) String startDate, 
                            @RequestParam(required = false) String endDate, Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
@@ -35,8 +43,12 @@ public class CommandeController {
         
         model.addAttribute("commandes", commandeService.findWithFilters(idProforma, start, end));
         model.addAttribute("proformas", proformaRepository.findAll());
+        model.addAttribute("clients", clientRepository.findAll());
+        model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("commandeEtats", commandeEtatRepository.findAll());
         model.addAttribute("filterIdProforma", idProforma);
+        model.addAttribute("filterIdClient", idClient);
+        model.addAttribute("filterIdFournisseur", idFournisseur);
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
         model.addAttribute("content", "pages/commande/commande-liste");

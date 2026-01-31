@@ -60,7 +60,9 @@ public class ProformaController {
     public String getCreerClient(Model model) {
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
-        model.addAttribute("demandesAchat", demandeAchatRepository.findAll());
+        model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
+            .filter(da -> da.getIdClient() != null)
+            .toList());
         model.addAttribute("content", "pages/proforma/creer-proforma-client");
         return "admin-layout";
     }
@@ -69,7 +71,9 @@ public class ProformaController {
     public String getCreerFournisseur(Model model) {
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
-        model.addAttribute("demandesAchat", demandeAchatRepository.findAll());
+        model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
+            .filter(da -> da.getIdClient() == null)
+            .toList());
         model.addAttribute("content", "pages/proforma/creer-proforma-fournisseur");
         return "admin-layout";
     }
