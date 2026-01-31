@@ -2,6 +2,7 @@ package com.cinema.dev.controllers;
 
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.repositories.ProformaRepository;
+import com.cinema.dev.models.Livraison;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.repositories.CaisseRepository;
 import com.cinema.dev.repositories.CommandeEtatRepository;
@@ -19,7 +20,6 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/commande")
@@ -60,11 +60,22 @@ public class CommandeController {
         model.addAttribute("commandes", commandes);
         
         // Create a map of commande ID to livraison object for easy lookup in template
-        Map<Integer, com.cinema.dev.models.Livraison> commandeLivraisons = commandes.stream()
-            .collect(Collectors.toMap(
-                c -> c.getIdCommande(),
-                c -> livraisonRepository.findByIdCommande(c.getIdCommande()).orElse(null)
-            ));
+        // Build map manually to handle null values properly
+        Map<Integer, Livraison> commandeLivraisons = new java.util.HashMap<>();
+        for (var commande : commandes) {
+            if (commande.getIdCommande() != null) {
+                commandeLivraisons.put(
+                    commande.getIdCommande(), 
+                    livraisonRepository.findByIdCommande(commande.getIdCommande()).orElse(null)
+                );
+            }
+        }
+
+        // Print map for debugging
+        for(var entry : commandeLivraisons.entrySet()) {
+            System.out.println("Commande ID: " + entry.getKey() + " => Livraison: " + entry.getValue());
+        }
+        
         model.addAttribute("commandeLivraisons", commandeLivraisons);
         
         model.addAttribute("proformas", proformaRepository.findAll());
