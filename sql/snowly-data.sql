@@ -29,5 +29,6 @@ INSERT INTO caisse (id_caisse, lieu) VALUES
 
 -- Etats (basic ones used by proforma/commande flows)
 INSERT INTO etat (libelle) VALUES
-('Créé'),
-('Validé');
+('Cree'),
+('Valide'),
+('Payee');
