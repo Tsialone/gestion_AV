@@ -282,6 +282,7 @@
    CREATE TABLE mvt_stock_lot(
       id_mvt INTEGER,
       id_lot INTEGER,
+      qte INTEGER,
       PRIMARY KEY(id_mvt, id_lot),
       FOREIGN KEY(id_mvt) REFERENCES mvt_stock(id_mvt),
       FOREIGN KEY(id_lot) REFERENCES lot(id_lot)
@@ -299,6 +300,7 @@
       id_fournisseur INTEGER,
       id_utilisateur INTEGER,
       PRIMARY KEY(id_fournisseur, id_utilisateur),
+      
       FOREIGN KEY(id_fournisseur) REFERENCES fournisseur(id_fournisseur),
       FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur)
    );

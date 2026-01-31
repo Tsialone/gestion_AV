@@ -31,6 +31,24 @@
 
 
                 </li>
+                 <li class="sidebar-item  has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-hexagon-fill"></i>
+                        <span>Valorisation Stock</span>
+                    </a>
+                    <ul class="submenu ">
+                        <li class="submenu-item ">
+                            <a th:href="@{/valorisations/fifo}">FIFO</a>
+                        </li>
+                            <li class="submenu-item ">
+                            <a th:href="@{/valorisations/lifo}">LIFO</a>
+                        </li>
+                        <li class="submenu-item ">
+                            <a th:href="@{/valorisations/cump}">CUMP</a>
+                        </li>
+
+                    </ul>
+                </li>
 
 
             </ul>
