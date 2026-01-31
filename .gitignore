@@ -34,3 +34,5 @@ build/
 
 .my.txt
 _notes/ray_tasks.md
+
+\src\main\resources\application.properties

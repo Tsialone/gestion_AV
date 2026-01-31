@@ -12,5 +12,4 @@ public class DashboardController {
         model.addAttribute("content", "pages/home");
         return "admin-layout";
     }
-    
 }

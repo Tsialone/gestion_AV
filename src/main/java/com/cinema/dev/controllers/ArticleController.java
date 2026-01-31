@@ -12,7 +12,7 @@ import com.cinema.dev.utils.BreadcrumbItem;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/")
+@RequestMapping("/articles")
 @RequiredArgsConstructor
 public class ArticleController {
 
