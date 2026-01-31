@@ -5,6 +5,7 @@ import com.cinema.dev.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +23,12 @@ public class CommandeService {
     
     @Autowired
     private ProformaEtatRepository proformaEtatRepository;
+    
+    @Autowired
+    private PaiementService paiementService;
+    
+    @Autowired
+    private LivraisonRepository livraisonRepository;
     
     public List<Commande> findAll() {
         return commandeRepository.findAll();
@@ -82,5 +89,31 @@ public class CommandeService {
         CommandeEtat commandeEtat = new CommandeEtat(idCommande, 2, date);
         
         return commandeEtatRepository.save(commandeEtat);
+    }
+    
+    @Transactional
+    public Livraison livrerCommande(Integer idCommande, LocalDateTime dateLivraison) {
+        //* -- Check if commande exists
+        Commande commande = commandeRepository.findById(idCommande)
+            .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
+        
+        //* -- Check if commande is validated
+        if (!commandeEtatRepository.existsByIdCommandeAndIdEtat(idCommande, 2)) {
+            throw new IllegalArgumentException("Commande must be validated before delivery");
+        }
+        
+        //* -- Check if commande is fully paid
+        LocalDateTime checkDate = dateLivraison != null ? dateLivraison : LocalDateTime.now();
+        BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, checkDate);
+        if (reste.compareTo(BigDecimal.ZERO) > 0) {
+            throw new IllegalArgumentException("Commande must be fully paid before delivery. Remaining: " + reste);
+        }
+        
+        //* -- Create livraison
+        Livraison livraison = new Livraison();
+        livraison.setIdCommande(idCommande);
+        livraison.setDate(dateLivraison != null ? dateLivraison : LocalDateTime.now());
+        
+        return livraisonRepository.save(livraison);
     }
 }

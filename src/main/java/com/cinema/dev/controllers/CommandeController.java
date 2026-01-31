@@ -148,16 +148,7 @@ public class CommandeController {
     public String livrerCommande(@PathVariable Integer idCommande, @RequestParam(required = false) LocalDateTime dateLivraison,
                                  RedirectAttributes redirectAttributes) {
         try {
-            if (!commandeEtatRepository.existsByIdCommandeAndIdEtat(idCommande, 2)) {
-                String message = "La commande doit être validée avant de pouvoir être livrée";
-                redirectAttributes.addFlashAttribute("toastMessage", message);
-                redirectAttributes.addFlashAttribute("toastType", "error");
-                return "redirect:/commande/liste";
-            }
-            
-            // TODO: Implement actual delivery logic
-            // For now, just a placeholder that will be implemented later
-            
+            commandeService.livrerCommande(idCommande, dateLivraison);
             redirectAttributes.addFlashAttribute("toastMessage", "Commande livrée avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
         } catch (IllegalArgumentException e) {
