@@ -7,11 +7,11 @@
 INSERT INTO categorie (libelle) VALUES ('Electronique'), ('Informatique'), ('Mobilier'), ('Fournitures');
 INSERT INTO article (libelle, id_categorie) VALUES 
 ('Ordinateur Portable HP', 2), ('Souris Sans Fil', 2), ('Clavier Mecanique', 2), 
-('Ecran 24 pouces', 1), ('Chaise de Bureau', 3), ('Imprimante Laser', 1), ('Stylos Boîte 50', 4);
+('Ecran 24 pouces', 1), ('Chaise de Bureau', 3), ('Imprimante Laser', 1), ('Stylos Boite 50', 4);
 INSERT INTO client (nom) VALUES ('Societe ABC SARL'), ('Entreprise XYZ SA'), ('Commerce 123'), ('StartUp Tech');
 INSERT INTO fournisseur (nom) VALUES ('TechSupply SARL'), ('OfficeWorld SA'), ('ElectroDistrib'), ('FournituresPro');
 INSERT INTO depot (nom) VALUES ('Depôt Central'), ('Depôt Secondaire'), ('Entrepôt Nord');
-INSERT INTO caisse (id_caisse, lieu) VALUES (1, 'Siège Social'), (2, 'Succursale Est');
+INSERT INTO caisse (id_caisse, lieu) VALUES (1, 'Siege Social'), (2, 'Succursale Est');
 INSERT INTO etat (libelle) VALUES ('Cree'), ('Valide'), ('Commande'), ('Livree'), ('Annule');
 INSERT INTO role (nom, niveau, seuil) VALUES ('Administrateur', 1, 1000000.00), ('Manager', 2, 500000.00), ('Employe', 3, 100000.00);
 INSERT INTO dept (nom) VALUES ('Achats'), ('Logistique'), ('Ventes');
