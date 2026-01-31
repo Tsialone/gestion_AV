@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface LotRepository extends JpaRepository<Lot, Integer> {
     List<Lot> findByIdArticle(Integer idArticle);
+    
+    // List<Lot> findByIdArticleAndArticle_QteGreaterThan(Integer idArticle, Integer qte);
 }

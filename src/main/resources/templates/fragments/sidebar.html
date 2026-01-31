@@ -28,29 +28,25 @@
                             <a th:href="@{/articles/liste}">Liste</a>
                         </li>
                     </ul>
-
-
                 </li>
-                 <li class="sidebar-item  has-sub">
+            </ul>
+
+
+             <ul class="menu">
+                <li class="sidebar-title">Stocks</li>
+               
+
+                <li class="sidebar-item  has-sub">
                     <a href="#" class='sidebar-link'>
                         <i class="bi bi-hexagon-fill"></i>
-                        <span>Valorisation Stock</span>
+                        <span>Etats</span>
                     </a>
                     <ul class="submenu ">
                         <li class="submenu-item ">
-                            <a th:href="@{/valorisations/fifo}">FIFO</a>
+                            <a th:href="@{/etat-stock/liste}">Liste</a>
                         </li>
-                            <li class="submenu-item ">
-                            <a th:href="@{/valorisations/lifo}">LIFO</a>
-                        </li>
-                        <li class="submenu-item ">
-                            <a th:href="@{/valorisations/cump}">CUMP</a>
-                        </li>
-
                     </ul>
                 </li>
-
-
             </ul>
         </div>
         <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>

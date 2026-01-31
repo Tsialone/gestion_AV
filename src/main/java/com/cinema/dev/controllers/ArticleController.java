@@ -9,16 +9,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/articles")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class ArticleController {
 
     // private final ArticleService articleService;
-
-    @GetMapping("/liste")
+    @GetMapping
     public String getListe(Model model) {
         // model.addAttribute("articles", articleService.findAll());
-        model.addAttribute("content", "pages/articles/article-liste");
+        model.addAttribute("content", "pages/home");
         return "admin-layout";
     }
 }

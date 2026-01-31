@@ -25,12 +25,12 @@ public class MvtCaisse {
     private Integer idPaiement;
 
     @Column(name = "id_caisse", length = 50, nullable = false)
-    private String idCaisse;
+    private Integer idCaisse;
 
     public MvtCaisse() {
     }
 
-    public MvtCaisse(BigDecimal debit, BigDecimal credit, LocalDateTime date, Integer idPaiement, String idCaisse) {
+    public MvtCaisse(BigDecimal debit, BigDecimal credit, LocalDateTime date, Integer idPaiement, Integer idCaisse) {
         this.debit = debit;
         this.credit = credit;
         this.date = date;
@@ -78,11 +78,11 @@ public class MvtCaisse {
         this.idPaiement = idPaiement;
     }
 
-    public String getIdCaisse() {
+    public Integer getIdCaisse() {
         return idCaisse;
     }
 
-    public void setIdCaisse(String idCaisse) {
+    public void setIdCaisse(Integer idCaisse) {
         this.idCaisse = idCaisse;
     }
 }
