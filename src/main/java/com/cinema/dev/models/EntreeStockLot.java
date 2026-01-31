@@ -9,7 +9,7 @@ import java.math.BigDecimal;
 @Entity
 @Immutable
 @Table(name = "v_entree_stock_lot")
-@IdClass(SortieStockLotId.class) // On lie la clé ici
+@IdClass(EntreeStockLotId.class) // On lie la clé ici
 @Getter
 public class EntreeStockLot {
 
