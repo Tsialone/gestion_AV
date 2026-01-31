@@ -79,6 +79,7 @@ public class PaiementController {
         
         model.addAttribute("paiements", paiements);
         model.addAttribute("commandes", commandeRepository.findAll());
+        model.addAttribute("caisses", caisseRepository.findAll());
         model.addAttribute("paiementTypes", paiementTypes);
         model.addAttribute("partenaireNames", partenaireNames);
         model.addAttribute("filterIdCommande", idCommande);

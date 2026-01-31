@@ -1,0 +1,224 @@
+<!-- File: templates/fragments/paiement-modal.html -->
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+    <!-- Reusable Payment Modal Fragment -->
+    <div th:fragment="modal" class="modal fade" id="paiementModal" tabindex="-1" aria-labelledby="paiementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paiementModalLabel">Effectuer un Paiement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form th:action="@{/paiement/payer}" method="post" id="paiementForm">
+                    <div class="modal-body">
+                        <input type="hidden" id="modalIdCommande" name="idCommande">
+                        
+                        <!-- Commande Info -->
+                        <div class="card mb-3 bg-light">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Commande:</strong> <span id="modalPaiementCommandeNum">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Date:</strong> <span id="modalPaiementCommandeDate">-</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <strong>Proforma:</strong> <span id="modalPaiementProformaNum">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Partenaire:</strong> <span id="modalPaiementPartenaire">-</span> <span id="modalPaiementTypeBadge" class="badge">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Summary -->
+                        <div class="card mb-3 bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">Résumé des Paiements</h6>
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Total à Payer</small><br>
+                                        <span id="modalPaiementTotal" class="text-primary fs-4 fw-bold">-</span>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Déjà Payé</small><br>
+                                        <span id="modalPaiementPaye" class="text-success fs-4 fw-bold">-</span>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Reste à Payer</small><br>
+                                        <span id="modalPaiementReste" class="text-danger fs-4 fw-bold">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Payment Form Fields -->
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="modalPaiementMontant" class="form-label">Montant <span class="text-danger">*</span></label>
+                                <div class="input-group">
+                                    <input type="number" step="0.01" class="form-control" id="modalPaiementMontant" name="montant" min="0" required placeholder="0.00">
+                                    <span class="input-group-text">Ar</span>
+                                </div>
+                                <small class="text-muted">Maximum: <span id="modalPaiementMaxAmount">-</span> Ar</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="modalPaiementIdCaisse" class="form-label">Caisse <span class="text-danger">*</span></label>
+                                <select class="form-select" id="modalPaiementIdCaisse" name="idCaisse" required>
+                                    <option value="">-- Sélectionner une caisse --</option>
+                                    <option th:each="caisse : ${caisses}" 
+                                            th:value="${caisse.idCaisse}"
+                                            th:text="${caisse.lieu}">
+                                    </option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <label for="modalPaiementDatePaiement" class="form-label">Date Paiement <span class="text-danger">*</span></label>
+                                <input type="datetime-local" class="form-control" id="modalPaiementDatePaiement" name="date" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="modalPaiementDateMvtCaisse" class="form-label">Date Mouvement Caisse</label>
+                                <input type="datetime-local" class="form-control" id="modalPaiementDateMvtCaisse" name="dateMvtCaisse">
+                                <small class="text-muted">Laisser vide pour utiliser la date de paiement</small>
+                            </div>
+                        </div>
+
+                        <!-- Quick Amount Buttons -->
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <label class="form-label">Montants Rapides:</label><br>
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="setQuickAmount(25)">25%</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="setQuickAmount(50)">50%</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm me-2" onclick="setQuickAmount(75)">75%</button>
+                                <button type="button" class="btn btn-outline-primary btn-sm" onclick="setQuickAmount(100)">100% (Tout payer)</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-cash"></i> Enregistrer le Paiement
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Payment Modal Script -->
+    <script th:fragment="script">
+        let currentResteAmount = 0;
+        
+        function openPaiementModal(idCommande) {
+            // Reset form
+            document.getElementById('paiementForm').reset();
+            document.getElementById('modalIdCommande').value = idCommande;
+            
+            // Reset all display fields
+            document.getElementById('modalPaiementCommandeNum').textContent = '-';
+            document.getElementById('modalPaiementCommandeDate').textContent = '-';
+            document.getElementById('modalPaiementProformaNum').textContent = '-';
+            document.getElementById('modalPaiementPartenaire').textContent = '-';
+            document.getElementById('modalPaiementTypeBadge').textContent = '-';
+            document.getElementById('modalPaiementTotal').textContent = '-';
+            document.getElementById('modalPaiementPaye').textContent = '-';
+            document.getElementById('modalPaiementReste').textContent = '-';
+            document.getElementById('modalPaiementMaxAmount').textContent = '-';
+            
+            // Set default date to now
+            const now = new Date();
+            now.setMinutes(now.getMinutes() - now.getTimezoneOffset());
+            document.getElementById('modalPaiementDatePaiement').value = now.toISOString().slice(0, 16);
+            
+            // Fetch commande info
+            fetch('/api/commande/proforma-by-commande/' + idCommande)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('modalPaiementCommandeNum').textContent = idCommande;
+                        
+                        // Format date if it exists
+                        if (data.date) {
+                            let dateObj;
+                            if (Array.isArray(data.date)) {
+                                // Handle array format [year, month, day, hour, minute, second]
+                                dateObj = new Date(data.date[0], data.date[1] - 1, data.date[2], data.date[3], data.date[4], data.date[5]);
+                            } else {
+                                // Handle ISO string format
+                                dateObj = new Date(data.date);
+                            }
+                            const formattedDate = dateObj.toLocaleDateString('fr-FR') + ' ' + dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                            document.getElementById('modalPaiementCommandeDate').textContent = formattedDate;
+                        }
+                        
+                        document.getElementById('modalPaiementProformaNum').textContent = data.idProforma || '-';
+                        
+                        // Set partenaire and type
+                        if (data.clientName) {
+                            document.getElementById('modalPaiementPartenaire').textContent = data.clientName;
+                            document.getElementById('modalPaiementTypeBadge').textContent = 'Client';
+                            document.getElementById('modalPaiementTypeBadge').className = 'badge bg-primary';
+                        } else if (data.fournisseurName) {
+                            document.getElementById('modalPaiementPartenaire').textContent = data.fournisseurName;
+                            document.getElementById('modalPaiementTypeBadge').textContent = 'Fournisseur';
+                            document.getElementById('modalPaiementTypeBadge').className = 'badge bg-info';
+                        }
+                    }
+                })
+                .catch(error => console.error('Fetch error:', error));
+            
+            // Fetch payment info
+            fetch('/api/commande/' + idCommande + '/paiement-info')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('modalPaiementTotal').textContent = data.total.toFixed(2) + ' Ar';
+                        document.getElementById('modalPaiementPaye').textContent = data.paye.toFixed(2) + ' Ar';
+                        document.getElementById('modalPaiementReste').textContent = data.reste.toFixed(2) + ' Ar';
+                        document.getElementById('modalPaiementMaxAmount').textContent = data.reste.toFixed(2);
+                        
+                        currentResteAmount = data.reste;
+                        
+                        // Set max on input
+                        document.getElementById('modalPaiementMontant').max = data.reste;
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            
+            // Show modal
+            const modal = new bootstrap.Modal(document.getElementById('paiementModal'));
+            modal.show();
+        }
+        
+        function setQuickAmount(percentage) {
+            const amount = (currentResteAmount * percentage / 100).toFixed(2);
+            document.getElementById('modalPaiementMontant').value = amount;
+        }
+        
+        // Validate amount before submit
+        document.getElementById('paiementForm').addEventListener('submit', function(e) {
+            const montant = parseFloat(document.getElementById('modalPaiementMontant').value);
+            if (montant > currentResteAmount) {
+                e.preventDefault();
+                alert('Le montant ne peut pas dépasser le reste à payer (' + currentResteAmount.toFixed(2) + ' Ar)');
+                return false;
+            }
+            if (montant <= 0) {
+                e.preventDefault();
+                alert('Le montant doit être supérieur à 0');
+                return false;
+            }
+        });
+    </script>
+</body>
+</html>

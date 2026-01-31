@@ -136,4 +136,9 @@ public class PaiementService {
         BigDecimal total = proformaDetailRepository.sumTotalByProforma(idProforma);
         return total != null ? total : BigDecimal.ZERO;
     }
+
+    public BigDecimal getSommePaiements(Integer idCommande) {
+        BigDecimal sommePaiements = paiementRepository.sumMontantByIdCommande(idCommande);
+        return sommePaiements != null ? sommePaiements : BigDecimal.ZERO;
+    }
 }

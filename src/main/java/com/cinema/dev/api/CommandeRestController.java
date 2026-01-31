@@ -94,6 +94,48 @@ public class CommandeRestController {
         }
     }
 
+    @GetMapping("/{idCommande}/paiement-info")
+    public ResponseEntity<Map<String, Object>> getPaiementInfo(@PathVariable Integer idCommande) {
+        try {
+            Optional<Commande> commandeOpt = commandeRepository.findById(idCommande);
+            if (commandeOpt.isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Commande not found");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            Commande commande = commandeOpt.get();
+            Integer idProforma = commande.getIdProforma();
+            
+            // Get total amount from proforma
+            BigDecimal total = BigDecimal.ZERO;
+            if (idProforma != null) {
+                total = paiementService.getTotalProforma(idProforma);
+            }
+            
+            // Get amount already paid
+            BigDecimal paye = paiementService.getSommePaiements(idCommande);
+            
+            // Get remaining amount
+            BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, LocalDateTime.now());
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("total", total);
+            response.put("paye", paye);
+            response.put("reste", reste);
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+    }
+
     @GetMapping("/{idCommande}")
     public Map<String, Object> getCommandeDetail(@PathVariable Integer idCommande) {
         Map<String, Object> response = new HashMap<>();
@@ -120,5 +162,51 @@ public class CommandeRestController {
         }
         
         return response;
+    }
+
+    @GetMapping("/proforma-by-commande/{idCommande}")
+    public ResponseEntity<Map<String, Object>> getProformaByCommande(@PathVariable Integer idCommande) {
+        try {
+            Optional<Commande> commandeOpt = commandeRepository.findById(idCommande);
+            if (commandeOpt.isEmpty()) {
+                Map<String, Object> errorResponse = new HashMap<>();
+                errorResponse.put("success", false);
+                errorResponse.put("message", "Commande not found");
+                return ResponseEntity.badRequest().body(errorResponse);
+            }
+
+            Commande commande = commandeOpt.get();
+            Integer idProforma = commande.getIdProforma();
+            
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("idProforma", idProforma);
+            response.put("date", commande.getDate());
+            
+            if (idProforma != null) {
+                Optional<Proforma> proformaOpt = proformaRepository.findById(idProforma);
+                if (proformaOpt.isPresent()) {
+                    Proforma proforma = proformaOpt.get();
+                    
+                    // Set client or fournisseur name
+                    if (proforma.getIdClient() != null) {
+                        clientRepository.findById(proforma.getIdClient()).ifPresent(client -> {
+                            response.put("clientName", client.getNom());
+                        });
+                    } else if (proforma.getIdFournisseur() != null) {
+                        fournisseurRepository.findById(proforma.getIdFournisseur()).ifPresent(fournisseur -> {
+                            response.put("fournisseurName", fournisseur.getNom());
+                        });
+                    }
+                }
+            }
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
     }
 }

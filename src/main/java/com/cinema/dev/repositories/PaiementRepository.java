@@ -16,7 +16,9 @@ public interface PaiementRepository extends JpaRepository<Paiement, Integer> {
 	@Query("SELECT COALESCE(SUM(p.montant), 0) FROM Paiement p WHERE p.idCommande = :idCommande AND p.date <= :date")
 	BigDecimal sumMontantByIdCommandeBeforeDate(@Param("idCommande") Integer idCommande, @Param("date") LocalDateTime date);
 
-
+	@Query("SELECT COALESCE(SUM(p.montant), 0) FROM Paiement p WHERE p.idCommande = :idCommande")
+	BigDecimal sumMontantByIdCommande(@Param("idCommande") Integer idCommande);
+	
 	@Query("SELECT p FROM Paiement p WHERE " +
 		"CASE WHEN :idCommande IS NULL THEN true ELSE p.idCommande = :idCommande END " +
 		"AND CASE WHEN CAST(:startDate AS timestamp) IS NULL THEN true ELSE p.date >= :startDate END " +

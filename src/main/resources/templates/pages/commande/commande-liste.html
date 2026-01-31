@@ -1,7 +1,10 @@
 <section class="section" th:fragment="page">
     <div class="card">
-        <div class="card-header">
-            <h4 class="card-title">Liste des Commandes</h4>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Commandes</h4>
+            <a th:href="@{/commande/creer}" class="btn btn-sm btn-success me-2">
+                <i class="bi bi-plus-circle"></i> Nouvelle Commande
+            </a>
         </div>
 
         <!-- Filter Form -->
@@ -44,11 +47,6 @@
         </div>
 
         <div class="card-body">
-            <div class="mb-3">
-                <a th:href="@{/commande/creer}" class="btn btn-primary">
-                    <i class="bi bi-plus-circle"></i> Nouvelle Commande
-                </a>
-            </div>
 
             <div class="table-responsive">
                 <table class="table table-striped">
@@ -103,9 +101,9 @@
                                             <i class="bi bi-check-circle"></i> Valider
                                         </button>
                                     </form>
-                                    <a th:href="@{/paiement/saisie(idCommande=${commande.idCommande})}" class="btn btn-primary btn-sm">
+                                    <button type="button" class="btn btn-primary btn-sm" th:onclick="'openPaiementModal(' + ${commande.idCommande} + ')'">
                                         <i class="bi bi-cash"></i> Payer
-                                    </a>
+                                    </button>
                                 </div>
                             </td>
                         </tr>
@@ -202,4 +200,8 @@
                 });
         });
     </script>
+
+    <!-- Include Payment Modal -->
+    <div th:replace="fragments/paiement-modal :: modal"></div>
+    <script th:replace="fragments/paiement-modal :: script"></script>
 </section>

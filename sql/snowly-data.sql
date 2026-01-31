@@ -24,7 +24,7 @@ INSERT INTO fournisseur (nom) VALUES
 
 -- Caisses (use Integer ids to match the model)
 INSERT INTO caisse (id_caisse, lieu) VALUES
-(1, 'Siège Social'),
+(1, 'Siege Social'),
 (2, 'Succursale');
 
 -- Etats (basic ones used by proforma/commande flows)

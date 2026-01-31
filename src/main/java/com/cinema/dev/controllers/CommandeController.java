@@ -54,6 +54,7 @@ public class CommandeController {
         model.addAttribute("proformas", proformaRepository.findAll());
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
+        model.addAttribute("caisses", caisseRepository.findAll());
         model.addAttribute("commandeEtats", commandeEtatRepository.findAll());
         model.addAttribute("filterIdProforma", idProforma);
         model.addAttribute("filterIdClient", idClient);

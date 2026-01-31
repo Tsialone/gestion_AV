@@ -23,7 +23,7 @@
                             <option value="">-- Sélectionner une caisse --</option>
                             <option th:each="caisse : ${caisses}" 
                                     th:value="${caisse.idCaisse}"
-                                    th:text="${caisse.libelle}">
+                                    th:text="${caisse.lieu}">
                             </option>
                         </select>
                     </div>
@@ -40,10 +40,34 @@
                     </div>
                 </div>
 
-                <div class="row mt-4">
+                <div class="row g-3 mt-2">
                     <div class="col-md-6">
-                        <div class="alert alert-info">
-                            <strong>Reste à payer :</strong> <span id="resteAmount">-</span> Ar
+                        <label for="dateMvtCaisse" class="form-label">Date Mouvement Caisse</label>
+                        <input type="datetime-local" class="form-control" id="dateMvtCaisse" name="dateMvtCaisse">
+                        <small class="text-muted">Laisser vide pour utiliser la date de paiement</small>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card mb-3 bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">Résumé des Paiements</h6>
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Total à Payer</small><br>
+                                        <span id="totalAmount" class="text-primary fs-4 fw-bold">-</span>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Déjà Payé</small><br>
+                                        <span id="payeAmount" class="text-success fs-4 fw-bold">-</span>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Reste à Payer</small><br>
+                                        <span id="resteAmount" class="text-danger fs-4 fw-bold">-</span>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -65,17 +89,27 @@
     <script>
         function updateCommandeInfo(idCommande) {
             if (idCommande) {
-                // Fetch reste amount from backend
-                fetch('/api/commande/' + idCommande + '/reste')
+                // Fetch payment info from backend
+                fetch('/api/commande/' + idCommande + '/paiement-info')
                     .then(response => response.json())
                     .then(data => {
-                        document.getElementById('resteAmount').textContent = data.reste.toFixed(2);
+                        if (data.success) {
+                            document.getElementById('totalAmount').textContent = data.total.toFixed(2) + ' Ar';
+                            document.getElementById('payeAmount').textContent = data.paye.toFixed(2) + ' Ar';
+                            document.getElementById('resteAmount').textContent = data.reste.toFixed(2) + ' Ar';
+                            // Set max on montant input
+                            document.getElementById('montant').max = data.reste;
+                        }
                     })
                     .catch(error => {
-                        console.error('Error fetching reste:', error);
+                        console.error('Error fetching paiement info:', error);
+                        document.getElementById('totalAmount').textContent = 'Erreur';
+                        document.getElementById('payeAmount').textContent = 'Erreur';
                         document.getElementById('resteAmount').textContent = 'Erreur';
                     });
             } else {
+                document.getElementById('totalAmount').textContent = '-';
+                document.getElementById('payeAmount').textContent = '-';
                 document.getElementById('resteAmount').textContent = '-';
             }
         }
