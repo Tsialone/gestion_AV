@@ -1,0 +1,78 @@
+<section class="section" th:fragment="page">
+    <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-primary h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Valorisation FIFO</p>
+                            <h4 class="mb-0" th:text="${valeurStock != null ? valeurStock : 0} + Ar ">0 AR</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+    <div class="card">
+        
+
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title">Tableau de Valorisation de Stock</h4>
+            <span class="badge bg-info" th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy HH:mm')}"></span>
+        </div>
+
+        <div class="card-body">
+            <div class="mb-3">
+                <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="bi bi-printer"></i> Imprimer l'état
+                </button>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-sm text-nowrap">
+                    <thead class="table-light text-center">
+                        <tr>
+                            <th>Date</th>
+                            <!-- <th>ID Mvt</th> -->
+                            <th>Désignation</th>
+                            <th>Article (ID)</th>
+                            <th>Lot (ID)</th>
+                            <th>Type</th>
+                            <th>Qté Init. Lot</th>
+                            <th>Qté Mvt</th>
+                            <th>Stock Restant</th>
+                            <th>P.U (Ar)</th>
+                            <th>Valeur Mvt</th>
+                            <th>Valeur Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody class="align-middle">
+                        <tr th:each="row : ${valeursStock}">
+                            <td th:text="${#temporals.format(row.dateMouvement, 'dd/MM/yyyy HH:mm')}"></td>
+                            <!-- <td class="text-center font-monospace" th:text="${row.idMvt}"></td> -->
+                            <td th:text="${row.designation}"></td>
+                            <td>
+                                <span th:text="${row.libelleArticle}"></span>
+                                <small class="text-muted d-block" th:text="'ID: ' + ${row.idArticle} + ' | ' + ${row.libelleCategorie}"></small>
+                            </td>
+                            <td>
+                                <span th:text="${row.libelleLot}"></span>
+                                <small class="text-muted d-block" th:text="'ID: ' + ${row.idLot}"></small>
+                            </td>
+                            <td class="text-center">
+                                <span th:if="${row.typeMouvement == 'ENTREE'}" class="badge bg-success">ENTRÉE</span>
+                                <span th:if="${row.typeMouvement == 'SORTIE'}" class="badge bg-danger">SORTIE</span>
+                            </td>
+                            <td class="text-center" th:text="${row.quantiteInitialeLot}"></td>
+                            <td class="text-center fw-bold" th:text="${row.quantiteMouvement}"></td>
+                            <td class="text-center" th:text="${row.stockRestantLot}"></td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(row.prixUnitaire, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                            <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(row.valeurMouvement, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                            <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.valeurStockLot, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(valeursStock)}">
+                            <td colspan="12" class="text-center py-4 text-muted">Aucune donnée disponible.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>

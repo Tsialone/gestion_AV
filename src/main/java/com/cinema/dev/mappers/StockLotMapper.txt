@@ -1,0 +1,158 @@
+package com.cinema.dev.mappers;
+
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+
+import com.cinema.dev.models.EntreeStockLot;
+import com.cinema.dev.models.SortieStockLot;
+
+/**
+ * Classe utilitaire pour mapper les résultats de requêtes natives (Object[]) en DTOs
+ */
+public class StockLotMapper {
+    
+    /**
+     * Convertit un Object[] de la vue v_entree_stock_lot en EntreeStockLotDto
+     */
+    public static EntreeStockLot mapToEntreeStockLot(Object[] row) {
+        if (row == null) {
+            return null;
+        }
+        
+        EntreeStockLot dto = new EntreeStockLot();
+        
+        int index = 0;
+        dto.setIdMvt(getInteger(row[index++]));
+        dto.setIdLot(getInteger(row[index++]));
+        dto.setLibelleLot(getString(row[index++]));
+        dto.setQuantiteLot(getInteger(row[index++]));
+        dto.setQuantiteInitialeLot(getInteger(row[index++]));
+        
+        dto.setIdArticle(getInteger(row[index++]));
+        dto.setLibelleArticle(getString(row[index++]));
+        dto.setIdCategorie(getInteger(row[index++]));
+        dto.setLibelleCategorie(getString(row[index++]));
+        
+        dto.setDateMouvement(getLocalDateTime(row[index++]));
+        dto.setDescriptionQualite(getString(row[index++]));
+        dto.setDesignation(getString(row[index++]));
+        dto.setIdDepot(getInteger(row[index++]));
+        dto.setNomDepot(getString(row[index++]));
+        
+        dto.setIdLivraison(getInteger(row[index++]));
+        dto.setDateLivraison(getLocalDateTime(row[index++]));
+        
+        dto.setIdCommande(getInteger(row[index++]));
+        dto.setDateCommande(getLocalDateTime(row[index++]));
+        dto.setRemise(getBigDecimal(row[index++]));
+        
+        dto.setIdProforma(getInteger(row[index++]));
+        dto.setDateDebutProforma(getLocalDateTime(row[index++]));
+        dto.setDateFinProforma(getLocalDateTime(row[index++]));
+        
+        dto.setPrixUnitaire(getBigDecimal(row[index++]));
+        dto.setQuantiteProforma(getInteger(row[index++]));
+        dto.setPrixTotalLot(getBigDecimal(row[index++]));
+        
+        dto.setIdFournisseur(getInteger(row[index++]));
+        dto.setNomFournisseur(getString(row[index++]));
+        
+        dto.setIdClient(getInteger(row[index++]));
+        dto.setNomClient(getString(row[index++]));
+        
+        return dto;
+    }
+    
+    /**
+     * Convertit un Object[] de la vue v_sortie_stock_lot en SortieStockLotDto
+     */
+    public static SortieStockLot mapToSortieStockLot(Object[] row) {
+        if (row == null) {
+            return null;
+        }
+        
+        SortieStockLot dto = new SortieStockLot();
+        
+        int index = 0;
+        dto.setIdMvt(getInteger(row[index++]));
+        dto.setIdLot(getInteger(row[index++]));
+        dto.setLibelleLot(getString(row[index++]));
+        dto.setQuantiteLot(getInteger(row[index++]));
+        dto.setQuantiteInitialeLot(getInteger(row[index++]));
+        
+        dto.setIdArticle(getInteger(row[index++]));
+        dto.setLibelleArticle(getString(row[index++]));
+        dto.setIdCategorie(getInteger(row[index++]));
+        dto.setLibelleCategorie(getString(row[index++]));
+        
+        dto.setDateMouvement(getLocalDateTime(row[index++]));
+        dto.setDescriptionQualite(getString(row[index++]));
+        dto.setDesignation(getString(row[index++]));
+        dto.setIdDepot(getInteger(row[index++]));
+        dto.setNomDepot(getString(row[index++]));
+        
+        return dto;
+    }
+    
+    // Méthodes utilitaires pour la conversion de types
+    
+    private static Integer getInteger(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Integer) {
+            return (Integer) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).intValue();
+        }
+        return null;
+    }
+    
+    private static String getString(Object value) {
+        if (value == null) {
+            return null;
+        }
+        return value.toString();
+    }
+    
+    private static BigDecimal getBigDecimal(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof BigDecimal) {
+            return (BigDecimal) value;
+        }
+        if (value instanceof Number) {
+            return BigDecimal.valueOf(((Number) value).doubleValue());
+        }
+        return null;
+    }
+    
+    private static LocalDateTime getLocalDateTime(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Timestamp) {
+            return ((Timestamp) value).toLocalDateTime();
+        }
+        if (value instanceof LocalDateTime) {
+            return (LocalDateTime) value;
+        }
+        return null;
+    }
+    
+    private static Double getDouble(Object value) {
+        if (value == null) {
+            return null;
+        }
+        if (value instanceof Double) {
+            return (Double) value;
+        }
+        if (value instanceof Number) {
+            return ((Number) value).doubleValue();
+        }
+        return null;
+    }
+}

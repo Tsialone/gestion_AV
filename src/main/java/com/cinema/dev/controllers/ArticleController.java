@@ -12,13 +12,12 @@ import com.cinema.dev.utils.BreadcrumbItem;
 import lombok.RequiredArgsConstructor;
 
 @Controller
-@RequestMapping("/articles")
+@RequestMapping("/")
 @RequiredArgsConstructor
 public class ArticleController {
 
     // private final ArticleService articleService;
-
-    @GetMapping("/liste")
+    @GetMapping
     public String getListe(Model model) {
         // model.addAttribute("articles", articleService.findAll());
         model.addAttribute("content", "pages/articles/article-liste");

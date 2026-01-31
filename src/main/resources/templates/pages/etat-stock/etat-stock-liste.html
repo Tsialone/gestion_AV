@@ -1,0 +1,91 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">État du Stock</h4>
+            <a th:href="@{/etat-stock/liste}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-primary h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Total Entrées</p>
+                            <h4 class="mb-0" th:text="${totalEntrees}">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-danger h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Total Sorties</p>
+                            <h4 class="mb-0" th:text="${totalSorties}">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-success h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Stock Actuel</p>
+                            <h4 class="mb-0" th:text="${stockActuel}">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div class="mb-3">
+                <form th:action="@{/etat-stock/liste}" method="get" class="row g-2">
+                    <div class="col-md-3">
+                        <label for="idDepotFilter" class="form-label">Dépôt</label>
+                        <select class="form-select" id="idDepotFilter" name="idDepot">
+                            <option value="">-- Tous les dépôts --</option>
+                            <option th:each="etat : ${etatStocks}" 
+                                    th:value="${etat.idDepot}"
+                                    th:text="${etat.depot}"
+                                    th:selected="${idDepot == etat.idDepot}"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="dateFilter" class="form-label">Filtrer par date</label>
+                        <input type="datetime-local" class="form-control" id="dateFilter" name="date" 
+                               th:value="${date}" />
+                    </div>
+                    <div class="col-md-auto d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Filtrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Dépôt</th>
+                            <th>Article</th>
+                            <th>Entrées</th>
+                            <th>Sorties</th>
+                            <th>Stock à Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${etatStocks.isEmpty()}">
+                            <td colspan="5" class="text-center">Aucune donnée disponible</td>
+                        </tr>
+                        <tr th:each="etat : ${etatStocks}">
+                            <td th:text="${etat.depot}"></td>
+                            <td th:text="${etat.article}"></td>
+                            <td th:text="${etat.totalEntrees}"></td>
+                            <td th:text="${etat.totalSorties}"></td>
+                            <td>
+                                <span class="badge bg-primary" th:text="${etat.stockADate}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
