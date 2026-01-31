@@ -119,8 +119,14 @@ public class PaiementService {
             totalProforma = BigDecimal.ZERO;
         }
 
-        LocalDateTime effectiveDate = date != null ? date : LocalDateTime.now();
-        BigDecimal sommePaiements = paiementRepository.sumMontantByIdCommandeBeforeDate(idCommande, effectiveDate);
+        BigDecimal sommePaiements;
+        if (date != null) {
+            // Use date filter only if explicitly provided
+            sommePaiements = paiementRepository.sumMontantByIdCommandeBeforeDate(idCommande, date);
+        } else {
+            // Default: sum all payments regardless of date
+            sommePaiements = paiementRepository.sumMontantByIdCommande(idCommande);
+        }
         if (sommePaiements == null) {
             sommePaiements = BigDecimal.ZERO;
         }

@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -77,7 +76,7 @@ public class CommandeRestController {
     @GetMapping("/{idCommande}/reste")
     public ResponseEntity<Map<String, Object>> getResteCommande(@PathVariable Integer idCommande) {
         try {
-            BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, LocalDateTime.now());
+            BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, null);
             
             Map<String, Object> response = new HashMap<>();
             response.put("idCommande", idCommande);
@@ -118,7 +117,7 @@ public class CommandeRestController {
             BigDecimal paye = paiementService.getSommePaiements(idCommande);
             
             // Get remaining amount
-            BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, LocalDateTime.now());
+            BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, null);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

@@ -103,8 +103,7 @@ public class CommandeService {
         }
         
         //* -- Check if commande is fully paid
-        LocalDateTime checkDate = dateLivraison != null ? dateLivraison : LocalDateTime.now();
-        BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, checkDate);
+        BigDecimal reste = paiementService.getMontantTotalPourUneCommande(idCommande, null);
         if (reste.compareTo(BigDecimal.ZERO) > 0) {
             throw new IllegalArgumentException("Commande must be fully paid before delivery. Remaining: " + reste);
         }
