@@ -18,6 +18,7 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/proforma")
@@ -54,16 +55,16 @@ public class ProformaController {
         List<Proforma> proformas = proformaService.findWithFilters(idClient, idFournisseur, start, end);
         
         // Apply sorting
-        java.util.Comparator<Proforma> comparator = null;
+        Comparator<Proforma> comparator = null;
         switch (sortBy) {
             case "idProforma":
-                comparator = java.util.Comparator.comparing(Proforma::getIdProforma);
+                comparator = Comparator.comparing(Proforma::getIdProforma);
                 break;
             case "dateDebut":
-                comparator = java.util.Comparator.comparing(Proforma::getDateDebut, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Proforma::getDateDebut, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
             case "dateFin":
-                comparator = java.util.Comparator.comparing(Proforma::getDateFin, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Proforma::getDateFin, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
         }
         

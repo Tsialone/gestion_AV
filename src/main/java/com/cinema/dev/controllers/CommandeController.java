@@ -2,6 +2,7 @@ package com.cinema.dev.controllers;
 
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.repositories.ProformaRepository;
+import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Livraison;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.repositories.CaisseRepository;
@@ -20,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/commande")
@@ -62,16 +64,16 @@ public class CommandeController {
         var commandes = commandeService.findWithFilters(idProforma, start, end);
         
         // Apply sorting
-        java.util.Comparator<com.cinema.dev.models.Commande> comparator = null;
+        Comparator<Commande> comparator = null;
         switch (sortBy) {
             case "idCommande":
-                comparator = java.util.Comparator.comparing(com.cinema.dev.models.Commande::getIdCommande);
+                comparator = Comparator.comparing(Commande::getIdCommande);
                 break;
             case "date":
-                comparator = java.util.Comparator.comparing(com.cinema.dev.models.Commande::getDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Commande::getDate, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
             case "idProforma":
-                comparator = java.util.Comparator.comparing(com.cinema.dev.models.Commande::getIdProforma, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Commande::getIdProforma, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
         }
         

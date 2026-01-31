@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/paiement")
@@ -58,19 +59,19 @@ public class PaiementController {
         List<Paiement> paiements = paiementService.findWithFilters(idCommande, type, start, end);
         
         // Apply sorting
-        java.util.Comparator<Paiement> comparator = null;
+        Comparator<Paiement> comparator = null;
         switch (sortBy) {
             case "idPaiement":
-                comparator = java.util.Comparator.comparing(Paiement::getIdPaiement);
+                comparator = Comparator.comparing(Paiement::getIdPaiement);
                 break;
             case "date":
-                comparator = java.util.Comparator.comparing(Paiement::getDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Paiement::getDate, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
             case "montant":
-                comparator = java.util.Comparator.comparing(Paiement::getMontant, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Paiement::getMontant, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
             case "idCommande":
-                comparator = java.util.Comparator.comparing(Paiement::getIdCommande, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Paiement::getIdCommande, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
         }
         

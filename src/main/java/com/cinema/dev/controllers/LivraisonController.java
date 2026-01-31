@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/livraison")
@@ -121,16 +122,16 @@ public class LivraisonController {
         }
         
         // Apply sorting
-        java.util.Comparator<Livraison> comparator = null;
+        Comparator<Livraison> comparator = null;
         switch (sortBy) {
             case "idLivraison":
-                comparator = java.util.Comparator.comparing(Livraison::getIdLivraison);
+                comparator = Comparator.comparing(Livraison::getIdLivraison);
                 break;
             case "date":
-                comparator = java.util.Comparator.comparing(Livraison::getDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Livraison::getDate, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
             case "idCommande":
-                comparator = java.util.Comparator.comparing(Livraison::getIdCommande, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(Livraison::getIdCommande, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
         }
         

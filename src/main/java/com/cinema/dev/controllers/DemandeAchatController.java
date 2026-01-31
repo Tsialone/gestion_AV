@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.Comparator;
 
 @Controller
 @RequestMapping("/demande-achat")
@@ -47,16 +48,16 @@ public class DemandeAchatController {
         List<DemandeAchat> demandesAchat = demandeAchatService.findWithFilters(idClient, start, end);
         
         // Apply sorting
-        java.util.Comparator<DemandeAchat> comparator = null;
+        Comparator<DemandeAchat> comparator = null;
         switch (sortBy) {
             case "idDa":
-                comparator = java.util.Comparator.comparing(DemandeAchat::getIdDa);
+                comparator = Comparator.comparing(DemandeAchat::getIdDa);
                 break;
             case "dateDemande":
-                comparator = java.util.Comparator.comparing(DemandeAchat::getDateDemande, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(DemandeAchat::getDateDemande, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
             case "idClient":
-                comparator = java.util.Comparator.comparing(DemandeAchat::getIdClient, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                comparator = Comparator.comparing(DemandeAchat::getIdClient, Comparator.nullsLast(Comparator.naturalOrder()));
                 break;
         }
         
