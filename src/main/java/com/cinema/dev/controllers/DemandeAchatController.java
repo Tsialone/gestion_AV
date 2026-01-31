@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -35,12 +36,40 @@ public class DemandeAchatController {
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) String startDate, 
-                          @RequestParam(required = false) String endDate, Model model) {
+                          @RequestParam(required = false) String endDate,
+                          @RequestParam(required = false, defaultValue = "idDa") String sortBy,
+                          @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                          Model model) {
         
         LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
         LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
         
-        model.addAttribute("demandesAchat", demandeAchatService.findWithFilters(idClient, start, end));
+        List<DemandeAchat> demandesAchat = demandeAchatService.findWithFilters(idClient, start, end);
+        
+        // Apply sorting
+        java.util.Comparator<DemandeAchat> comparator = null;
+        switch (sortBy) {
+            case "idDa":
+                comparator = java.util.Comparator.comparing(DemandeAchat::getIdDa);
+                break;
+            case "dateDemande":
+                comparator = java.util.Comparator.comparing(DemandeAchat::getDateDemande, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "idClient":
+                comparator = java.util.Comparator.comparing(DemandeAchat::getIdClient, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            demandesAchat.sort(comparator);
+        }
+        
+        model.addAttribute("demandesAchat", demandesAchat);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("clients", clientRepository.findAll());
         Map<Integer, String> clientsMap = clientRepository.findAll()
             .stream().collect(Collectors.toMap(c -> c.getIdClient(), c -> c.getNom()));

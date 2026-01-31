@@ -17,6 +17,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/proforma")
@@ -42,12 +43,40 @@ public class ProformaController {
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, 
-                           @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate, Model model) {
+                           @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
+                           @RequestParam(required = false, defaultValue = "idProforma") String sortBy,
+                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
         
-        model.addAttribute("proformas", proformaService.findWithFilters(idClient, idFournisseur, start, end));
+        List<Proforma> proformas = proformaService.findWithFilters(idClient, idFournisseur, start, end);
+        
+        // Apply sorting
+        java.util.Comparator<Proforma> comparator = null;
+        switch (sortBy) {
+            case "idProforma":
+                comparator = java.util.Comparator.comparing(Proforma::getIdProforma);
+                break;
+            case "dateDebut":
+                comparator = java.util.Comparator.comparing(Proforma::getDateDebut, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "dateFin":
+                comparator = java.util.Comparator.comparing(Proforma::getDateFin, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            proformas.sort(comparator);
+        }
+        
+        model.addAttribute("proformas", proformas);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("proformaEtats", proformaEtatRepository.findAll());

@@ -48,12 +48,38 @@ public class PaiementController {
                           @RequestParam(required = false) String type,
                           @RequestParam(required = false) String startDate,
                           @RequestParam(required = false) String endDate,
+                          @RequestParam(required = false, defaultValue = "idPaiement") String sortBy,
+                          @RequestParam(required = false, defaultValue = "desc") String sortDir,
                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
         
         List<Paiement> paiements = paiementService.findWithFilters(idCommande, type, start, end);
+        
+        // Apply sorting
+        java.util.Comparator<Paiement> comparator = null;
+        switch (sortBy) {
+            case "idPaiement":
+                comparator = java.util.Comparator.comparing(Paiement::getIdPaiement);
+                break;
+            case "date":
+                comparator = java.util.Comparator.comparing(Paiement::getDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "montant":
+                comparator = java.util.Comparator.comparing(Paiement::getMontant, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "idCommande":
+                comparator = java.util.Comparator.comparing(Paiement::getIdCommande, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            paiements.sort(comparator);
+        }
         
         // Build maps for type and partenaire names
         Map<Integer, String> paiementTypes = new HashMap<>();
@@ -80,6 +106,8 @@ public class PaiementController {
         }
         
         model.addAttribute("paiements", paiements);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("commandes", commandeRepository.findAll());
         model.addAttribute("caisses", caisseRepository.findAll());
         model.addAttribute("paiementTypes", paiementTypes);

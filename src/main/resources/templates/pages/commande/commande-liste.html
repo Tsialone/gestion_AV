@@ -52,9 +52,27 @@
                 <table class="table table-striped">
                     <thead>
                         <tr>
-                            <th>ID Commande</th>
-                            <th>Date Commande</th>
-                            <th>Proforma</th>
+                            <th>
+                                <a th:href="@{/commande/liste(idClient=${filterIdClient}, idFournisseur=${filterIdFournisseur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='idCommande', sortDir=${sortBy == 'idCommande' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    ID Commande
+                                    <i th:if="${sortBy == 'idCommande'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/commande/liste(idClient=${filterIdClient}, idFournisseur=${filterIdFournisseur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='date', sortDir=${sortBy == 'date' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    Date Commande
+                                    <i th:if="${sortBy == 'date'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/commande/liste(idClient=${filterIdClient}, idFournisseur=${filterIdFournisseur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='idProforma', sortDir=${sortBy == 'idProforma' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    Proforma
+                                    <i th:if="${sortBy == 'idProforma'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
                             <th>État</th>
                             <th>Total à Payer</th>
                             <th>Déjà Payé</th>

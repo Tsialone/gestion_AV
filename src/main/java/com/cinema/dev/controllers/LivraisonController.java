@@ -44,6 +44,8 @@ public class LivraisonController {
                           @RequestParam(required = false) String type,
                           @RequestParam(required = false) String startDate,
                           @RequestParam(required = false) String endDate,
+                          @RequestParam(required = false, defaultValue = "idLivraison") String sortBy,
+                          @RequestParam(required = false, defaultValue = "desc") String sortDir,
                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
@@ -118,7 +120,30 @@ public class LivraisonController {
             }
         }
         
+        // Apply sorting
+        java.util.Comparator<Livraison> comparator = null;
+        switch (sortBy) {
+            case "idLivraison":
+                comparator = java.util.Comparator.comparing(Livraison::getIdLivraison);
+                break;
+            case "date":
+                comparator = java.util.Comparator.comparing(Livraison::getDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "idCommande":
+                comparator = java.util.Comparator.comparing(Livraison::getIdCommande, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            filteredLivraisons.sort(comparator);
+        }
+        
         model.addAttribute("livraisons", filteredLivraisons);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         model.addAttribute("commandes", commandeRepository.findAll());
         model.addAttribute("livraisonTypes", livraisonTypes);
         model.addAttribute("partenaireNames", partenaireNames);

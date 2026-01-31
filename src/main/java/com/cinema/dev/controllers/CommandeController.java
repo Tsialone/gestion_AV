@@ -51,13 +51,40 @@ public class CommandeController {
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, @RequestParam(required = false) String startDate, 
-                           @RequestParam(required = false) String endDate, Model model) {
+                           @RequestParam(required = false) String endDate,
+                           @RequestParam(required = false, defaultValue = "idCommande") String sortBy,
+                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                           Model model) {
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
         
         var commandes = commandeService.findWithFilters(idProforma, start, end);
+        
+        // Apply sorting
+        java.util.Comparator<com.cinema.dev.models.Commande> comparator = null;
+        switch (sortBy) {
+            case "idCommande":
+                comparator = java.util.Comparator.comparing(com.cinema.dev.models.Commande::getIdCommande);
+                break;
+            case "date":
+                comparator = java.util.Comparator.comparing(com.cinema.dev.models.Commande::getDate, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+            case "idProforma":
+                comparator = java.util.Comparator.comparing(com.cinema.dev.models.Commande::getIdProforma, java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()));
+                break;
+        }
+        
+        if (comparator != null) {
+            if ("desc".equals(sortDir)) {
+                comparator = comparator.reversed();
+            }
+            commandes.sort(comparator);
+        }
+        
         model.addAttribute("commandes", commandes);
+        model.addAttribute("sortBy", sortBy);
+        model.addAttribute("sortDir", sortDir);
         
         // Create a map of commande ID to livraison object for easy lookup in template
         // Build map manually to handle null values properly
@@ -75,7 +102,7 @@ public class CommandeController {
         for(var entry : commandeLivraisons.entrySet()) {
             System.out.println("Commande ID: " + entry.getKey() + " => Livraison: " + entry.getValue());
         }
-        
+
         model.addAttribute("commandeLivraisons", commandeLivraisons);
         
         model.addAttribute("proformas", proformaRepository.findAll());
