@@ -22,6 +22,7 @@ public class ArticleController {
     public String getListe(Model model) {
         // model.addAttribute("articles", articleService.findAll());
         model.addAttribute("content", "pages/articles/article-liste");
+        model.addAttribute("pageTitle", "Liste des Articles");
         model.addAttribute("breadcrumbs", Arrays.asList(
             new BreadcrumbItem("Articles", "/articles/liste")
         ));
