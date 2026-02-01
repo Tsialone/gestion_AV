@@ -2,6 +2,7 @@ package com.cinema.dev.repositories;
 
 import com.cinema.dev.dtos.EtatStockDto;
 import com.cinema.dev.models.EtatStock;
+import com.cinema.dev.models.EtatStockId;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface EtatStockRepository extends JpaRepository<EtatStock, Long> {
+public interface EtatStockRepository extends JpaRepository<EtatStock, EtatStockId> {
 
     @Query("""
                 SELECT new com.cinema.dev.dtos.EtatStockDto(
@@ -24,12 +25,14 @@ public interface EtatStockRepository extends JpaRepository<EtatStock, Long> {
                 )
                 FROM EtatStock e
                 WHERE (:idDepot IS NULL OR e.idDepot = :idDepot)
+                  AND (:idArticle IS NULL OR e.idArticle = :idArticle)
                   AND e.dateMouvement <= COALESCE(:date, e.dateMouvement)
                 GROUP BY e.idDepot, e.depot, e.idArticle, e.article
                 ORDER BY e.depot, e.article
             """)
     List<EtatStockDto> findEtatStockFiltered(
-            @Param("idDepot") Long idDepot,
+            @Param("idDepot") Integer idDepot,
+          @Param("idArticle") Integer idArticle,
             @Param("date") LocalDateTime date);
 
 }

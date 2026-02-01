@@ -1,9 +1,9 @@
 <section class="section" th:fragment="page">
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h4 class="card-title mb-0">État du Stock</h4>
-            <a th:href="@{/etat-stock/liste}" class="btn btn-outline-primary btn-sm">
-                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            <h4 class="card-title mb-0">Détail du <span th:text="${depotNom}"></span></h4>
+            <a th:href="@{/etat-stock/liste}" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-arrow-left"></i> Retour
             </a>
         </div>
 
@@ -36,28 +36,8 @@
             </div>
             <hr/>
             <div class="mb-3">
-                <form th:action="@{/etat-stock/liste}" method="get" class="row g-2">
-                    <div class="col-md-3">
-                        <label for="idDepotFilter" class="form-label">Dépôt</label>
-                        <select class="form-select" id="idDepotFilter" name="idDepot">
-                            <option value="">-- Tous les dépôts --</option>
-                            <option th:each="etat : ${etatStocks}" 
-                                    th:value="${etat.idDepot}"
-                                    th:text="${etat.depot}"
-                                    th:selected="${idDepot == etat.idDepot}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
-                        <label for="idArticleFilter" class="form-label">Article</label>
-                        <select class="form-select" id="idArticleFilter" name="idArticle">
-                            <option value="">-- Tous les articles --</option>
-                            <option th:each="etat : ${etatStocks}" 
-                                    th:value="${etat.idArticle}"
-                                    th:text="${etat.article}"
-                                    th:selected="${idArticle == etat.idArticle}"></option>
-                        </select>
-                    </div>
-                    <div class="col-md-3">
+                <form th:action="@{/depot/detail/{idDepot}(idDepot=${idDepot})}" method="get" class="row g-2">
+                    <div class="col-md-4">
                         <label for="dateFilter" class="form-label">Filtrer par date</label>
                         <input type="datetime-local" class="form-control" id="dateFilter" name="date" 
                                th:value="${date}" />
@@ -73,27 +53,21 @@
                 <table class="table table-striped align-middle">
                     <thead>
                         <tr>
-                            <th>Dépôt</th>
-                            <th>Article</th>
+                            <th>ID Lot</th>
+                            <th>Lot</th>
                             <th>Entrées</th>
                             <th>Sorties</th>
-                            <th>Stock à Date</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr th:if="${etatStocks.isEmpty()}">
-                            <td colspan="5" class="text-center">Aucune donnée disponible</td>
+                        <tr th:if="${lotsCpl.isEmpty()}">
+                            <td colspan="4" class="text-center">Aucune donnée disponible</td>
                         </tr>
-                        <tr th:each="etat : ${etatStocks}">
-                            <td>
-                                <a th:href="@{/depot/detail/{idDepot}(idDepot=${etat.idDepot})}" class="text-decoration-none" th:text="${etat.depot}"></a>
-                            </td>
-                            <td th:text="${etat.article}"></td>
-                            <td th:text="${etat.totalEntrees}"></td>
-                            <td th:text="${etat.totalSorties}"></td>
-                            <td>
-                                <span class="badge bg-primary" th:text="${etat.stockADate}"></span>
-                            </td>
+                        <tr th:each="lot : ${lotsCpl}">
+                            <td th:text="${lot.idLot}"></td>
+                            <td th:text="${lot.lot}"></td>
+                            <td th:text="${lot.entrees}"></td>
+                            <td th:text="${lot.sorties}"></td>
                         </tr>
                     </tbody>
                 </table>
