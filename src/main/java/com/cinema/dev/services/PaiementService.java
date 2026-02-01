@@ -28,6 +28,9 @@ public class PaiementService {
     @Autowired
     private ProformaDetailRepository proformaDetailRepository;
     
+    @Autowired
+    private AuthorizationService authorizationService;
+    
     public List<Paiement> findAll() {
         return paiementRepository.findAll();
     }
@@ -58,6 +61,69 @@ public class PaiementService {
             .toList();
     }
 
+    /**
+     * Payer une commande
+     * 
+     * Authorization:
+     * - Must be in 'Ventes' department (paiement is part of sales flow)
+     */
+    @Transactional
+    public Paiement payerCommande(Integer idUtilisateur, Integer idCommande, Integer idCaisse, Paiement paiement, LocalDateTime dateMvtCaisse) {
+        //* -- Authorization check (paiement is part of ventes process)
+        authorizationService.requireVentesDept(idUtilisateur, "Payer commande");
+        
+        //* -- Get commande and proforma to check client/fournisseur
+        Commande commande = commandeRepository.findById(idCommande)
+            .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
+        
+        Proforma proforma = proformaRepository.findById(commande.getIdProforma())
+            .orElseThrow(() -> new IllegalArgumentException("Proforma not found"));
+        
+        //* -- Validate montant against remaining to pay
+        LocalDateTime checkDate = dateMvtCaisse != null ? dateMvtCaisse : LocalDateTime.now();
+        BigDecimal reste = getMontantTotalPourUneCommande(idCommande, checkDate);
+        if (paiement.getMontant() == null) {
+            throw new IllegalArgumentException("Paiement montant is null");
+        }
+        if (paiement.getMontant().compareTo(reste) > 0) {
+            throw new IllegalArgumentException("Montant du paiement dépasse le reste à payer: reste=" + reste);
+        }
+
+        //* -- Set idCommande
+        paiement.setIdCommande(idCommande);
+
+        //* -- Insert paiement
+        Paiement savedPaiement = paiementRepository.save(paiement);
+        
+        //* -- Create mvt_caisse
+        MvtCaisse mvtCaisse = new MvtCaisse();
+        mvtCaisse.setIdPaiement(savedPaiement.getIdPaiement());
+        mvtCaisse.setIdCaisse(idCaisse);
+        mvtCaisse.setDate(dateMvtCaisse != null ? dateMvtCaisse : LocalDateTime.now());
+        
+        //* -- Debit if idFournisseur != null, Credit if idClient != null
+        if (proforma.getIdFournisseur() != null) {
+            mvtCaisse.setDebit(paiement.getMontant());
+            mvtCaisse.setCredit(BigDecimal.ZERO);
+        } else if (proforma.getIdClient() != null) {
+            mvtCaisse.setDebit(BigDecimal.ZERO);
+            mvtCaisse.setCredit(paiement.getMontant());
+        }
+        
+        //* -- Insert mvt_caisse
+        mvtCaisseRepository.save(mvtCaisse);
+        
+        //* -- Log to historique
+        authorizationService.logAction(idUtilisateur, "paiement", "Paiement commande", savedPaiement.getIdPaiement(), checkDate);
+        
+        return savedPaiement;
+    }
+    
+    /**
+     * Legacy method without authorization (for backward compatibility)
+     * @deprecated Use payerCommande(Integer idUtilisateur, ...) instead
+     */
+    @Deprecated
     @Transactional
     public Paiement payerCommande(Integer idCommande, Integer idCaisse, Paiement paiement, LocalDateTime dateMvtCaisse) {
         //* -- Get commande and proforma to check client/fournisseur

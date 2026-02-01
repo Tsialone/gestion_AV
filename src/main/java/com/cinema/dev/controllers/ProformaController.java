@@ -1,14 +1,17 @@
 package com.cinema.dev.controllers;
 
+import com.cinema.dev.dtos.ValidationStatusDTO;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.models.ProformaDetail;
 import com.cinema.dev.services.ProformaService;
+import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ArticleRepository;
 import com.cinema.dev.repositories.DemandeAchatRepository;
 import com.cinema.dev.repositories.ProformaEtatRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,6 +21,8 @@ import java.time.LocalDateTime;
 import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.Comparator;
 
 @Controller
@@ -41,6 +46,9 @@ public class ProformaController {
     
     @Autowired
     private ProformaEtatRepository proformaEtatRepository;
+    
+    @Autowired
+    private SessionService sessionService;
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, 
@@ -81,6 +89,14 @@ public class ProformaController {
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("proformaEtats", proformaEtatRepository.findAll());
+        
+        // Build validation status map for each proforma
+        Map<Integer, ValidationStatusDTO> validationStatusMap = new HashMap<>();
+        for (Proforma p : proformas) {
+            validationStatusMap.put(p.getIdProforma(), proformaService.getValidationStatus(p.getIdProforma()));
+        }
+        model.addAttribute("validationStatusMap", validationStatusMap);
+        
         model.addAttribute("filterIdClient", idClient);
         model.addAttribute("filterIdFournisseur", idFournisseur);
         model.addAttribute("filterStartDate", startDate);
@@ -145,6 +161,7 @@ public class ProformaController {
     
     @PostMapping("/creer")
     public String creerProforma(
+            HttpSession session,
             @RequestParam Integer idDemandeAchat,
             @RequestParam(required = false) Integer idClient,
             @RequestParam(required = false) Integer idFournisseur,
@@ -154,6 +171,8 @@ public class ProformaController {
             @RequestParam BigDecimal[] prix,
             @RequestParam Integer[] quantites,
             RedirectAttributes redirectAttributes) {
+        
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         
         try {
             ProformaDetail[] details = new ProformaDetail[idArticles.length];
@@ -167,9 +186,13 @@ public class ProformaController {
                 details[i] = detail;
             }
             
-            proformaService.creerProforma(idDemandeAchat, idClient, idFournisseur, proforma, details, dateCreation);
+            proformaService.creerProforma(idUtilisateur, idDemandeAchat, idClient, idFournisseur, proforma, details, dateCreation);
             redirectAttributes.addFlashAttribute("toastMessage", "Proforma créé avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return idClient != null ? "redirect:/proforma/creer-client" : "redirect:/proforma/creer-fournisseur";
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");
@@ -184,13 +207,24 @@ public class ProformaController {
     
     @PostMapping("/valider/{idProforma}")
     public String validerProforma(
+            HttpSession session,
             @PathVariable Integer idProforma,
             @RequestParam(required = false) LocalDateTime dateValidation,
             RedirectAttributes redirectAttributes) {
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         try {
-            proformaService.validerProforma(idProforma, dateValidation);
-            redirectAttributes.addFlashAttribute("toastMessage", "Proforma validé avec succès");
+            var status = proformaService.validerProforma(idUtilisateur, idProforma, dateValidation);
+            if (status.isFullyValidated()) {
+                redirectAttributes.addFlashAttribute("toastMessage", "Proforma entierement valide (toutes les etapes completees)");
+            } else {
+                redirectAttributes.addFlashAttribute("toastMessage", 
+                    "Etape " + status.getStepsCompleted() + "/" + status.getTotalStepsRequired() + " validee. " +
+                    "En attente de validation niveau " + status.getNextStepRequiredNiveau() + "+");
+            }
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");

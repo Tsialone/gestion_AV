@@ -36,18 +36,50 @@
                     </ul>
                 </li>
 
+                <li class="sidebar-title">Achats/Ventes</li>
+                
                 <li class="sidebar-item has-sub">
                     <a href="#" class='sidebar-link'>
-                        <i class="bi bi-bag-fill"></i>
-                        <span>Achats/Ventes</span>
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>Demandes Achats</span>
                     </a>
                     <ul class="submenu">
                         <li class="submenu-item">
-                            <a th:href="@{/demande-achat/liste}">Liste Demandes Achat</a>
+                            <a th:href="@{/demande-achat/liste}">Liste Demandes</a>
                         </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/saisie-client}">Nouvelle Demande Client</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/saisie-fournisseur}">Nouvelle Demande Fournisseur</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Proformas</span>
+                    </a>
+                    <ul class="submenu">
                         <li class="submenu-item">
                             <a th:href="@{/proforma/liste}">Liste Proformas</a>
                         </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/creer-client}">Nouveau (Client)</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/creer-fournisseur}">Nouveau (Fournisseur)</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-cart-fill"></i>
+                        <span>Commandes</span>
+                    </a>
+                    <ul class="submenu">
                         <li class="submenu-item">
                             <a th:href="@{/commande/liste}">Liste Commandes</a>
                         </li>
@@ -55,7 +87,7 @@
                             <a th:href="@{/paiement/liste}">Liste Paiements</a>
                         </li>
                         <li class="submenu-item">
-                            <a th:href="@{/livraison/liste}">Liste Livraison</a>
+                            <a th:href="@{/livraison/liste}">Liste Livraisons</a>
                         </li>
                     </ul>
                 </li>
@@ -65,8 +97,7 @@
              <ul class="menu">
                 <li class="sidebar-title">Stocks</li>
                
-                </li>
-                 <li class="sidebar-item  has-sub">
+                <li class="sidebar-item has-sub">
                     <a href="#" class='sidebar-link'>
                         <i class="bi bi-hexagon-fill"></i>
                         <span>Valorisation Stock</span>
@@ -94,6 +125,17 @@
                             <a th:href="@{/etat-stock/liste}">Liste</a>
                         </li>
                     </ul>
+                </li>
+            </ul>
+
+            <ul class="menu">
+                <li class="sidebar-title">Administration</li>
+                
+                <li class="sidebar-item">
+                    <a th:href="@{/historique/liste}" class='sidebar-link'>
+                        <i class="bi bi-clock-history"></i>
+                        <span>Historique</span>
+                    </a>
                 </li>
             </ul>
         </div>

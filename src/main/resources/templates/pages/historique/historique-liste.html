@@ -1,0 +1,144 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Historique Général</h4>
+            <div>
+                <span class="badge bg-secondary" th:text="'Total: ' + ${historiques != null ? #lists.size(historiques) : 0} + ' entrées'"></span>
+            </div>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/historique/liste}" class="row g-3">
+                <div class="col-md-2">
+                    <label for="filterNomTable" class="form-label">Table</label>
+                    <select id="filterNomTable" name="nomTable" class="form-select">
+                        <option value="">Toutes les tables</option>
+                        <option th:each="table : ${tables}" 
+                                th:value="${table}" 
+                                th:text="${table}"
+                                th:selected="${filterNomTable != null and filterNomTable == table}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterIdUtilisateur" class="form-label">Utilisateur</label>
+                    <select id="filterIdUtilisateur" name="idUtilisateur" class="form-select">
+                        <option value="">Tous les utilisateurs</option>
+                        <option th:each="user : ${utilisateurs}" 
+                                th:value="${user.idUtilisateur}" 
+                                th:text="${user.nom}"
+                                th:selected="${filterIdUtilisateur != null and filterIdUtilisateur == user.idUtilisateur}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="datetime-local" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="datetime-local" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-3 d-flex align-items-end gap-2">
+                    <button type="submit" class="btn btn-primary flex-fill">Filtrer</button>
+                    <a th:href="@{/historique/liste}" class="btn btn-outline-secondary">Réinitialiser</a>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a th:href="@{/historique/liste(nomTable=${filterNomTable}, idUtilisateur=${filterIdUtilisateur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='idHg', sortDir=${sortBy == 'idHg' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    ID
+                                    <i th:if="${sortBy == 'idHg'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/historique/liste(nomTable=${filterNomTable}, idUtilisateur=${filterIdUtilisateur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='dateHistorique', sortDir=${sortBy == 'dateHistorique' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    Date
+                                    <i th:if="${sortBy == 'dateHistorique'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/historique/liste(nomTable=${filterNomTable}, idUtilisateur=${filterIdUtilisateur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='nomTable', sortDir=${sortBy == 'nomTable' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    Table
+                                    <i th:if="${sortBy == 'nomTable'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>Description</th>
+                            <th>ID Entité</th>
+                            <th>Utilisateur</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${historiques == null or #lists.isEmpty(historiques)}">
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+                                Aucun historique disponible
+                            </td>
+                        </tr>
+                        <tr th:each="h : ${historiques}">
+                            <td th:text="${h.idHg}"></td>
+                            <td>
+                                <span th:text="${#temporals.format(h.dateHistorique, 'dd/MM/yyyy HH:mm:ss')}"></span>
+                            </td>
+                            <td>
+                                <span class="badge bg-info" th:text="${h.nomTable}"></span>
+                            </td>
+                            <td th:text="${h.desc}"></td>
+                            <td>
+                                <span class="badge bg-secondary" th:text="${h.id}"></span>
+                            </td>
+                            <td>
+                                <span th:text="${utilisateurNames[h.idUtilisateur] != null ? utilisateurNames[h.idUtilisateur] : 'Utilisateur ' + h.idUtilisateur}"></span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Legend/Info Card -->
+    <div class="card mt-3">
+        <div class="card-header">
+            <h6 class="mb-0"><i class="bi bi-info-circle"></i> Informations</h6>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6>Tables concernées:</h6>
+                    <ul class="list-unstyled">
+                        <li><span class="badge bg-info">demande_achat</span> - Demandes d'achat</li>
+                        <li><span class="badge bg-info">proforma</span> - Proformas créés</li>
+                        <li><span class="badge bg-info">proforma_etat</span> - Validations de proforma</li>
+                        <li><span class="badge bg-info">commande</span> - Commandes créées</li>
+                        <li><span class="badge bg-info">commande_etat</span> - Validations de commande</li>
+                        <li><span class="badge bg-info">paiement</span> - Paiements effectués</li>
+                        <li><span class="badge bg-info">livraison</span> - Livraisons effectuées</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Description des actions:</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Création DA</strong> - Nouvelle demande d'achat</li>
+                        <li><strong>Création proforma</strong> - Nouveau proforma</li>
+                        <li><strong>Validation proforma</strong> - Proforma validé par un manager</li>
+                        <li><strong>Création commande</strong> - Nouvelle commande</li>
+                        <li><strong>Validation commande</strong> - Commande validée par un manager</li>
+                        <li><strong>Paiement commande</strong> - Paiement enregistré</li>
+                        <li><strong>Livraison commande</strong> - Commande livrée</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

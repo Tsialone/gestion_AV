@@ -1,6 +1,8 @@
 package com.cinema.dev.controllers;
 
+import com.cinema.dev.dtos.ValidationStatusDTO;
 import com.cinema.dev.services.CommandeService;
+import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ProformaRepository;
 import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Livraison;
@@ -12,6 +14,7 @@ import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ProformaEtatRepository;
 import com.cinema.dev.repositories.LivraisonRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Comparator;
 
 @Controller
@@ -50,6 +54,9 @@ public class CommandeController {
     
     @Autowired
     private LivraisonRepository livraisonRepository;
+    
+    @Autowired
+    private SessionService sessionService;
     
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, @RequestParam(required = false) String startDate, 
@@ -112,6 +119,14 @@ public class CommandeController {
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("caisses", caisseRepository.findAll());
         model.addAttribute("commandeEtats", commandeEtatRepository.findAll());
+        
+        // Build validation status map for each commande
+        Map<Integer, ValidationStatusDTO> validationStatusMap = new HashMap<>();
+        for (Commande c : commandes) {
+            validationStatusMap.put(c.getIdCommande(), commandeService.getValidationStatus(c.getIdCommande()));
+        }
+        model.addAttribute("validationStatusMap", validationStatusMap);
+        
         model.addAttribute("filterIdProforma", idProforma);
         model.addAttribute("filterIdClient", idClient);
         model.addAttribute("filterIdFournisseur", idFournisseur);
@@ -168,12 +183,18 @@ public class CommandeController {
     }
     
     @PostMapping("/creer/{idProforma}")
-    public String creerCommande(@PathVariable Integer idProforma, @RequestParam(required = false) LocalDateTime dateCommande,
+    public String creerCommande(@PathVariable Integer idProforma,
+                                HttpSession session,
+                                @RequestParam(required = false) LocalDateTime dateCommande,
                                 RedirectAttributes redirectAttributes) {
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         try {
-            commandeService.creerCommande(idProforma, dateCommande);
+            commandeService.creerCommande(idUtilisateur, idProforma, dateCommande);
             redirectAttributes.addFlashAttribute("toastMessage", "Commande créée avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");
@@ -185,12 +206,24 @@ public class CommandeController {
     }
     
     @PostMapping("/valider/{idCommande}")
-    public String validerCommande(@PathVariable Integer idCommande, @RequestParam(required = false) LocalDateTime dateValidation,
+    public String validerCommande(@PathVariable Integer idCommande,
+                                  HttpSession session,
+                                  @RequestParam(required = false) LocalDateTime dateValidation,
                                   RedirectAttributes redirectAttributes) {
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         try {
-            commandeService.validerCommande(idCommande, dateValidation);
-            redirectAttributes.addFlashAttribute("toastMessage", "Commande validée avec succès");
+            var status = commandeService.validerCommande(idUtilisateur, idCommande, dateValidation);
+            if (status.isFullyValidated()) {
+                redirectAttributes.addFlashAttribute("toastMessage", "Commande entierement validee (toutes les etapes completees)");
+            } else {
+                redirectAttributes.addFlashAttribute("toastMessage", 
+                    "Etape " + status.getStepsCompleted() + "/" + status.getTotalStepsRequired() + " validee. " +
+                    "En attente de validation niveau " + status.getNextStepRequiredNiveau() + "+");
+            }
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");
@@ -202,12 +235,18 @@ public class CommandeController {
     }
     
     @PostMapping("/livrer/{idCommande}")
-    public String livrerCommande(@PathVariable Integer idCommande, @RequestParam(required = false) LocalDateTime dateLivraison,
+    public String livrerCommande(@PathVariable Integer idCommande,
+                                 HttpSession session,
+                                 @RequestParam(required = false) LocalDateTime dateLivraison,
                                  RedirectAttributes redirectAttributes) {
+        Integer idUtilisateur = sessionService.getCurrentUserId(session);
         try {
-            commandeService.livrerCommande(idCommande, dateLivraison);
+            commandeService.livrerCommande(idUtilisateur, idCommande, dateLivraison);
             redirectAttributes.addFlashAttribute("toastMessage", "Commande livrée avec succès");
             redirectAttributes.addFlashAttribute("toastType", "success");
+        } catch (SecurityException e) {
+            redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
+            redirectAttributes.addFlashAttribute("toastType", "error");
         } catch (IllegalArgumentException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());
             redirectAttributes.addFlashAttribute("toastType", "error");
