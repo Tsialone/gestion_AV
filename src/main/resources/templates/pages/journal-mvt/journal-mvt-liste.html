@@ -1,0 +1,87 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Journal des Mouvements de Stock</h4>
+            <a th:href="@{/journal-mvt/liste}" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+            </a>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-lg-6 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-primary h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Total Entrées</p>
+                            <h4 class="mb-0" th:text="${totalEntrees}">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-6 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-danger h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Total Sorties</p>
+                            <h4 class="mb-0" th:text="${totalSorties}">0</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div class="mb-3">
+                <form th:action="@{/journal-mvt/liste}" method="get" class="row g-2">
+                    <div class="col-md-4">
+                        <label for="dateFilter" class="form-label">Filtrer par date</label>
+                        <input type="datetime-local" class="form-control" id="dateFilter" name="date" 
+                               th:value="${date}" />
+                    </div>
+                    <div class="col-md-auto d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Filtrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="table-responsive">
+                <table class="table table-striped align-middle">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Dépôt</th>
+                            <th>Article</th>
+                            <th>Lot</th>
+                            <th>Quantité</th>
+                            <th>Qualité</th>
+                            <th>Désignation</th>
+                            <th>Livraison</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:if="${journalMvts.isEmpty()}">
+                            <td colspan="9" class="text-center">Aucune donnée disponible</td>
+                        </tr>
+                        <tr th:each="mvt : ${journalMvts}">
+                            <td th:text="${#temporals.format(mvt.dateMouvement, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td>
+                                <span class="badge" 
+                                      th:classappend="${mvt.entrant ? 'bg-success' : 'bg-danger'}"
+                                      th:text="${mvt.typeMouvement}"></span>
+                            </td>
+                            <td th:text="${mvt.depot}"></td>
+                            <td th:text="${mvt.article}"></td>
+                            <td th:text="${mvt.lot}"></td>
+                            <td th:text="${mvt.quantite}"></td>
+                            <td th:text="${mvt.descriptionQualite ?: '-'}"></td>
+                            <td th:text="${mvt.designation}"></td>
+                            <td>
+                                <span th:if="${mvt.idLivraison != null}" 
+                                      th:text="'LIV-' + ${mvt.idLivraison}"></span>
+                                <span th:if="${mvt.idLivraison == null}">-</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
