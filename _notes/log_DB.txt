@@ -1,0 +1,31 @@
+gestion_db=# select * from demande_achat;
+ id_da | date_demande | id_client
+-------+--------------+-----------
+     1 | 2026-01-31   |
+(1 ligne)
+
+
+gestion_db=# select * from proforma;
+ id_proforma |     date_debut      |      date_fin       | id_da | id_client | id_fournisseur
+-------------+---------------------+---------------------+-------+-----------+----------------
+           1 | 2026-01-31 12:03:00 | 2026-02-12 12:03:00 |     1 |           |              1
+(1 ligne)
+
+
+gestion_db=# select * from commande;
+ id_commande | date_ | remise | id_proforma
+-------------+-------+--------+-------------
+(0 ligne)
+
+
+gestion_db=# select * from commande;
+ id_commande | date_ | remise | id_proforma
+-------------+-------+--------+-------------
+(0 ligne)
+
+
+gestion_db=# select * from commande;
+ id_commande |        date_        | remise | id_proforma
+-------------+---------------------+--------+-------------
+           1 | 2026-01-31 12:03:00 |        |           1
+(1 ligne)

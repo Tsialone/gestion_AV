@@ -1,0 +1,183 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Paiement Commande</h4>
+        </div>
+
+        <div class="card-body">
+            <form th:action="@{/paiement/payer}" method="post">
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="idCommande" class="form-label">Commande <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idCommande" name="idCommande" required onchange="updateCommandeInfo(this.value)">
+                            <option value="">-- Sélectionner une commande --</option>
+                            <option th:each="commande : ${commandes}" 
+                                    th:value="${commande.idCommande}"
+                                    th:text="'Commande ' + ${commande.idCommande} + ' (' + ${#temporals.format(commande.date, 'dd/MM/yyyy')} + ')'">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="idCaisse" class="form-label">Caisse <span class="text-danger">*</span></label>
+                        <select class="form-select" id="idCaisse" name="idCaisse" required>
+                            <option value="">-- Sélectionner une caisse --</option>
+                            <option th:each="caisse : ${caisses}" 
+                                    th:value="${caisse.idCaisse}"
+                                    th:text="${caisse.lieu}">
+                            </option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label for="montant" class="form-label">Montant <span class="text-danger">*</span></label>
+                        <input type="number" step="0.01" class="form-control" id="montant" name="montant" min="0" required placeholder="0.00">
+                    </div>
+                    <div class="col-md-6">
+                        <label for="date" class="form-label">Date Paiement <span class="text-danger">*</span></label>
+                        <input type="datetime-local" class="form-control" id="date" name="date" required>
+                    </div>
+                </div>
+
+                <div class="row g-3 mt-2">
+                    <div class="col-md-6">
+                        <label for="dateMvtCaisse" class="form-label">Date Mouvement Caisse</label>
+                        <input type="datetime-local" class="form-control" id="dateMvtCaisse" name="dateMvtCaisse">
+                        <small class="text-muted">Laisser vide pour utiliser la date de paiement</small>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <div class="card mb-3 bg-light">
+                            <div class="card-body">
+                                <h6 class="card-title">Résumé des Paiements</h6>
+                                <!-- Commande Info -->
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <strong>Commande:</strong> <span id="commandeNum">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Date:</strong> <span id="commandeDate">-</span>
+                                    </div>
+                                </div>
+                                <div class="row mt-2">
+                                    <div class="col-md-6">
+                                        <strong>Proforma:</strong> <span id="proformaNum">-</span>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <strong>Partenaire:</strong> <span id="partenaire">-</span> <span id="typeBadge" class="badge">-</span>
+                                    </div>
+                                </div>
+                                <hr>
+                                <!-- Paiement Info -->
+                                <div class="row">
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Total à Payer</small><br>
+                                        <span id="totalAmount" class="text-primary fs-4 fw-bold">-</span>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Déjà Payé</small><br>
+                                        <span id="payeAmount" class="text-success fs-4 fw-bold">-</span>
+                                    </div>
+                                    <div class="col-md-4 text-center">
+                                        <small class="text-muted">Reste à Payer</small><br>
+                                        <span id="resteAmount" class="text-danger fs-4 fw-bold">-</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Enregistrer le Paiement
+                        </button>
+                        <a th:href="@{/commande/liste}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function updateCommandeInfo(idCommande) {
+            if (idCommande) {
+                // Fetch commande info
+                fetch('/api/commande/proforma-by-commande/' + idCommande)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('commandeNum').textContent = idCommande;
+                            
+                            // Format date if it exists
+                            if (data.date) {
+                                let dateObj;
+                                if (Array.isArray(data.date)) {
+                                    // Handle array format [year, month, day, hour, minute, second]
+                                    dateObj = new Date(data.date[0], data.date[1] - 1, data.date[2], data.date[3], data.date[4], data.date[5]);
+                                } else {
+                                    // Handle ISO string format
+                                    dateObj = new Date(data.date);
+                                }
+                                const formattedDate = dateObj.toLocaleDateString('fr-FR') + ' ' + dateObj.toLocaleTimeString('fr-FR', {hour: '2-digit', minute: '2-digit'});
+                                document.getElementById('commandeDate').textContent = formattedDate;
+                                
+                                // Set Date Paiement to commande date
+                                const isoDate = dateObj.toISOString().slice(0, 16);
+                                document.getElementById('date').value = isoDate;
+                            }
+                            
+                            document.getElementById('proformaNum').textContent = data.idProforma || '-';
+                            
+                            // Set partenaire and type
+                            if (data.clientName) {
+                                document.getElementById('partenaire').textContent = data.clientName;
+                                document.getElementById('typeBadge').textContent = 'Client';
+                                document.getElementById('typeBadge').className = 'badge bg-primary';
+                            } else if (data.fournisseurName) {
+                                document.getElementById('partenaire').textContent = data.fournisseurName;
+                                document.getElementById('typeBadge').textContent = 'Fournisseur';
+                                document.getElementById('typeBadge').className = 'badge bg-info';
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Fetch error:', error));
+                
+                // Fetch payment info from backend
+                fetch('/api/commande/' + idCommande + '/paiement-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.getElementById('totalAmount').textContent = data.total.toFixed(2) + ' Ar';
+                            document.getElementById('payeAmount').textContent = data.paye.toFixed(2) + ' Ar';
+                            document.getElementById('resteAmount').textContent = data.reste.toFixed(2) + ' Ar';
+                            // Set max on montant input
+                            document.getElementById('montant').max = data.reste;
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching paiement info:', error);
+                        document.getElementById('totalAmount').textContent = 'Erreur';
+                        document.getElementById('payeAmount').textContent = 'Erreur';
+                        document.getElementById('resteAmount').textContent = 'Erreur';
+                    });
+            } else {
+                // Reset all display fields
+                document.getElementById('commandeNum').textContent = '-';
+                document.getElementById('commandeDate').textContent = '-';
+                document.getElementById('proformaNum').textContent = '-';
+                document.getElementById('partenaire').textContent = '-';
+                document.getElementById('typeBadge').textContent = '-';
+                document.getElementById('totalAmount').textContent = '-';
+                document.getElementById('payeAmount').textContent = '-';
+                document.getElementById('resteAmount').textContent = '-';
+            }
+        }
+    </script>
+</section>

@@ -17,6 +17,12 @@
             <ul class="menu">
                 <li class="sidebar-title">Menu</li>
 
+                <li class="sidebar-item">
+                    <a th:href="@{/}" class='sidebar-link'>
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
 
                 <li class="sidebar-item  has-sub">
                     <a href="#" class='sidebar-link'>
@@ -27,6 +33,55 @@
                         <li class="submenu-item ">
                             <a th:href="@{/articles/liste}">Liste</a>
                         </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-bag-fill"></i>
+                        <span>Achats/Ventes</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/liste}">Liste Demandes Achat</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/liste}">Liste Proformas</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/commande/liste}">Liste Commandes</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/paiement/liste}">Liste Paiements</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/livraison/liste}">Liste Livraison</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+
+             <ul class="menu">
+                <li class="sidebar-title">Stocks</li>
+               
+                </li>
+                 <li class="sidebar-item  has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-hexagon-fill"></i>
+                        <span>Valorisation Stock</span>
+                    </a>
+                    <ul class="submenu ">
+                        <li class="submenu-item ">
+                            <a th:href="@{/valorisations/fifo}">FIFO</a>
+                        </li>
+                            <li class="submenu-item ">
+                            <a th:href="@{/valorisations/lifo}">LIFO</a>
+                        </li>
+                        <li class="submenu-item ">
+                            <a th:href="@{/valorisations/cump}">CUMP</a>
+                        </li>
+
                     </ul>
                 </li>
                 <li class="sidebar-item  has-sub">
