@@ -18,4 +18,6 @@ public class Dept {
 
     @Column(name = "nom", length = 255)
     private String nom;
+
+   
 }

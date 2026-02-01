@@ -8,9 +8,9 @@ services:
     environment:
       POSTGRES_DB: gestion_db
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
+      POSTGRES_PASSWORD: snow
     ports:
-      - "1112:5432"
+      - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
 
