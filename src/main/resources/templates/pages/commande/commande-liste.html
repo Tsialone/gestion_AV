@@ -1,0 +1,263 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="card-title mb-0">Liste des Commandes</h4>
+            <a th:href="@{/commande/creer}" class="btn btn-sm btn-success me-2">
+                <i class="bi bi-plus-circle"></i> Nouvelle Commande
+            </a>
+        </div>
+
+        <!-- Filter Form -->
+        <div class="card-body border-bottom">
+            <form method="get" th:action="@{/commande/liste}" class="row g-3">
+                <div class="col-md-3">
+                    <label for="filterIdClient" class="form-label">Client</label>
+                    <select id="filterIdClient" name="idClient" class="form-select">
+                        <option value="">Tous les clients</option>
+                        <option th:each="client : ${clients}" 
+                                th:value="${client.idClient}" 
+                                th:text="${client.nom}"
+                                th:selected="${filterIdClient != null and filterIdClient == client.idClient}"></option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label for="filterIdFournisseur" class="form-label">Fournisseur</label>
+                    <select id="filterIdFournisseur" name="idFournisseur" class="form-select">
+                        <option value="">Tous les fournisseurs</option>
+                        <option th:each="fournisseur : ${fournisseurs}" 
+                                th:value="${fournisseur.idFournisseur}" 
+                                th:text="${fournisseur.nom}"
+                                th:selected="${filterIdFournisseur != null and filterIdFournisseur == fournisseur.idFournisseur}"></option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="filterStartDate" class="form-label">Date Début</label>
+                    <input type="datetime-local" id="filterStartDate" name="startDate" class="form-control" 
+                           th:value="${filterStartDate}">
+                </div>
+                <div class="col-md-2">
+                    <label for="filterEndDate" class="form-label">Date Fin</label>
+                    <input type="datetime-local" id="filterEndDate" name="endDate" class="form-control" 
+                           th:value="${filterEndDate}">
+                </div>
+                <div class="col-md-2 d-flex align-items-end">
+                    <button type="submit" class="btn btn-primary w-100">Filtrer</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>
+                                <a th:href="@{/commande/liste(idClient=${filterIdClient}, idFournisseur=${filterIdFournisseur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='idCommande', sortDir=${sortBy == 'idCommande' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    ID Commande
+                                    <i th:if="${sortBy == 'idCommande'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/commande/liste(idClient=${filterIdClient}, idFournisseur=${filterIdFournisseur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='date', sortDir=${sortBy == 'date' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    Date Commande
+                                    <i th:if="${sortBy == 'date'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>
+                                <a th:href="@{/commande/liste(idClient=${filterIdClient}, idFournisseur=${filterIdFournisseur}, startDate=${filterStartDate}, endDate=${filterEndDate}, sortBy='idProforma', sortDir=${sortBy == 'idProforma' and sortDir == 'asc' ? 'desc' : 'asc'})}" 
+                                   class="text-decoration-none text-dark">
+                                    Proforma
+                                    <i th:if="${sortBy == 'idProforma'}" th:class="${sortDir == 'asc' ? 'bi bi-arrow-up' : 'bi bi-arrow-down'}"></i>
+                                </a>
+                            </th>
+                            <th>État</th>
+                            <th>Total à Payer</th>
+                            <th>Déjà Payé</th>
+                            <th>Reste à Payer</th>
+                            <th>Livraison</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="commande : ${commandes}">
+                            <td>
+                                <button type="button" class="btn btn-link p-0" data-bs-toggle="modal" data-bs-target="#commandeModal"
+                                        th:data-id="${commande.idCommande}" th:data-date="${commande.date}" th:data-proforma="${commande.idProforma}">
+                                    <span th:text="${commande.idCommande}"></span>
+                                </button>
+                            </td>
+                            <td th:text="${#temporals.format(commande.date, 'dd/MM/yyyy HH:mm')}"></td>
+                            <td th:text="'Proforma ' + ${commande.idProforma}"></td>
+                            <td th:with="status=${validationStatusMap[commande.idCommande]}">
+                                <!-- Show validation progress -->
+                                <div th:if="${status != null}">
+                                    <span th:if="${status.fullyValidated}" class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Validee
+                                    </span>
+                                    <span th:unless="${status.fullyValidated}" class="badge bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split"></i> 
+                                        Etape <span th:text="${status.stepsCompleted}">0</span>/<span th:text="${status.totalStepsRequired}">2</span>
+                                    </span>
+                                    <!-- Show who validated each step -->
+                                    <div th:if="${status.stepsCompleted > 0}" class="small text-muted mt-1">
+                                        <th:block th:each="step : ${status.steps}" th:if="${step.completed}">
+                                            <span th:text="'Etape ' + ${step.stepNumber} + ': ' + ${step.validatedByUserName}"></span><br/>
+                                        </th:block>
+                                    </div>
+                                </div>
+                                <!-- Fallback to old system if no status -->
+                                <th:block th:if="${status == null}">
+                                    <span class="badge bg-warning" th:each="etat : ${commandeEtats}" 
+                                          th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 1}">Creee</span>
+                                    <span class="badge bg-success" th:each="etat : ${commandeEtats}" 
+                                          th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 2}">Validee</span>
+                                </th:block>
+                            </td>
+                            <td class="montant-total" th:data-commande-id="${commande.idCommande}">...</td>
+                            <td class="montant-paye" th:data-commande-id="${commande.idCommande}">...</td>
+                            <td class="montant-reste" th:data-commande-id="${commande.idCommande}">...</td>
+                            <td>
+                                <!-- Show livraison form only if livraison doesn't exist yet (backend check) -->
+                                <form th:if="${commandeLivraisons[commande.idCommande] == null}" class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post" style="display: inline;">
+                                    <div class="input-group input-group-sm">
+                                        <input type="datetime-local" 
+                                               class="form-control form-control-sm" 
+                                               name="dateLivraison" 
+                                               th:min="${commande.date}"
+                                               th:value="${commande.date}"
+                                               required>
+                                        <button type="submit" class="btn btn-outline-success btn-sm">
+                                            <i class="bi bi-truck"></i> Livrer
+                                        </button>
+                                    </div>
+                                </form>
+                                <!-- Show 'Livré' with date if livraison already exists -->
+                                <span th:if="${commandeLivraisons[commande.idCommande] != null}" class="text-success">
+                                    <i class="bi bi-check-circle"></i> Livré 
+                                    (<span th:text="${#temporals.format(commandeLivraisons[commande.idCommande].date, 'dd/MM/yyyy HH:mm')}"></span>)
+                                </span>
+                            </td>
+                            <td th:with="status=${validationStatusMap[commande.idCommande]}">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <!-- Show Valider button if not fully validated -->
+                                    <form th:action="@{/commande/valider/{id}(id=${commande.idCommande})}" method="post" style="display:inline;"
+                                          th:if="${status != null && !status.fullyValidated}">
+                                        <button type="submit" class="btn btn-success btn-sm"
+                                                th:title="'Niveau requis: ' + ${status.nextStepRequiredNiveau} + '+'">
+                                            <i class="bi bi-check-circle"></i> 
+                                            Valider (niv.<span th:text="${status.nextStepRequiredNiveau}">7</span>+)
+                                        </button>
+                                    </form>
+                                    <button type="button" class="btn btn-primary btn-sm btn-payer" th:data-commande-id="${commande.idCommande}" th:onclick="'openPaiementModal(' + ${commande.idCommande} + ')'">
+                                        <i class="bi bi-cash"></i> Payer
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detail Modal -->
+    <div class="modal fade" id="commandeModal" tabindex="-1" aria-labelledby="commandeModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="commandeModalLabel">Détails de la Commande</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>ID Commande:</strong> <span id="modalCommandeId">-</span>
+                        </div>
+                        <div class="col-md-6">
+                            <strong>Proforma:</strong> <span id="modalCommandeProforma">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <strong>Date:</strong> <span id="modalCommandeDate">-</span>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-12">
+                            <strong>Articles:</strong>
+                            <div id="modalCommandeArticles" class="mt-2">Chargement...</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Load payment info for all commandes
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.montant-total').forEach(cell => {
+                const commandeId = cell.getAttribute('data-commande-id');
+                fetch('/api/commande/' + commandeId + '/paiement-info')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.querySelector(`.montant-total[data-commande-id="${commandeId}"]`).textContent = data.total + ' Ar';
+                            document.querySelector(`.montant-paye[data-commande-id="${commandeId}"]`).textContent = data.paye + ' Ar';
+                            document.querySelector(`.montant-reste[data-commande-id="${commandeId}"]`).textContent = data.reste + ' Ar';
+                            
+                            // Hide Payer button if reste is 0
+                            if (data.reste == 0) {
+                                const payerBtn = document.querySelector(`.btn-payer[data-commande-id="${commandeId}"]`);
+                                if (payerBtn) payerBtn.style.display = 'none';
+                            }
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
+        });
+    
+        document.getElementById('commandeModal').addEventListener('show.bs.modal', function(e) {
+            const button = e.relatedTarget;
+            const idCommande = button.getAttribute('data-id');
+            const dateCommande = button.getAttribute('data-date');
+            const idProforma = button.getAttribute('data-proforma');
+            
+            document.getElementById('modalCommandeId').textContent = idCommande || '-';
+            document.getElementById('modalCommandeDate').textContent = dateCommande || '-';
+            document.getElementById('modalCommandeProforma').textContent = 'Proforma ' + (idProforma || '-');
+            
+            // Fetch details from API
+            fetch('/api/commande/' + idCommande)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.details) {
+                        const articlesHtml = data.details.length > 0 
+                            ? '<ul class="list-group mt-2">' + 
+                              data.details.map(detail => 
+                                '<li class="list-group-item">' + detail.libelle + ' - Quantité: ' + detail.quantite + '</li>'
+                              ).join('') + 
+                              '</ul>'
+                            : '<p class="text-muted">Aucun article</p>';
+                        document.getElementById('modalCommandeArticles').innerHTML = articlesHtml;
+                    } else {
+                        document.getElementById('modalCommandeArticles').textContent = 'Erreur de chargement';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    document.getElementById('modalCommandeArticles').textContent = 'Erreur de chargement';
+                });
+        });
+    </script>
+
+    <!-- Include Payment Modal -->
+    <div th:replace="fragments/paiement-modal :: modal"></div>
+    <script th:replace="fragments/paiement-modal :: script"></script>
+</section>

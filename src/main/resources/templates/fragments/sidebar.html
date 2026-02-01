@@ -17,6 +17,12 @@
             <ul class="menu">
                 <li class="sidebar-title">Menu</li>
 
+                <li class="sidebar-item">
+                    <a th:href="@{/}" class='sidebar-link'>
+                        <i class="bi bi-grid-fill"></i>
+                        <span>Home</span>
+                    </a>
+                </li>
 
                 <li class="sidebar-item  has-sub">
                     <a href="#" class='sidebar-link'>
@@ -27,6 +33,86 @@
                         <li class="submenu-item ">
                             <a th:href="@{/articles/liste}">Liste</a>
                         </li>
+                    </ul>
+                </li>
+
+                <li class="sidebar-title">Achats/Ventes</li>
+                
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-clipboard-check"></i>
+                        <span>Demandes Achats</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/liste}">Liste Demandes</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/saisie-client}">Nouvelle Demande Client</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/demande-achat/saisie-fournisseur}">Nouvelle Demande Fournisseur</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-file-earmark-text"></i>
+                        <span>Proformas</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/liste}">Liste Proformas</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/creer-client}">Nouveau (Client)</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/proforma/creer-fournisseur}">Nouveau (Fournisseur)</a>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-cart-fill"></i>
+                        <span>Commandes</span>
+                    </a>
+                    <ul class="submenu">
+                        <li class="submenu-item">
+                            <a th:href="@{/commande/liste}">Liste Commandes</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/paiement/liste}">Liste Paiements</a>
+                        </li>
+                        <li class="submenu-item">
+                            <a th:href="@{/livraison/liste}">Liste Livraisons</a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+
+
+             <ul class="menu">
+                <li class="sidebar-title">Stocks</li>
+               
+                <li class="sidebar-item has-sub">
+                    <a href="#" class='sidebar-link'>
+                        <i class="bi bi-hexagon-fill"></i>
+                        <span>Valorisation Stock</span>
+                    </a>
+                    <ul class="submenu ">
+                        <li class="submenu-item ">
+                            <a th:href="@{/valorisations/fifo}">FIFO</a>
+                        </li>
+                            <li class="submenu-item ">
+                            <a th:href="@{/valorisations/lifo}">LIFO</a>
+                        </li>
+                        <li class="submenu-item ">
+                            <a th:href="@{/valorisations/cump}">CUMP</a>
+                        </li>
+
                     </ul>
                 </li>
                 <li class="sidebar-item  has-sub">
@@ -45,8 +131,16 @@
                 </li>
             </ul>
 
-
-
+            <ul class="menu">
+                <li class="sidebar-title">Administration</li>
+                
+                <li class="sidebar-item">
+                    <a th:href="@{/historique/liste}" class='sidebar-link'>
+                        <i class="bi bi-clock-history"></i>
+                        <span>Historique</span>
+                    </a>
+                </li>
+            </ul>
         </div>
         <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
     </div>

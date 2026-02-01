@@ -1,3 +1,5 @@
+# Condition dans fifo tsy tokony selon id lot fa id article ihany
+
 DROP DATABASE IF EXISTS gestion_db;
 CREATE DATABASE gestion_db;
 \c gestion_db;
