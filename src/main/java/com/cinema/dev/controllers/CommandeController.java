@@ -1,6 +1,7 @@
 package com.cinema.dev.controllers;
 
 import com.cinema.dev.dtos.ValidationStatusDTO;
+import com.cinema.dev.services.AuthorizationService;
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ProformaRepository;
@@ -58,12 +59,36 @@ public class CommandeController {
     @Autowired
     private SessionService sessionService;
     
+    @Autowired
+    private AuthorizationService authorizationService;
+    
+    /**
+     * Check if current user has access to this module (Ventes or Direction only)
+     */
+    private String checkVentesAccess(HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = sessionService.getCurrentUserId(session);
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        if (!authorizationService.isInVentesOrDirection(userId)) {
+            redirectAttributes.addFlashAttribute("toastMessage", 
+                "Acces refuse. Seul le departement Ventes ou Direction peut acceder aux commandes.");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/";
+        }
+        return null; // Access granted
+    }
+    
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idProforma, @RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, @RequestParam(required = false) String startDate, 
                            @RequestParam(required = false) String endDate,
                            @RequestParam(required = false, defaultValue = "idCommande") String sortBy,
                            @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                           HttpSession session, RedirectAttributes redirectAttributes,
                            Model model) {
+        
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
@@ -145,7 +170,10 @@ public class CommandeController {
     }
     
     @GetMapping("/creer")
-    public String getCreer(Model model) {
+    public String getCreer(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         List<Proforma> validatedP = proformaRepository.findAll().stream()
             .filter(p -> proformaEtatRepository.existsByIdProformaAndIdEtat(p.getIdProforma(), 2) 
                       && !proformaEtatRepository.existsByIdProformaAndIdEtat(p.getIdProforma(), 3))
@@ -166,7 +194,10 @@ public class CommandeController {
     }
     
     @GetMapping("/paiement")
-    public String getPaiement(Model model) {
+    public String getPaiement(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         model.addAttribute("commandes", commandeService.findAll());
         model.addAttribute("caisses", caisseRepository.findAll());
         

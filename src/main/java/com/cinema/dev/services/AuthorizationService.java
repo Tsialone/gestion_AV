@@ -125,6 +125,23 @@ public class AuthorizationService {
     }
 
     /**
+     * Check if user is in Direction department
+     */
+    public boolean isInDirection(Integer idUtilisateur) {
+        Utilisateur user = getUtilisateur(idUtilisateur);
+        return user.getIdDept() == DEPT_DIRECTION;
+    }
+
+    /**
+     * Check if user is in Ventes or Direction department (for Achats/Ventes module access)
+     */
+    public boolean isInVentesOrDirection(Integer idUtilisateur) {
+        if (isDirecteurLevel(idUtilisateur)) return true;
+        Utilisateur user = getUtilisateur(idUtilisateur);
+        return user.getIdDept() == DEPT_VENTES || user.getIdDept() == DEPT_DIRECTION;
+    }
+
+    /**
      * Check if user is in a specific department by name
      */
     public boolean isInDepartement(Integer idUtilisateur, String deptName) {
