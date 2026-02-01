@@ -1,5 +1,6 @@
-   DROP SCHEMA IF EXISTS public CASCADE;
-   CREATE SCHEMA public;
+   DROP DATABASE IF EXISTS gestion_db;
+   CREATE DATABASE gestion_db;
+   \c gestion_db;
 
    CREATE TABLE categorie(
       id_categorie SERIAL,
@@ -34,7 +35,7 @@
    );
 
    CREATE TABLE caisse(
-      id_caisse SERIAL ,
+      id_caisse VARCHAR(50) ,
       lieu VARCHAR(255) ,
       PRIMARY KEY(id_caisse)
    );
@@ -234,7 +235,7 @@
       credit NUMERIC(15,2)  ,
       date_ TIMESTAMP NOT NULL,
       id_paiement INTEGER NOT NULL,
-      id_caisse INTEGER NOT NULL,
+      id_caisse VARCHAR(50)  NOT NULL,
       PRIMARY KEY(id_mvtc),
       UNIQUE(id_paiement),
       FOREIGN KEY(id_paiement) REFERENCES paiement(id_paiement),

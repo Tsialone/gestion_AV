@@ -22,6 +22,10 @@ public class Lot {
     @Column(name = "qte")
     private Integer qte;
     
+    
+        @Column(name = "qte_init")
+        private Integer qteInit;
+
     @Column(name = "qte_initiale")
     private Integer qteInitiale;
 

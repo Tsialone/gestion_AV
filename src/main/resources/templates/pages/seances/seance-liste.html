@@ -1,0 +1,118 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Liste des Séances</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-primary h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Total Séances</p>
+                            <h4 class="mb-0" th:text="${seanceRecap != null ? seanceRecap.totalSeance : 0}">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6 mb-3 mb-lg-0">
+                    <div class="card border-success h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Total Ticket vendue</p>
+                            <h4 class="mb-0" th:text="${seanceRecap != null ? seanceRecap.totalReservation : 0}">0</h4>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4 col-md-6">
+                    <div class="card border-warning h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-1">Chiffre d'Affaires</p>
+                            <h4 class="mb-0" th:text="${seanceRecap != null ? #numbers.formatDecimal(seanceRecap.chiffreAffaire,1,'COMMA',2,'POINT') : '0.00'}">0.00</h4>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <form th:action="@{/seances/liste}" method="get" class="mb-4">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="idSalle" class="form-label">Salle</label>
+                        <select class="form-select" id="idSalle" name="idSalle">
+                            <option value="">-- Tous --</option>
+                            <option th:each="salle : ${salles}" 
+                                    th:value="${salle.idSalle}"
+                                    th:text="${salle.nom}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="idFilm" class="form-label">Film</label>
+                        <select class="form-select" id="idFilm" name="idFilm">
+                            <option value="">-- Tous --</option>
+                            <option th:each="film : ${films}" 
+                                    th:value="${film.idFilm}"
+                                    th:text="${film.nom}">
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label for="debut" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="debut" name="debut">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="debut" class="form-label">Heure</label>
+                        <input type="time" class="form-control" id="heure" name="heure" th:value="${param.heure}">
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-search"></i> Filtrer
+                        </button>
+                        <a th:href="@{/seances/liste}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-clockwise"></i> Réinitialiser
+                        </a>
+                    </div>
+                </div>
+            </form>
+
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Séance</th>
+                            <th>Date</th>
+                            <th>Heure</th>
+                            <th>Salle</th>
+                            <th>Film</th>
+                            <th>Durée</th>
+                            <!-- <th>Max revenu</th> -->
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr th:each="seance : ${seances}">
+                            <td th:text="'SEC' + ${seance.idSeance}"></td>
+                            <td th:text="${seance.debut}"></td>
+                            <td th:text="${seance.heure}"></td>
+                            <td th:text="${seance.salleNom}"></td>
+                            <td th:text="${seance.filmNom}"></td>
+                            <td th:text="${seance.filmDuree}"></td>
+                            <!-- <td th:text="${seance.maxRevenu}"></td> -->
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm btn-link" type="button" data-bs-toggle="dropdown">
+                                        <i class="bi bi-three-dots-vertical"></i>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" th:href="@{/reservations/saisie?(idFilm=${seance.idFilm} , idSalle=${seance.idSalle} , dateSeance=${seance.debut} , heure=${seance.heure}  , idSeance=${seance.idSeance})}"></i>Reservé</a></li>
+                                        <!-- <li><a class="dropdown-item" href="#"></i> Modifier</a></li> -->
+                                        </ul>
+                                </div>
+                            </td>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</section>
+

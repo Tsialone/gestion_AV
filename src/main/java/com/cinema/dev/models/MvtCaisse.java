@@ -24,7 +24,7 @@ public class MvtCaisse {
     @Column(name = "id_paiement", nullable = false)
     private Integer idPaiement;
 
-    @Column(name = "id_caisse", length = 50, nullable = false)
+    @Column(name = "id_caisse", nullable = false)
     private Integer idCaisse;
 
     public MvtCaisse() {
@@ -37,6 +37,7 @@ public class MvtCaisse {
         this.idPaiement = idPaiement;
         this.idCaisse = idCaisse;
     }
+ 
 
     public Integer getIdMvtc() {
         return idMvtc;

@@ -1,0 +1,103 @@
+<section class="section" th:fragment="page">
+    <div class="card">
+        <div class="card-header">
+            <h4 class="card-title">Détail du Groupe de Tickets</h4>
+        </div>
+
+        <div class="card-body">
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Ticket:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.ticketStrId}"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Place:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.placeStrId}"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Film:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.filmNom}"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Client:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.clientStrId}"></p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Date Prévue:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.datePrevue}"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Code Groupe:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.codeGroupe}"></p>
+                    </div>
+                    <!-- <div class="mb-3">
+                        <label class="form-label"><strong>Nombre de Tickets:</strong></label>
+                        <p class="form-control-plaintext" th:text="${ticketFiche.ticketStrIds.size()}"></p>
+                    </div> -->
+                    
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Montant Total:</strong></label>
+                        <p class="form-control-plaintext text-primary fs-5" 
+                           th:text="${#numbers.formatDecimal(ticketFiche.montantTotal, 0, 2)} + ' Ar'"></p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label"><strong>Reste à Payer:</strong></label>
+                        <p class="form-control-plaintext text-danger fs-5" 
+                           th:text="${#numbers.formatDecimal(ticketFiche.restePaye, 0, 2)} + ' Ar'"></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-light">
+                <div class="card-header bg-light">
+                    <h5 class="card-title mb-0">Tickets Inclus</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item" th:each="ticketStrId : ${ticketFiche.ticketStrIds}">
+                            <i class="bi bi-ticket"></i>
+                              <a th:text="${ticketStrId}"
+                                        th:href="@{/tickets/fiche/{id}(id=${ticketStrId})}">
+                                    </a>
+                            <!-- <span th:text="${ticketStrId}"></span> -->
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <form th:action="@{/tickets/payer/{id}(id=${ticketFiche.ticketStrId})}" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="strIdCaisse" class="form-label">Caisse</label>
+                        <select id="strIdCaisse" name="strIdCaisse" class="form-select" required>
+                            <option value="">Sélectionner une caisse</option>
+                            <option th:each="caisse : ${caisses}" th:value="${caisse.strId}" th:text="${caisse.nom} + ' (' + ${caisse.strId} + ')'"></option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="montantTotal" class="form-label">Montant</label>
+                        <input type="number" 
+                               id="montantTotal" 
+                               name="montantTotal" 
+                               class="form-control" 
+                               th:value="${ticketFiche.restePaye}" 
+                               step="0.01"
+                               required>
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <a href="/tickets/liste" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Retour
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-cash"></i> Tout payer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
