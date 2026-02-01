@@ -8,6 +8,7 @@ import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ArticleRepository;
+import com.cinema.dev.repositories.CategorieRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ public class DemandeAchatController {
     
     @Autowired
     private ArticleRepository articleRepository;
+    
+    @Autowired
+    private CategorieRepository categorieRepository;
     
     @Autowired
     private SessionService sessionService;
@@ -128,6 +132,7 @@ public class DemandeAchatController {
         
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
+        model.addAttribute("categories", categorieRepository.findAll());
         
         // Page title and breadcrumbs
         model.addAttribute("pageTitle", "Nouvelle Demande d'Achat");
@@ -148,6 +153,7 @@ public class DemandeAchatController {
         
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
+        model.addAttribute("categories", categorieRepository.findAll());
         
         // Page title and breadcrumbs
         model.addAttribute("pageTitle", "Nouvelle Demande d'Achat");

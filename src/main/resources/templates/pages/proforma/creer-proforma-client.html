@@ -47,12 +47,17 @@
                             <div class="row mb-3 article-row">
                                 <div class="col-md-5">
                                     <label class="form-label">Article <span class="text-danger">*</span></label>
-                                    <select class="form-select" name="idArticles" required>
+                                    <select class="form-select article-select" name="idArticles" required>
                                         <option value="">-- Sélectionner un article --</option>
-                                        <option th:each="article : ${articles}" 
-                                                th:value="${article.idArticle}"
-                                                th:text="${article.libelle}">
-                                        </option>
+                                        <th:block th:each="cat : ${categories}">
+                                            <optgroup th:label="${cat.libelle}">
+                                                <option th:each="article : ${articles}" 
+                                                        th:if="${article.idCategorie == cat.idCategorie}"
+                                                        th:value="${article.idArticle}"
+                                                        th:text="${article.libelle}">
+                                                </option>
+                                            </optgroup>
+                                        </th:block>
                                     </select>
                                 </div>
                                 <div class="col-md-4">

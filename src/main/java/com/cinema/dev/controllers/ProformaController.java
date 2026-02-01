@@ -9,6 +9,7 @@ import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
 import com.cinema.dev.repositories.ArticleRepository;
+import com.cinema.dev.repositories.CategorieRepository;
 import com.cinema.dev.repositories.DemandeAchatRepository;
 import com.cinema.dev.repositories.ProformaEtatRepository;
 import com.cinema.dev.utils.BreadcrumbItem;
@@ -41,6 +42,9 @@ public class ProformaController {
     
     @Autowired
     private ArticleRepository articleRepository;
+    
+    @Autowired
+    private CategorieRepository categorieRepository;
     
     @Autowired
     private DemandeAchatRepository demandeAchatRepository;
@@ -145,6 +149,7 @@ public class ProformaController {
         
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
+        model.addAttribute("categories", categorieRepository.findAll());
         model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
             .filter(da -> da.getIdClient() != null)
             .toList());
@@ -168,6 +173,7 @@ public class ProformaController {
         
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
+        model.addAttribute("categories", categorieRepository.findAll());
         model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
             .filter(da -> da.getIdClient() == null)
             .toList());
