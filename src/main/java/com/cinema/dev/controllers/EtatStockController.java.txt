@@ -28,11 +28,12 @@ public class EtatStockController {
             @RequestParam(value = "date", required = false) 
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
             @RequestParam(value = "idDepot", required = false) Long idDepot,
+            @RequestParam(value = "idArticle", required = false) Long idArticle,
             Model model) {
         LocalDateTime filterDate = date != null ? date : LocalDateTime.now();
         String dateFormatted = filterDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
         
-        List<EtatStockDto> etatStocks = etatStockRepository.findEtatStockFiltered(idDepot, filterDate);
+        List<EtatStockDto> etatStocks = etatStockRepository.findEtatStockFiltered(idDepot, idArticle, filterDate);
         
         // Calculer les totaux
         Integer totalEntrees = etatStocks.stream()
@@ -53,6 +54,7 @@ public class EtatStockController {
         model.addAttribute("stockActuel", stockActuel);
         model.addAttribute("date", dateFormatted);
         model.addAttribute("idDepot", idDepot);
+        model.addAttribute("idArticle", idArticle);
         model.addAttribute("content", "pages/etat-stock/etat-stock-liste");
         return "admin-layout";
     }
