@@ -1,7 +1,7 @@
 package com.cinema.dev.controllers;
 
+import com.cinema.dev.dtos.DeptUsersDTO;
 import com.cinema.dev.dtos.UtilisateurSessionDTO;
-import com.cinema.dev.models.Utilisateur;
 import com.cinema.dev.services.SessionService;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,8 +28,8 @@ public class LoginController {
             return "redirect:/";
         }
 
-        List<Utilisateur> utilisateurs = sessionService.getAllUtilisateurs();
-        model.addAttribute("utilisateurs", utilisateurs);
+        List<DeptUsersDTO> usersGroupedByDept = sessionService.getUtilisateursGroupedByDept();
+        model.addAttribute("usersGroupedByDept", usersGroupedByDept);
         return "pages/auth/login";
     }
 

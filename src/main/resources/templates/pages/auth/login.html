@@ -105,7 +105,7 @@
         </div>
         
         <div class="login-title">
-            <h2>ERP-JUICE</h2>
+            <h2>Gestion Achat/Vente</h2>
             <p>Gestion des Appareils Électroniques</p>
         </div>
 
@@ -116,10 +116,12 @@
                 </label>
                 <select name="idUtilisateur" id="idUtilisateur" class="form-select" required>
                     <option value="" disabled selected>-- Choisir un utilisateur --</option>
-                    <option th:each="user : ${utilisateurs}" 
-                            th:value="${user.idUtilisateur}" 
-                            th:text="${user.nom}">
-                    </option>
+                    <optgroup th:each="deptGroup : ${usersGroupedByDept}" th:label="${deptGroup.deptNom}">
+                        <option th:each="user : ${deptGroup.utilisateurs}" 
+                                th:value="${user.idUtilisateur}" 
+                                th:text="${user.displayText}">
+                        </option>
+                    </optgroup>
                 </select>
             </div>
 

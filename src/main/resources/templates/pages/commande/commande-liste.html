@@ -91,11 +91,30 @@
                             </td>
                             <td th:text="${#temporals.format(commande.date, 'dd/MM/yyyy HH:mm')}"></td>
                             <td th:text="'Proforma ' + ${commande.idProforma}"></td>
-                            <td>
-                                <span class="badge bg-warning" th:each="etat : ${commandeEtats}" 
-                                      th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 1}">Créée</span>
-                                <span class="badge bg-success" th:each="etat : ${commandeEtats}" 
-                                      th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 2}">Validée</span>
+                            <td th:with="status=${validationStatusMap[commande.idCommande]}">
+                                <!-- Show validation progress -->
+                                <div th:if="${status != null}">
+                                    <span th:if="${status.fullyValidated}" class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Validee
+                                    </span>
+                                    <span th:unless="${status.fullyValidated}" class="badge bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split"></i> 
+                                        Etape <span th:text="${status.stepsCompleted}">0</span>/<span th:text="${status.totalStepsRequired}">2</span>
+                                    </span>
+                                    <!-- Show who validated each step -->
+                                    <div th:if="${status.stepsCompleted > 0}" class="small text-muted mt-1">
+                                        <th:block th:each="step : ${status.steps}" th:if="${step.completed}">
+                                            <span th:text="'Etape ' + ${step.stepNumber} + ': ' + ${step.validatedByUserName}"></span><br/>
+                                        </th:block>
+                                    </div>
+                                </div>
+                                <!-- Fallback to old system if no status -->
+                                <th:block th:if="${status == null}">
+                                    <span class="badge bg-warning" th:each="etat : ${commandeEtats}" 
+                                          th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 1}">Creee</span>
+                                    <span class="badge bg-success" th:each="etat : ${commandeEtats}" 
+                                          th:if="${etat.id.idCommande == commande.idCommande && etat.id.idEtat == 2}">Validee</span>
+                                </th:block>
                             </td>
                             <td class="montant-total" th:data-commande-id="${commande.idCommande}">...</td>
                             <td class="montant-paye" th:data-commande-id="${commande.idCommande}">...</td>
@@ -121,13 +140,15 @@
                                     (<span th:text="${#temporals.format(commandeLivraisons[commande.idCommande].date, 'dd/MM/yyyy HH:mm')}"></span>)
                                 </span>
                             </td>
-                            <td>
+                            <td th:with="status=${validationStatusMap[commande.idCommande]}">
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <!-- Only show Valider button if not already validated (etat != 2) -->
+                                    <!-- Show Valider button if not fully validated -->
                                     <form th:action="@{/commande/valider/{id}(id=${commande.idCommande})}" method="post" style="display:inline;"
-                                          th:unless="${commandeEtats.?[id.idCommande == __${commande.idCommande}__ && id.idEtat == 2].size() > 0}">
-                                        <button type="submit" class="btn btn-success btn-sm">
-                                            <i class="bi bi-check-circle"></i> Valider
+                                          th:if="${status != null && !status.fullyValidated}">
+                                        <button type="submit" class="btn btn-success btn-sm"
+                                                th:title="'Niveau requis: ' + ${status.nextStepRequiredNiveau} + '+'">
+                                            <i class="bi bi-check-circle"></i> 
+                                            Valider (niv.<span th:text="${status.nextStepRequiredNiveau}">7</span>+)
                                         </button>
                                     </form>
                                     <button type="button" class="btn btn-primary btn-sm btn-payer" th:data-commande-id="${commande.idCommande}" th:onclick="'openPaiementModal(' + ${commande.idCommande} + ')'">

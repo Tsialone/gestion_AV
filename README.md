@@ -1,15 +1,9 @@
-# cienema
-    docker compose up -d
-# hiconnecta @base
-    psql -h localhost -U postgres -p 1111 -d cinema_db
-    copiena ilay script ao @table.sql
+## SQL Insertion Order
 
-# run
-    mvn sprin-boot:run
-
-# anarana branche atao oh hoe:
-    feat/client-saisie
-    de manao pull request fa tsy tonde push any @main
-
-# nb
-    efa misy code mba mazava2 ny ao de mba ataov mifanaraka# gestion_AV
+```
+1. table_27_janv.sql    -- Creates all tables
+2. views.sql            -- Creates views
+3. dataV3A.sql          -- Permissions data (users, roles, depts, categories, restrictions)
+4. dataV3B.sql          -- Transaction data (demandes, proformas, commandes, stock)
+5. dataV3C.sql          -- Validation data
+```

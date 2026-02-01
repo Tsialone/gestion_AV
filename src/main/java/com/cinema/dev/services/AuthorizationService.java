@@ -62,45 +62,42 @@ public class AuthorizationService {
     private HistoriqueGeneralRepository historiqueGeneralRepository;
     
     // ========================================
-    // UTILITY METHODS
+    // UTILITY METHODS ABOUT USER
     // ========================================
     
-    /**
-     * Get utilisateur by ID, throws exception if not found
-     */
+    public List<Utilisateur> findAllUtilisateurs() {
+        return utilisateurRepository.findAll();
+    }
+    
+    public List<Role> findAllRoles() {
+        return roleRepository.findAll();
+    }
+    
+    public List<Dept> findAllDepts() {
+        return deptRepository.findAll();
+    }
+
     public Utilisateur getUtilisateur(Integer idUtilisateur) {
         return utilisateurRepository.findById(idUtilisateur)
             .orElseThrow(() -> new IllegalArgumentException("Utilisateur non trouvé: " + idUtilisateur));
     }
     
-    /**
-     * Get role for a user
-     */
     public Role getRole(Integer idUtilisateur) {
         Utilisateur user = getUtilisateur(idUtilisateur);
         return roleRepository.findById(user.getIdRole())
             .orElseThrow(() -> new IllegalArgumentException("Role non trouvé: " + user.getIdRole()));
     }
     
-    /**
-     * Get department for a user
-     */
     public Dept getDept(Integer idUtilisateur) {
         Utilisateur user = getUtilisateur(idUtilisateur);
         return deptRepository.findById(user.getIdDept())
             .orElseThrow(() -> new IllegalArgumentException("Département non trouvé: " + user.getIdDept()));
     }
-    
-    /**
-     * Get user's niveau (level)
-     */
+
     public int getNiveau(Integer idUtilisateur) {
         return getRole(idUtilisateur).getNiveau();
     }
     
-    /**
-     * Check if user is director level (no restrictions)
-     */
     public boolean isDirecteurLevel(Integer idUtilisateur) {
         return getNiveau(idUtilisateur) >= NIVEAU_DIRECTEUR;
     }
@@ -126,6 +123,16 @@ public class AuthorizationService {
         Utilisateur user = getUtilisateur(idUtilisateur);
         return user.getIdDept() == DEPT_FINANCE;
     }
+
+    /**
+     * Check if user is in a specific department by name
+     */
+    public boolean isInDepartement(Integer idUtilisateur, String deptName) {
+        if (isDirecteurLevel(idUtilisateur)) return true;
+        Dept dept = getDept(idUtilisateur);
+        return dept.getNom().equalsIgnoreCase(deptName);
+    }
+    
     
     /**
      * Require user to be in Ventes department
@@ -150,6 +157,20 @@ public class AuthorizationService {
             throw new SecurityException(
                 "Action non autorisée: " + action + ". " +
                 "Seul le département 'Finance' peut effectuer cette action. " +
+                "Votre département: " + dept.getNom()
+            );
+        }
+    }
+
+    /**
+     * Require user to be in a specific department by name
+     */
+    public void requireDepartement(Integer idUtilisateur, String deptName, String action) {
+        if (!isInDepartement(idUtilisateur, deptName)) {
+            Dept dept = getDept(idUtilisateur);
+            throw new SecurityException(
+                "Action non autorisée: " + action + ". " +
+                "Seul le département '" + deptName + "' peut effectuer cette action. " +
                 "Votre département: " + dept.getNom()
             );
         }
@@ -417,20 +438,5 @@ public class AuthorizationService {
     public void authorizeValorisationStock(Integer idUtilisateur) {
         requireFinanceDept(idUtilisateur, "Accéder à la valorisation de stock");
     }
-    
-    // ========================================
-    // GET ALL USERS (for UI dropdowns)
-    // ========================================
-    
-    public List<Utilisateur> findAllUtilisateurs() {
-        return utilisateurRepository.findAll();
-    }
-    
-    public List<Role> findAllRoles() {
-        return roleRepository.findAll();
-    }
-    
-    public List<Dept> findAllDepts() {
-        return deptRepository.findAll();
-    }
+
 }

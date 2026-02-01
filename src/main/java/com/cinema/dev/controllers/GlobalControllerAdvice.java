@@ -1,5 +1,6 @@
 package com.cinema.dev.controllers;
 
+import com.cinema.dev.dtos.DeptUsersDTO;
 import com.cinema.dev.dtos.UtilisateurSessionDTO;
 import com.cinema.dev.models.Utilisateur;
 import com.cinema.dev.services.SessionService;
@@ -33,6 +34,14 @@ public class GlobalControllerAdvice {
     @ModelAttribute("allUtilisateurs")
     public List<Utilisateur> allUtilisateurs() {
         return sessionService.getAllUtilisateurs();
+    }
+    
+    /**
+     * Ajoute la liste des utilisateurs groupés par département
+     */
+    @ModelAttribute("usersGroupedByDept")
+    public List<DeptUsersDTO> usersGroupedByDept() {
+        return sessionService.getUtilisateursGroupedByDept();
     }
 
     /**

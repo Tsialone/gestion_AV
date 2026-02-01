@@ -42,7 +42,7 @@
                     <a href="#" data-bs-toggle="dropdown" aria-expanded="false">
                         <div class="user-menu d-flex">
                             <div class="user-name text-end me-3">
-                                <h6 class="mb-0 text-gray-600" th:text="${currentUser.nom}">Utilisateur</h6>
+                                <h6 class="mb-0 text-gray-600" th:text="${currentUser.nom + ' (niv.' + currentUser.roleNiveau + ')'}">Utilisateur</h6>
                                 <p class="mb-0 text-sm text-gray-600" th:text="${currentUser.roleDisplay}">Role - Dept</p>
                             </div>
                             <div class="user-img d-flex align-items-center">
@@ -54,7 +54,7 @@
                             </div>
                         </div>
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 280px;">
+                    <ul class="dropdown-menu dropdown-menu-end" style="min-width: 300px;">
                         <li>
                             <h6 class="dropdown-header">
                                 <i class="bi bi-person-circle me-2"></i>
@@ -76,15 +76,58 @@
                                 <i class="bi bi-arrow-repeat me-2"></i>Changer d'utilisateur
                             </h6>
                         </li>
-                        <li th:each="user : ${allUtilisateurs}" th:if="${user.idUtilisateur != currentUser.idUtilisateur}">
-                            <form th:action="@{/switch-user}" method="post" class="d-inline w-100">
-                                <input type="hidden" name="idUtilisateur" th:value="${user.idUtilisateur}">
-                                <button type="submit" class="dropdown-item">
-                                    <i class="bi bi-person me-2"></i>
-                                    <span th:text="${user.nom}">Nom</span>
-                                </button>
-                            </form>
-                        </li>
+                        <!-- Users grouped by department - expandable sections -->
+                        <th:block th:each="deptGroup, deptStat : ${usersGroupedByDept}">
+                            <li>
+                                <a class="dropdown-item d-flex justify-content-between align-items-center dept-toggle" 
+                                   href="javascript:void(0)"
+                                   th:data-target="'deptCollapse' + ${deptStat.index}">
+                                    <span>
+                                        <i class="bi bi-building me-2"></i>
+                                        <span th:text="${deptGroup.deptNom}">Dept</span>
+                                    </span>
+                                    <span class="d-flex align-items-center">
+                                        <span class="badge bg-secondary me-2" th:text="${deptGroup.utilisateurs.size()}">0</span>
+                                        <i class="bi bi-chevron-down dept-chevron" style="transition: transform 0.2s;"></i>
+                                    </span>
+                                </a>
+                            </li>
+                            <li class="dept-users" th:id="'deptCollapse' + ${deptStat.index}" style="display: none;">
+                                <div class="ps-3 border-start border-2 border-primary ms-3">
+                                    <th:block th:each="user : ${deptGroup.utilisateurs}" th:if="${user.idUtilisateur != currentUser.idUtilisateur}">
+                                        <form th:action="@{/switch-user}" method="post" class="d-block">
+                                            <input type="hidden" name="idUtilisateur" th:value="${user.idUtilisateur}">
+                                            <button type="submit" class="dropdown-item py-1">
+                                                <i class="bi bi-person me-2"></i>
+                                                <span th:text="${user.displayText}">Nom (niv.X)</span>
+                                            </button>
+                                        </form>
+                                    </th:block>
+                                    <span th:if="${#lists.size(deptGroup.utilisateurs) == 1 and deptGroup.utilisateurs[0].idUtilisateur == currentUser.idUtilisateur}"
+                                          class="dropdown-item-text text-muted small py-1">Aucun autre utilisateur</span>
+                                </div>
+                            </li>
+                        </th:block>
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                document.querySelectorAll('.dept-toggle').forEach(function(toggle) {
+                                    toggle.addEventListener('click', function(e) {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        var targetId = this.getAttribute('data-target');
+                                        var target = document.getElementById(targetId);
+                                        var chevron = this.querySelector('.dept-chevron');
+                                        if (target.style.display === 'none') {
+                                            target.style.display = 'block';
+                                            chevron.style.transform = 'rotate(180deg)';
+                                        } else {
+                                            target.style.display = 'none';
+                                            chevron.style.transform = 'rotate(0deg)';
+                                        }
+                                    });
+                                });
+                            });
+                        </script>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <a class="dropdown-item text-danger" th:href="@{/logout}">

@@ -1,5 +1,6 @@
 package com.cinema.dev.controllers;
 
+import com.cinema.dev.dtos.ValidationStatusDTO;
 import com.cinema.dev.services.CommandeService;
 import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ProformaRepository;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Comparator;
 
 @Controller
@@ -117,6 +119,14 @@ public class CommandeController {
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("caisses", caisseRepository.findAll());
         model.addAttribute("commandeEtats", commandeEtatRepository.findAll());
+        
+        // Build validation status map for each commande
+        Map<Integer, ValidationStatusDTO> validationStatusMap = new HashMap<>();
+        for (Commande c : commandes) {
+            validationStatusMap.put(c.getIdCommande(), commandeService.getValidationStatus(c.getIdCommande()));
+        }
+        model.addAttribute("validationStatusMap", validationStatusMap);
+        
         model.addAttribute("filterIdProforma", idProforma);
         model.addAttribute("filterIdClient", idClient);
         model.addAttribute("filterIdFournisseur", idFournisseur);
@@ -202,8 +212,14 @@ public class CommandeController {
                                   RedirectAttributes redirectAttributes) {
         Integer idUtilisateur = sessionService.getCurrentUserId(session);
         try {
-            commandeService.validerCommande(idUtilisateur, idCommande, dateValidation);
-            redirectAttributes.addFlashAttribute("toastMessage", "Commande validée avec succès");
+            var status = commandeService.validerCommande(idUtilisateur, idCommande, dateValidation);
+            if (status.isFullyValidated()) {
+                redirectAttributes.addFlashAttribute("toastMessage", "Commande entierement validee (toutes les etapes completees)");
+            } else {
+                redirectAttributes.addFlashAttribute("toastMessage", 
+                    "Etape " + status.getStepsCompleted() + "/" + status.getTotalStepsRequired() + " validee. " +
+                    "En attente de validation niveau " + status.getNextStepRequiredNiveau() + "+");
+            }
             redirectAttributes.addFlashAttribute("toastType", "success");
         } catch (SecurityException e) {
             redirectAttributes.addFlashAttribute("toastMessage", e.getMessage());

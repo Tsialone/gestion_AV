@@ -1,5 +1,6 @@
 package com.cinema.dev.services;
 
+import com.cinema.dev.dtos.ValidationStatusDTO;
 import com.cinema.dev.models.*;
 import com.cinema.dev.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class ProformaService {
     
     @Autowired
     private AuthorizationService authorizationService;
+    
+    @Autowired
+    private ValidationService validationService;
     
     public List<Proforma> findAll() {
         return proformaRepository.findAll();
@@ -137,30 +141,37 @@ public class ProformaService {
     }
     
     /**
-     * Valider un proforma
+     * Valider un proforma (multi-step validation)
      * 
      * Authorization:
      * - Must be in 'Ventes' department
-     * - Must have niveau >= 7
+     * - Must have required niveau for the next step
+     * - Cannot validate if already validated a step for this proforma
+     * 
+     * @return ValidationStatusDTO with current validation status
      */
     @Transactional
-    public ProformaEtat validerProforma(Integer idUtilisateur, Integer idProforma, LocalDateTime dateValidation) {
-        //* -- Authorization check
-        authorizationService.authorizeValiderProforma(idUtilisateur);
-        
+    public ValidationStatusDTO validerProforma(Integer idUtilisateur, Integer idProforma, LocalDateTime dateValidation) {
         //* -- Check if proforma exists
         proformaRepository.findById(idProforma)
             .orElseThrow(() -> new IllegalArgumentException("Proforma not found"));
         
-        //* -- Insert proforma_etat (valide = 2)
-        LocalDateTime date = dateValidation != null ? dateValidation : LocalDateTime.now();
-        ProformaEtat proformaEtat = new ProformaEtat(idProforma, 2, date);
-        ProformaEtat saved = proformaEtatRepository.save(proformaEtat);
-        
-        //* -- Log to historique
-        authorizationService.logAction(idUtilisateur, "proforma_etat", "Validation proforma", idProforma, date);
-        
-        return saved;
+        //* -- Delegate to ValidationService for multi-step validation
+        return validationService.validate(idUtilisateur, ValidationService.ENTITY_PROFORMA, idProforma, dateValidation);
+    }
+    
+    /**
+     * Get the validation status of a proforma
+     */
+    public ValidationStatusDTO getValidationStatus(Integer idProforma) {
+        return validationService.getValidationStatus(ValidationService.ENTITY_PROFORMA, idProforma);
+    }
+    
+    /**
+     * Check if proforma is fully validated
+     */
+    public boolean isFullyValidated(Integer idProforma) {
+        return validationService.isFullyValidated(ValidationService.ENTITY_PROFORMA, idProforma);
     }
     
     /**

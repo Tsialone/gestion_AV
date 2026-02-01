@@ -1,5 +1,6 @@
 package com.cinema.dev.services;
 
+import com.cinema.dev.dtos.ValidationStatusDTO;
 import com.cinema.dev.models.*;
 import com.cinema.dev.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class CommandeService {
     
     @Autowired
     private AuthorizationService authorizationService;
+    
+    @Autowired
+    private ValidationService validationService;
     
     public List<Commande> findAll() {
         return commandeRepository.findAll();
@@ -139,30 +143,38 @@ public class CommandeService {
     }
     
     /**
-     * Valider une commande
+     * Valider une commande (multi-step validation)
      * 
      * Authorization:
      * - Must be in 'Ventes' department
-     * - Must have niveau >= 7
+     * - Must have required niveau for the next step
+     * - Cannot validate if already validated a step for this commande
+     * 
+     * @return ValidationStatusDTO with current validation status
      */
     @Transactional
-    public CommandeEtat validerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateValidation) {
-        //* -- Authorization check
-        authorizationService.authorizeValiderCommande(idUtilisateur);
-        
+    public ValidationStatusDTO validerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateValidation) {
         //* -- Check if commande exists
         commandeRepository.findById(idCommande)
             .orElseThrow(() -> new IllegalArgumentException("Commande not found"));
         
-        //* -- Insert commande_etat (valide = 2)
-        LocalDateTime date = dateValidation != null ? dateValidation : LocalDateTime.now();
-        CommandeEtat commandeEtat = new CommandeEtat(idCommande, 2, date);
-        CommandeEtat saved = commandeEtatRepository.save(commandeEtat);
-        
-        //* -- Log to historique
-        authorizationService.logAction(idUtilisateur, "commande_etat", "Validation commande", idCommande, date);
-        
-        return saved;
+        //* -- Delegate to ValidationService for multi-step validation
+        return validationService.validate(idUtilisateur, ValidationService.ENTITY_COMMANDE, 
+                                          idCommande, dateValidation);
+    }
+    
+    /**
+     * Get the validation status of a commande
+     */
+    public ValidationStatusDTO getValidationStatus(Integer idCommande) {
+        return validationService.getValidationStatus(ValidationService.ENTITY_COMMANDE, idCommande);
+    }
+    
+    /**
+     * Check if commande is fully validated
+     */
+    public boolean isFullyValidated(Integer idCommande) {
+        return validationService.isFullyValidated(ValidationService.ENTITY_COMMANDE, idCommande);
     }
     
     /**

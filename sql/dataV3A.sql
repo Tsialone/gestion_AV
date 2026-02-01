@@ -13,15 +13,16 @@ INSERT INTO dept (id_dept, nom) VALUES
     (3, 'Logistique'),  -- stock management
     (4, 'Direction');   -- management
 
--- 2. ROLES (niveau >= 7 can validate, seuil = max validation amount)
+-- 2. ROLES (niveau >= 7 can validate step 1, niveau >= 10 for step 2)
 INSERT INTO role (id_role, nom, niveau, seuil) VALUES 
     (1, 'Stagiaire', 1, 0.00),           -- no validation
     (2, 'Magasinier', 3, 50000.00),      -- basic
     (3, 'Vendeur', 3, 100000.00),        -- basic
     (4, 'Vendeur Senior', 5, 250000.00), -- intermediate
-    (5, 'Manager', 7, 500000.00),        -- CAN VALIDATE
-    (6, 'Chef Dept', 12, 1000000.00),    -- high authority
-    (7, 'Directeur', 15, 5000000.00);    -- highest, bypasses restrictions
+    (5, 'Manager', 7, 500000.00),        -- CAN VALIDATE STEP 1
+    (6, 'Chef Equipe', 10, 750000.00),   -- CAN VALIDATE STEP 2
+    (7, 'Chef Dept', 12, 1000000.00),    -- CAN VALIDATE BOTH STEPS
+    (8, 'Directeur', 15, 5000000.00);    -- highest, bypasses restrictions
 
 -- 3. CATEGORIES (Electronics)
 INSERT INTO categorie (id_categorie, libelle) VALUES 
@@ -90,27 +91,28 @@ INSERT INTO utilisateur (id_utilisateur, nom, date_naissance, date_embauche, id_
     (1, 'stg_vt_rabe', '2000-05-15', '2025-01-01', 1, 1, 1),     -- Stagiaire Ventes, niveau 1, cannot validate
     (2, 'vdr_vt_rakoto', '1995-03-20', '2023-06-01', 1, 3, 1),   -- Vendeur Ventes, niveau 3, no validation
     (3, 'vds_vt_rasoa', '1990-08-10', '2021-04-15', 2, 4, 1),    -- Vendeur Senior Ventes, niveau 5, no validation
-    (4, 'mgr_vt_andry', '1985-12-25', '2018-02-01', 1, 5, 1),    -- Manager Ventes, niveau 7, CAN VALIDATE
-    (5, 'cdp_vt_hery', '1980-01-30', '2015-01-10', NULL, 6, 1),  -- Chef Dept Ventes, niveau 12, full rights
-    (6, 'mag_fi_jean', '1992-07-14', '2022-03-01', 1, 2, 2),     -- Magasinier Finance, can access valorisation
-    (7, 'mgr_fi_marie', '1988-11-20', '2019-08-15', 2, 5, 2),    -- Manager Finance, validate + valorisation
-    (8, 'cdp_fi_paul', '1975-04-05', '2010-05-20', NULL, 6, 2),  -- Chef Finance, full finance rights
-    (9, 'mag_lg_fidy', '1993-09-12', '2022-01-15', 1, 2, 3),     -- Magasinier Logistique, stock only
-    (10, 'mgr_lg_tiana', '1986-06-08', '2017-11-01', 2, 5, 3),   -- Manager Logistique, stock management
-    (11, 'dir_all_boss', '1970-02-28', '2005-01-01', NULL, 7, 4),-- Directeur, niveau 15, CAN DO EVERYTHING
-    (12, 'vdr_vt_info', '1994-04-18', '2023-08-01', 1, 3, 1),    -- Vendeur restricted to Informatique
-    (13, 'vdr_vt_phone', '1996-10-22', '2024-01-15', 2, 3, 1),   -- Vendeur restricted to Telephonie + PhonePro
-    (14, 'mgr_vt_game', '1991-12-01', '2020-05-10', 1, 5, 1);    -- Manager restricted to Gaming/Accessoires + GameZone
+    (4, 'mgr_vt_andry', '1985-12-25', '2018-02-01', 1, 5, 1),    -- Manager Ventes, niveau 7, CAN VALIDATE STEP 1
+    (5, 'cde_vt_lova', '1983-09-14', '2016-05-20', 1, 6, 1),     -- Chef Equipe Ventes, niveau 10, CAN VALIDATE STEP 2
+    (6, 'cdp_vt_hery', '1980-01-30', '2015-01-10', NULL, 7, 1),  -- Chef Dept Ventes, niveau 12, full rights
+    (7, 'mag_fi_jean', '1992-07-14', '2022-03-01', 1, 2, 2),     -- Magasinier Finance, can access valorisation
+    (8, 'mgr_fi_marie', '1988-11-20', '2019-08-15', 2, 5, 2),    -- Manager Finance, validate + valorisation
+    (9, 'cdp_fi_paul', '1975-04-05', '2010-05-20', NULL, 7, 2),  -- Chef Finance, full finance rights
+    (10, 'mag_lg_fidy', '1993-09-12', '2022-01-15', 1, 2, 3),    -- Magasinier Logistique, stock only
+    (11, 'mgr_lg_tiana', '1986-06-08', '2017-11-01', 2, 5, 3),   -- Manager Logistique, stock management
+    (12, 'dir_all_boss', '1970-02-28', '2005-01-01', NULL, 8, 4),-- Directeur, niveau 15, CAN DO EVERYTHING
+    (13, 'vdr_vt_info', '1994-04-18', '2023-08-01', 1, 3, 1),    -- Vendeur restricted to Informatique
+    (14, 'vdr_vt_phone', '1996-10-22', '2024-01-15', 2, 3, 1),   -- Vendeur restricted to Telephonie + PhonePro
+    (15, 'mgr_vt_game', '1991-12-01', '2020-05-10', 1, 5, 1);    -- Manager restricted to Gaming/Accessoires + GameZone
 
 -- 11. RESTRICTION CATEGORIES (if user is here, can ONLY access these categories)
 INSERT INTO restriction_categorie (id_categorie, id_utilisateur) VALUES 
-    (1, 12),  -- vdr_vt_info -> Informatique only
-    (2, 13),  -- vdr_vt_phone -> Telephonie only
-    (5, 14),  -- mgr_vt_game -> Gaming
-    (6, 14);  -- mgr_vt_game -> Accessoires
+    (1, 13),  -- vdr_vt_info -> Informatique only
+    (2, 14),  -- vdr_vt_phone -> Telephonie only
+    (5, 15),  -- mgr_vt_game -> Gaming
+    (6, 15);  -- mgr_vt_game -> Accessoires
 
 -- 12. RESTRICTION FOURNISSEURS (if user is here, can ONLY work with these suppliers)
 INSERT INTO restriction_fournisseur (id_fournisseur, id_utilisateur) VALUES 
-    (4, 13),  -- vdr_vt_phone -> PhonePro only
-    (3, 14);  -- mgr_vt_game -> GameZone only
+    (4, 14),  -- vdr_vt_phone -> PhonePro only
+    (3, 15);  -- mgr_vt_game -> GameZone only
 

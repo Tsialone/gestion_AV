@@ -97,25 +97,46 @@
                                 <span th:if="${proforma.idClient != null}" class="badge bg-primary">Client</span>
                                 <span th:if="${proforma.idFournisseur != null}" class="badge bg-info">Fournisseur</span>
                             </td>
-                            <td>
-                                <span class="badge bg-warning" th:each="etat : ${proformaEtats}" 
-                                      th:if="${etat.id.idProforma == proforma.idProforma && etat.id.idEtat == 1}">Créé</span>
-                                <span class="badge bg-success" th:each="etat : ${proformaEtats}" 
-                                      th:if="${etat.id.idProforma == proforma.idProforma && etat.id.idEtat == 2}">Validé</span>
+                            <td th:with="status=${validationStatusMap[proforma.idProforma]}">
+                                <!-- Show validation progress -->
+                                <div th:if="${status != null}">
+                                    <span th:if="${status.fullyValidated}" class="badge bg-success">
+                                        <i class="bi bi-check-circle-fill"></i> Valide
+                                    </span>
+                                    <span th:unless="${status.fullyValidated}" class="badge bg-warning text-dark">
+                                        <i class="bi bi-hourglass-split"></i> 
+                                        Etape <span th:text="${status.stepsCompleted}">0</span>/<span th:text="${status.totalStepsRequired}">2</span>
+                                    </span>
+                                    <!-- Show who validated each step -->
+                                    <div th:if="${status.stepsCompleted > 0}" class="small text-muted mt-1">
+                                        <th:block th:each="step : ${status.steps}" th:if="${step.completed}">
+                                            <span th:text="'Etape ' + ${step.stepNumber} + ': ' + ${step.validatedByUserName}"></span><br/>
+                                        </th:block>
+                                    </div>
+                                </div>
+                                <!-- Fallback to old system if no status -->
+                                <th:block th:if="${status == null}">
+                                    <span class="badge bg-warning" th:each="etat : ${proformaEtats}" 
+                                          th:if="${etat.id.idProforma == proforma.idProforma && etat.id.idEtat == 1}">Cree</span>
+                                    <span class="badge bg-success" th:each="etat : ${proformaEtats}" 
+                                          th:if="${etat.id.idProforma == proforma.idProforma && etat.id.idEtat == 2}">Valide</span>
+                                </th:block>
                             </td>
-                            <td>
+                            <td th:with="status=${validationStatusMap[proforma.idProforma]}">
                                 <div class="btn-group btn-group-sm" role="group">
-                                    <!-- Only show Valider button if not already validated (etat != 2) -->
+                                    <!-- Show Valider button if not fully validated -->
                                     <form th:action="@{/proforma/valider/{id}(id=${proforma.idProforma})}" method="post" style="display:inline;"
-                                          th:unless="${proformaEtats.?[id.idProforma == __${proforma.idProforma}__ && id.idEtat == 2].size() > 0}">
-                                        <button type="submit" class="btn btn-success">
-                                            <i class="bi bi-check-circle"></i> Valider
+                                          th:if="${status != null && !status.fullyValidated}">
+                                        <button type="submit" class="btn btn-success" 
+                                                th:title="'Niveau requis: ' + ${status.nextStepRequiredNiveau} + '+'">
+                                            <i class="bi bi-check-circle"></i> 
+                                            Valider (niv.<span th:text="${status.nextStepRequiredNiveau}">7</span>+)
                                         </button>
                                     </form>
-                                    <!-- Show Créer Commande button only if validated (etat == 2) -->
+                                    <!-- Show Creer Commande button only if fully validated -->
                                     <a th:href="@{/commande/creer(idProforma=${proforma.idProforma})}" class="btn btn-primary"
-                                       th:if="${proformaEtats.?[id.idProforma == __${proforma.idProforma}__ && id.idEtat == 2].size() > 0}">
-                                        <i class="bi bi-cart-plus"></i> Créer Commande
+                                       th:if="${status != null && status.fullyValidated}">
+                                        <i class="bi bi-cart-plus"></i> Creer Commande
                                     </a>
                                 </div>
                             </td>
