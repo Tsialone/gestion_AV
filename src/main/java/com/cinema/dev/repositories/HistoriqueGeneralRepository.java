@@ -11,12 +11,12 @@ import java.util.List;
 @Repository
 public interface HistoriqueGeneralRepository extends JpaRepository<HistoriqueGeneral, Integer> {
     
-    @Query("SELECT h FROM HistoriqueGeneral h WHERE " +
-           "(:nomTable IS NULL OR h.nomTable = :nomTable) AND " +
-           "(:idUtilisateur IS NULL OR h.idUtilisateur = :idUtilisateur) AND " +
-           "(:startDate IS NULL OR h.dateHistorique >= :startDate) AND " +
-           "(:endDate IS NULL OR h.dateHistorique <= :endDate) " +
-           "ORDER BY h.dateHistorique DESC")
+    @Query(value = "SELECT * FROM historique_general h WHERE " +
+           "(CAST(:nomTable AS VARCHAR) IS NULL OR h.nom_table = :nomTable) AND " +
+           "(CAST(:idUtilisateur AS INTEGER) IS NULL OR h.id_utilisateur = :idUtilisateur) AND " +
+           "(CAST(:startDate AS TIMESTAMP) IS NULL OR h.date_historique >= :startDate) AND " +
+           "(CAST(:endDate AS TIMESTAMP) IS NULL OR h.date_historique <= :endDate) " +
+           "ORDER BY h.date_historique DESC", nativeQuery = true)
     List<HistoriqueGeneral> findWithFilters(
         @Param("nomTable") String nomTable,
         @Param("idUtilisateur") Integer idUtilisateur,
