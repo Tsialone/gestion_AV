@@ -3,7 +3,6 @@ package com.cinema.dev.models;
 import jakarta.persistence.*;
 import lombok.Data;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,32 +10,31 @@ import java.time.LocalDateTime;
 @Table(name = "v_etat_stock") // nom exact de la vue
 public class EtatStock {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @EmbeddedId
+    private EtatStockId id;
 
-    @Column(name = "id_depot")
-    private Long idDepot;
+    @Column(name = "id_depot", insertable = false, updatable = false)
+    private Integer idDepot;
 
     @Column(name = "depot")
     private String depot;
 
-    @Column(name = "id_article")
-    private Long idArticle;
+    @Column(name = "id_article", insertable = false, updatable = false)
+    private Integer idArticle;
 
     @Column(name = "article")
     private String article;
 
-    @Column(name = "date_mouvement")
+    @Column(name = "date_mouvement", insertable = false, updatable = false)
     private LocalDateTime dateMouvement;
 
     @Column(name = "variation")
-    private BigDecimal variation;
+    private Integer variation;
 
     @Column(name = "entree")
-    private BigDecimal entree;
+    private Integer entree;
 
     @Column(name = "sortie")
-    private BigDecimal sortie;
+    private Integer sortie;
 
 }

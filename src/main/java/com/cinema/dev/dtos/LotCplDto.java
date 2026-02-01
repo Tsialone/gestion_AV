@@ -7,7 +7,7 @@ import lombok.Data;
 @AllArgsConstructor
 public class LotCplDto {
 
-    private Long idLot;
+    private Integer idLot;
     private String lot;
     private Integer entrees;
     private Integer sorties;

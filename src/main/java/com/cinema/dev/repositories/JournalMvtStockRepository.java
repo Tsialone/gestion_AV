@@ -8,7 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface JournalMvtStockRepository extends JpaRepository<JournalMvtStock, Long> {
+public interface JournalMvtStockRepository extends JpaRepository<JournalMvtStock, Integer> {
 
     @Query("""
         SELECT j

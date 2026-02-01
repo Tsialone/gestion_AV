@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface LotCplRepository extends JpaRepository<LotCpl, Long> {
+public interface LotCplRepository extends JpaRepository<LotCpl, Integer> {
 
     @Query("""
                 SELECT new com.cinema.dev.dtos.LotCplDto(
