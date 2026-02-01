@@ -1,6 +1,7 @@
 package com.cinema.dev.services;
 
 import com.cinema.dev.dtos.ValidationStatusDTO;
+import com.cinema.dev.forms.MvtStockForm;
 import com.cinema.dev.models.*;
 import com.cinema.dev.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,7 +9,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class CommandeService {
@@ -36,6 +39,12 @@ public class CommandeService {
     
     @Autowired
     private ValidationService validationService;
+
+     @Autowired
+    private ProformaDetailRepository proformaDetailRepository;
+
+     @Autowired
+    private MvtStockService mvtStockService;
     
     public List<Commande> findAll() {
         return commandeRepository.findAll();
@@ -200,9 +209,10 @@ public class CommandeService {
      * 
      * Authorization:
      * - Must be in 'Ventes' department
+     * @throws Exception 
      */
     @Transactional
-    public Livraison livrerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateLivraison) {
+    public Livraison livrerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateLivraison) throws Exception {
         //* -- Authorization check
         authorizationService.authorizeLivraison(idUtilisateur);
         
@@ -230,12 +240,62 @@ public class CommandeService {
         
         Livraison saved = livraisonRepository.save(livraison);
         
+        faireMouvoirStockApresLivraison(saved, commande);
         //* -- Log to historique
         authorizationService.logAction(idUtilisateur, "livraison", "Livraison commande", saved.getIdLivraison(), date);
         
         return saved;
     }
-    
+
+    @jakarta.transaction.Transactional(rollbackOn = Exception.class)
+    public MvtStock faireMouvoirStockApresLivraison(Livraison livraison, Commande commande) throws Exception {
+        MvtStockForm mvtStockForm = new MvtStockForm();
+            List<ProformaDetail> listeArticlesDetails = this.proformaDetailRepository.findDetailsByCommandeId(commande.getIdCommande());
+            HashMap<Integer, Integer> articleQte =  (HashMap<Integer, Integer>) ProformaDetail.mapQuantiteParArticleStream(listeArticlesDetails);
+            mvtStockForm.setArticleQte(articleQte);
+            mvtStockForm.setDate(livraison.getDate().toLocalDate());
+            mvtStockForm.setDescriptionQualite("OK");
+            mvtStockForm.setIdLivraison(livraison.getIdLivraison());
+            mvtStockForm.setIdDepot(null);
+            mvtStockForm.setIdAjustement(null);
+            mvtStockForm.setDesignation(null);
+            mvtStockForm.setIdDepot(1);
+            MvtStock mvtStock = null;
+        if(estCommandeEntrante(livraison.getIdCommande())) {
+            // Entreante
+            mvtStock = this.mvtStockService.creerMvtStockEntree(mvtStockForm);
+        } else {
+            mvtStock = this.mvtStockService.creeerMvtStockSortie(mvtStockForm);
+        }
+        return mvtStock;
+    }
+
+    /**
+     * @return true si Entrante (idClient null), false si Sortante (idFournisseur null)
+     */
+    public boolean estCommandeEntrante(Integer idCommande) {
+        List<Object[]> results = commandeRepository.findProformaDetailsByCommandeId(idCommande);
+
+        if (results.isEmpty()) {
+            throw new RuntimeException("Commande ou Proforma associé introuvable.");
+        }
+
+        Object[] row = results.get(0);
+        Integer idClient = (Integer) row[0];
+        Integer idFournisseur = (Integer) row[1];
+
+        // Règle : Entrante si idClient est null (on achète au fournisseur)
+        if (idClient == null) {
+            return true; 
+        } 
+        // Sortante si idFournisseur est null (on vend au client)
+        else if (idFournisseur == null) {
+            return false;
+        }
+
+        throw new IllegalStateException("Le proforma doit avoir soit un client null, soit un fournisseur null.");
+    }
+
     /**
      * Legacy method without authorization (for backward compatibility)
      * @deprecated Use livrerCommande(Integer idUtilisateur, ...) instead

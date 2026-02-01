@@ -23,4 +23,9 @@ public interface ProformaDetailRepository extends JpaRepository<ProformaDetail, 
 	       "FROM ProformaDetail d JOIN Article a ON d.id.idArticle = a.idArticle " +
 	       "WHERE d.id.idProforma = :idProforma")
 	List<Map<String, Object>> findDetailsWithArticleNames(@Param("idProforma") Integer idProforma);
+
+	@Query("SELECT d FROM ProformaDetail d, Commande c " +
+           "WHERE d.id.idProforma = c.idProforma " +
+           "AND c.idCommande = :idCommande")
+    List<ProformaDetail> findDetailsByCommandeId(@Param("idCommande") Integer idCommande);
 }

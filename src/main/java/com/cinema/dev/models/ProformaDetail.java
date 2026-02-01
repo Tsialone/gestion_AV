@@ -6,6 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.io.Serializable;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "proforma_detail")
@@ -33,4 +36,12 @@ public class ProformaDetail {
         @Column(name = "id_proforma")
         private Integer idProforma;
     }
+
+    public static Map<Integer, Integer> mapQuantiteParArticleStream(List<ProformaDetail> details) {
+    return details.stream()
+        .collect(Collectors.toMap(
+            d -> d.getId().getIdArticle(), 
+            ProformaDetail::getQuantite
+        ));
+}
 }
