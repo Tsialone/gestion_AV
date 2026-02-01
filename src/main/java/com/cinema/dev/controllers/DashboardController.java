@@ -62,7 +62,7 @@ public class DashboardController {
                 }
 
             }
-            Double pourcentage =  (double)total / depot.getCapacite() * 100;
+            Double pourcentage =  (double)total / (depot.getCapacite()   ) * 100;
             System.out.println("total: " + total);
             System.out.println("capacite: " + depot.getCapacite());
             System.out.println("pourcentage: " + pourcentage);
