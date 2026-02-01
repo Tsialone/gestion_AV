@@ -24,12 +24,14 @@ public interface EtatStockRepository extends JpaRepository<EtatStock, Long> {
                 )
                 FROM EtatStock e
                 WHERE (:idDepot IS NULL OR e.idDepot = :idDepot)
+                  AND (:idArticle IS NULL OR e.idArticle = :idArticle)
                   AND e.dateMouvement <= COALESCE(:date, e.dateMouvement)
                 GROUP BY e.idDepot, e.depot, e.idArticle, e.article
                 ORDER BY e.depot, e.article
             """)
     List<EtatStockDto> findEtatStockFiltered(
             @Param("idDepot") Long idDepot,
+          @Param("idArticle") Long idArticle,
             @Param("date") LocalDateTime date);
 
 }
