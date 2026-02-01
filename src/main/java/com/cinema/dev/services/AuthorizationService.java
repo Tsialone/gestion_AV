@@ -142,6 +142,24 @@ public class AuthorizationService {
     }
 
     /**
+     * Check if user is in Finance or Direction department (for Valorisation Stock access)
+     */
+    public boolean isInFinanceOrDirection(Integer idUtilisateur) {
+        if (isDirecteurLevel(idUtilisateur)) return true;
+        Utilisateur user = getUtilisateur(idUtilisateur);
+        return user.getIdDept() == DEPT_FINANCE || user.getIdDept() == DEPT_DIRECTION;
+    }
+
+    /**
+     * Check if user is in Logistique or Direction department (for Journal/Etat Stock access)
+     */
+    public boolean isInLogistiqueOrDirection(Integer idUtilisateur) {
+        if (isDirecteurLevel(idUtilisateur)) return true;
+        Utilisateur user = getUtilisateur(idUtilisateur);
+        return user.getIdDept() == DEPT_LOGISTIQUE || user.getIdDept() == DEPT_DIRECTION;
+    }
+
+    /**
      * Check if user is in a specific department by name
      */
     public boolean isInDepartement(Integer idUtilisateur, String deptName) {
