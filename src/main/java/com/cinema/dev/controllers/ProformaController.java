@@ -3,6 +3,7 @@ package com.cinema.dev.controllers;
 import com.cinema.dev.dtos.ValidationStatusDTO;
 import com.cinema.dev.models.Proforma;
 import com.cinema.dev.models.ProformaDetail;
+import com.cinema.dev.services.AuthorizationService;
 import com.cinema.dev.services.ProformaService;
 import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ClientRepository;
@@ -50,12 +51,36 @@ public class ProformaController {
     @Autowired
     private SessionService sessionService;
     
+    @Autowired
+    private AuthorizationService authorizationService;
+    
+    /**
+     * Check if current user has access to this module (Ventes or Direction only)
+     */
+    private String checkVentesAccess(HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = sessionService.getCurrentUserId(session);
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        if (!authorizationService.isInVentesOrDirection(userId)) {
+            redirectAttributes.addFlashAttribute("toastMessage", 
+                "Acces refuse. Seul le departement Ventes ou Direction peut acceder aux proformas.");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/";
+        }
+        return null; // Access granted
+    }
+    
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) Integer idFournisseur, 
                            @RequestParam(required = false) String startDate, @RequestParam(required = false) String endDate,
                            @RequestParam(required = false, defaultValue = "idProforma") String sortBy,
                            @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                           HttpSession session, RedirectAttributes redirectAttributes,
                            Model model) {
+        
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
@@ -114,7 +139,10 @@ public class ProformaController {
     }
     
     @GetMapping("/creer-client")
-    public String getCreerClient(Model model) {
+    public String getCreerClient(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
         model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()
@@ -134,7 +162,10 @@ public class ProformaController {
     }
     
     @GetMapping("/creer-fournisseur")
-    public String getCreerFournisseur(Model model) {
+    public String getCreerFournisseur(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
         model.addAttribute("demandesAchat", demandeAchatRepository.findAll().stream()

@@ -2,6 +2,7 @@ package com.cinema.dev.controllers;
 
 import com.cinema.dev.models.DemandeAchat;
 import com.cinema.dev.models.DemandeAchatDetail;
+import com.cinema.dev.services.AuthorizationService;
 import com.cinema.dev.services.DemandeAchatService;
 import com.cinema.dev.services.SessionService;
 import com.cinema.dev.repositories.ClientRepository;
@@ -40,12 +41,36 @@ public class DemandeAchatController {
     @Autowired
     private SessionService sessionService;
     
+    @Autowired
+    private AuthorizationService authorizationService;
+    
+    /**
+     * Check if current user has access to this module (Ventes or Direction only)
+     */
+    private String checkVentesAccess(HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = sessionService.getCurrentUserId(session);
+        if (userId == null) {
+            return "redirect:/login";
+        }
+        if (!authorizationService.isInVentesOrDirection(userId)) {
+            redirectAttributes.addFlashAttribute("toastMessage", 
+                "Acces refuse. Seul le departement Ventes ou Direction peut acceder aux demandes d'achat.");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/";
+        }
+        return null; // Access granted
+    }
+    
     @GetMapping("/liste")
     public String getListe(@RequestParam(required = false) Integer idClient, @RequestParam(required = false) String startDate, 
                           @RequestParam(required = false) String endDate,
                           @RequestParam(required = false, defaultValue = "idDa") String sortBy,
                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
+                          HttpSession session, RedirectAttributes redirectAttributes,
                           Model model) {
+        
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         LocalDate start = (startDate != null && !startDate.isEmpty()) ? LocalDate.parse(startDate) : null;
         LocalDate end = (endDate != null && !endDate.isEmpty()) ? LocalDate.parse(endDate) : null;
@@ -97,7 +122,10 @@ public class DemandeAchatController {
     }
     
     @GetMapping("/saisie-client")
-    public String getSaisieClient(Model model) {
+    public String getSaisieClient(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         model.addAttribute("clients", clientRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
         
@@ -114,7 +142,10 @@ public class DemandeAchatController {
     }
     
     @GetMapping("/saisie-fournisseur")
-    public String getSaisieFournisseur(Model model) {
+    public String getSaisieFournisseur(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         model.addAttribute("fournisseurs", fournisseurRepository.findAll());
         model.addAttribute("articles", articleRepository.findAll());
         
@@ -131,7 +162,10 @@ public class DemandeAchatController {
     }
     
     @GetMapping("/saisie")
-    public String getSaisie(Model model) {
+    public String getSaisie(HttpSession session, RedirectAttributes redirectAttributes, Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
+        
         model.addAttribute("content", "pages/demande-achat/demande-achat-saisie");
         return "admin-layout";
     }
@@ -145,6 +179,9 @@ public class DemandeAchatController {
             @RequestParam Integer[] idArticles,
             @RequestParam Integer[] quantites,
             RedirectAttributes redirectAttributes) {
+        
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         Integer idUtilisateur = sessionService.getCurrentUserId(session);
         

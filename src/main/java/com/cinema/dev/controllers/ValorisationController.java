@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.cinema.dev.dtos.ValorisationStockRowDto;
 import com.cinema.dev.services.AuthorizationService;
@@ -29,13 +30,27 @@ public class ValorisationController {
     @Autowired
     SessionService sessionService;
 
-    @GetMapping("cump") 
-    public String cump(HttpSession session, Model model) throws Exception {
-        // Check authorization - only Finance department can access valorisation
-        Integer idUtilisateur = sessionService.getCurrentUserId(session);
-        if (idUtilisateur != null) {
-            authorizationService.authorizeValorisationStock(idUtilisateur);
+    /**
+     * Check if current user has access to this module (Finance or Direction only)
+     */
+    private String checkFinanceAccess(HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = sessionService.getCurrentUserId(session);
+        if (userId == null) {
+            return "redirect:/login";
         }
+        if (!authorizationService.isInFinanceOrDirection(userId)) {
+            redirectAttributes.addFlashAttribute("toastMessage", 
+                "Accès refusé. Seul le département Finance ou Direction peut accéder à la valorisation de stock.");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/";
+        }
+        return null; // Access granted
+    }
+
+    @GetMapping("cump") 
+    public String cump(HttpSession session, RedirectAttributes redirectAttributes, Model model) throws Exception {
+        String accessCheck = checkFinanceAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         List<ValorisationStockRowDto> result = this.stockLotService.getValorisationStockCUMP();
         for(int i = 0; i < result.size(); i++) {
@@ -51,12 +66,9 @@ public class ValorisationController {
     }
 
     @GetMapping("lifo") 
-    public String fifo(HttpSession session, Model model) throws Exception {
-        // Check authorization - only Finance department can access valorisation
-        Integer idUtilisateur = sessionService.getCurrentUserId(session);
-        if (idUtilisateur != null) {
-            authorizationService.authorizeValorisationStock(idUtilisateur);
-        }
+    public String fifo(HttpSession session, RedirectAttributes redirectAttributes, Model model) throws Exception {
+        String accessCheck = checkFinanceAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         List<ValorisationStockRowDto> result = this.stockLotService.getValorisationStockLIFO();
         for(int i = 0; i < result.size(); i++) {
@@ -72,12 +84,9 @@ public class ValorisationController {
     }
 
     @GetMapping("fifo") 
-    public String lifo(HttpSession session, Model model) throws Exception {
-        // Check authorization - only Finance department can access valorisation
-        Integer idUtilisateur = sessionService.getCurrentUserId(session);
-        if (idUtilisateur != null) {
-            authorizationService.authorizeValorisationStock(idUtilisateur);
-        }
+    public String lifo(HttpSession session, RedirectAttributes redirectAttributes, Model model) throws Exception {
+        String accessCheck = checkFinanceAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         List<ValorisationStockRowDto> result = this.stockLotService.getValorisationStockFIFO();
         for(int i = 0; i < result.size(); i++) {

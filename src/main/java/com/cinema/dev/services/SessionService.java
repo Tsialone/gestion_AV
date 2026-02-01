@@ -6,9 +6,15 @@ import com.cinema.dev.dtos.UtilisateurSessionDTO;
 import com.cinema.dev.models.Dept;
 import com.cinema.dev.models.Role;
 import com.cinema.dev.models.Utilisateur;
+import com.cinema.dev.models.Categorie;
+import com.cinema.dev.models.Fournisseur;
 import com.cinema.dev.repositories.DeptRepository;
 import com.cinema.dev.repositories.RoleRepository;
 import com.cinema.dev.repositories.UtilisateurRepository;
+import com.cinema.dev.repositories.CategorieRepository;
+import com.cinema.dev.repositories.FournisseurRepository;
+import com.cinema.dev.repositories.RestrictionCategorieRepository;
+import com.cinema.dev.repositories.RestrictionFournisseurRepository;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -33,6 +39,18 @@ public class SessionService {
     @Autowired
     private DeptRepository deptRepository;
 
+    @Autowired
+    private CategorieRepository categorieRepository;
+
+    @Autowired
+    private FournisseurRepository fournisseurRepository;
+
+    @Autowired
+    private RestrictionCategorieRepository restrictionCategorieRepository;
+
+    @Autowired
+    private RestrictionFournisseurRepository restrictionFournisseurRepository;
+
     /**
      * Connecte un utilisateur en le stockant dans la session
      */
@@ -46,6 +64,30 @@ public class SessionService {
         Dept dept = deptRepository.findById(user.getIdDept())
                 .orElseThrow(() -> new RuntimeException("Département non trouvé: " + user.getIdDept()));
 
+        // Get restriction data
+        List<String> restrictedCategories = new ArrayList<>();
+        List<String> restrictedFournisseurs = new ArrayList<>();
+
+        // Get category restrictions
+        List<Integer> categoryIds = restrictionCategorieRepository.findAllowedCategoriesByUtilisateur(idUtilisateur);
+        if (!categoryIds.isEmpty()) {
+            for (Integer catId : categoryIds) {
+                categorieRepository.findById(catId).ifPresent(cat -> 
+                    restrictedCategories.add(cat.getLibelle())
+                );
+            }
+        }
+
+        // Get fournisseur restrictions
+        List<Integer> fournisseurIds = restrictionFournisseurRepository.findAllowedFournisseursByUtilisateur(idUtilisateur);
+        if (!fournisseurIds.isEmpty()) {
+            for (Integer fournId : fournisseurIds) {
+                fournisseurRepository.findById(fournId).ifPresent(fourn -> 
+                    restrictedFournisseurs.add(fourn.getNom())
+                );
+            }
+        }
+
         UtilisateurSessionDTO sessionUser = new UtilisateurSessionDTO(
                 user.getIdUtilisateur(),
                 user.getNom(),
@@ -53,7 +95,9 @@ public class SessionService {
                 role.getNiveau(),
                 dept.getNom(),
                 dept.getIdDept(),
-                role.getIdRole()
+                role.getIdRole(),
+                restrictedCategories,
+                restrictedFournisseurs
         );
 
         session.setAttribute(SESSION_USER_KEY, sessionUser);
