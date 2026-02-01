@@ -12,13 +12,13 @@ public class JournalMvtStock {
 
     @Id
     @Column(name = "id_mvt")
-    private Long idMvt;
+    private Integer idMvt;
 
     @Column(name = "date_mouvement")
     private LocalDateTime dateMouvement;
 
     @Column(name = "id_depot")
-    private Long idDepot;
+    private Integer idDepot;
 
     @Column(name = "depot")
     private String depot;
@@ -36,19 +36,19 @@ public class JournalMvtStock {
     private String descriptionQualite;
 
     @Column(name = "id_livraison")
-    private Long idLivraison;
+    private Integer idLivraison;
 
     @Column(name = "date_livraison")
     private LocalDateTime dateLivraison;
 
     @Column(name = "id_article")
-    private Long idArticle;
+    private Integer idArticle;
 
     @Column(name = "article")
     private String article;
 
     @Column(name = "id_lot")
-    private Long idLot;
+    private Integer idLot;
 
     @Column(name = "lot")
     private String lot;

@@ -9,9 +9,9 @@ import lombok.Data;
 @AllArgsConstructor
 public class EtatStockDto {
 
-    private Long idDepot;
+    private Integer idDepot;
     private String depot;
-    private Long idArticle;
+    private Integer idArticle;
     private String article;
     private Integer totalEntrees;
     private Integer totalSorties;

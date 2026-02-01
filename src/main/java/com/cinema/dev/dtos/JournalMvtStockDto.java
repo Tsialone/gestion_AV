@@ -11,19 +11,19 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class JournalMvtStockDto {
 
-    private Long idMvt;
+    private Integer idMvt;
     private LocalDateTime dateMouvement;
-    private Long idDepot;
+    private Integer idDepot;
     private String depot;
     private Boolean entrant;
     private String typeMouvement;
     private String designation;
     private String descriptionQualite;
-    private Long idLivraison;
+    private Integer idLivraison;
     private LocalDateTime dateLivraison;
-    private Long idArticle;
+    private Integer idArticle;
     private String article;
-    private Long idLot;
+    private Integer idLot;
     private String lot;
     private Integer quantite;
 }

@@ -27,8 +27,8 @@ public class EtatStockController {
     public String getListe(
             @RequestParam(value = "date", required = false) 
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime date,
-            @RequestParam(value = "idDepot", required = false) Long idDepot,
-            @RequestParam(value = "idArticle", required = false) Long idArticle,
+            @RequestParam(value = "idDepot", required = false) Integer idDepot,
+            @RequestParam(value = "idArticle", required = false) Integer idArticle,
             Model model) {
         LocalDateTime filterDate = date != null ? date : LocalDateTime.now();
         String dateFormatted = filterDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));

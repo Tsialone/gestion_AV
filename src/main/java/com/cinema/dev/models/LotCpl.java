@@ -12,7 +12,7 @@ public class LotCpl {
 
     @Id
     @Column(name = "id_lot")
-    private Long idLot;
+    private Integer idLot;
 
     @Column(name = "lot")
     private String lot;
