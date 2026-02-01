@@ -1,3 +1,12 @@
+For quick insertion, use the python script in `sql/`
+```
+py execute_sql.py
+```
+
+## Script Configuration
+Check the script, in the main function
+Just replace the port/password with yours   
+
 ## SQL Insertion Order
 
 ```
