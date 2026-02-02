@@ -123,12 +123,19 @@
                                 <!-- Show livraison form only if livraison doesn't exist yet (backend check) -->
                                 <form th:if="${commandeLivraisons[commande.idCommande] == null}" class="d-inline" th:action="@{/commande/livrer/{id}(id=${commande.idCommande})}" method="post" style="display: inline;">
                                     <div class="input-group input-group-sm">
+                                        <select class="form-select form-select-sm" name="idDepot" required th:if="${depots != null}">
+                                            <option value="" disabled selected>Choisir dépôt</option>
+                                            <option th:each="depot : ${depots}"
+                                                    th:value="${depot.idDepot}"
+                                                    th:text="${depot.nom}"></option>
+                                        </select>
                                         <input type="datetime-local" 
                                                class="form-control form-control-sm" 
                                                name="dateLivraison" 
                                                th:min="${commande.date}"
                                                th:value="${commande.date}"
                                                required>
+                                            
                                         <button type="submit" class="btn btn-outline-success btn-sm">
                                             <i class="bi bi-truck"></i> Livrer
                                         </button>
