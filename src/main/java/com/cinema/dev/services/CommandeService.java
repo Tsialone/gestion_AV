@@ -264,7 +264,7 @@ public class CommandeService {
             mvtStockForm.setIdDepot(null);
             mvtStockForm.setIdAjustement(null);
             mvtStockForm.setDesignation(null);
-            mvtStockForm.setIdDepot(1);
+            mvtStockForm.setIdDepot(2);
             MvtStock mvtStock = null;
             if(estCommandeEntrante(livraison.getIdCommande())) {
                 // Entreante

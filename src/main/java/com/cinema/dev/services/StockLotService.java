@@ -10,6 +10,7 @@ import com.cinema.dev.repositories.EntreeStockLotRepository;
 import com.cinema.dev.repositories.SortieStockLotRepository;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -313,6 +314,8 @@ public class StockLotService {
     }
 
     private static ValorisationStockRowDto getValorisationRowEntreeCump(EntreeStockLot entree, BigDecimal currValorisation, BigDecimal ancienCump, Integer ancientQttCumul) {
+        System.out.println("8888888888888888");
+        System.out.println("ancien = " + ancientQttCumul + " and = " + entree.getQuantiteMouvement());
          ValorisationStockRowDto currEntree = ValorisationStockRowDto.builder()
                     .dateMouvement(entree.getDateMouvement())
                     .idMvt(entree.getIdMvt())
@@ -333,7 +336,11 @@ public class StockLotService {
                     .nomDepot(entree.getNomDepot())
                     .reste(entree.getQuantiteMouvement())
                     .qttCumul(ancientQttCumul + entree.getQuantiteMouvement())
-                    .cump(((ancienCump.multiply(BigDecimal.valueOf(ancientQttCumul))).add(entree.getPrixTotalMouvement())).divide(BigDecimal.valueOf(ancientQttCumul + entree.getQuantiteMouvement())))
+                    .cump(
+    ((ancienCump.multiply(BigDecimal.valueOf(ancientQttCumul)))
+    .add(entree.getPrixTotalMouvement()))
+    .divide(BigDecimal.valueOf(ancientQttCumul + entree.getQuantiteMouvement()), 4, RoundingMode.HALF_UP)
+)
                     .build();
         return currEntree;
     }

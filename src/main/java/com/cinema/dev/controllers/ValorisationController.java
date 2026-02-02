@@ -97,7 +97,7 @@ public class ValorisationController {
        model.addAttribute("valeursStock", result); // On passe 'result', pas "result"
        model.addAttribute("valeurStock", result.getLast().getValeurStockLot()); // On passe 'result', pas "result"
 
-       model.addAttribute("content", "pages/stock/valorisation-stock-lifo");
+       model.addAttribute("content", "pages/stock/valorisation-stock-fifo");
         return "admin-layout";
     }
 }
