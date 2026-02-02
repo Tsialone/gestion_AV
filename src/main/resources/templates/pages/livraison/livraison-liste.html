@@ -95,6 +95,12 @@
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-eye"></i> Voir Commande
                                 </a>
+                                <button type="button" class="btn btn-sm btn-outline-success" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#livraisonModal"
+                                        th:onclick="'openLivraisonModal(' + ${liv.idLivraison} + ', ' + ${commandeIds[liv.idLivraison]} + ')'">
+                                    <i class="bi bi-truck"></i> Livrer
+                                </button>
                             </td>
                         </tr>
                     </tbody>
@@ -102,4 +108,62 @@
             </div>
         </div>
     </div>
+
+    <!-- Livraison Modal -->
+    <div class="modal fade" id="livraisonModal" tabindex="-1" aria-labelledby="livraisonModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="livraisonModalLabel">Effectuer la Livraison</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="livraisonForm" th:action="@{/commande/livrer/{id}}" method="post">
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="modalIdDepot" class="form-label">Dépôt de Livraison <span class="text-danger">*</span></label>
+                            <select id="modalIdDepot" name="idDepot" class="form-select" required>
+                                <option value="">-- Sélectionner un dépôt --</option>
+                                <option th:each="depot : ${depots}" 
+                                        th:value="${depot.idDepot}" 
+                                        th:text="${depot.nom}">
+                                </option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="modalDateLivraison" class="form-label">Date de Livraison <span class="text-danger">*</span></label>
+                            <input type="datetime-local" 
+                                   id="modalDateLivraison" 
+                                   name="dateLivraison" 
+                                   class="form-control" 
+                                   required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </button>
+                        <button type="submit" class="btn btn-success">
+                            <i class="bi bi-truck"></i> Livrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openLivraisonModal(idLivraison, idCommande) {
+            // Set the form action with the correct command ID
+            const form = document.getElementById('livraisonForm');
+            form.action = '/commande/livrer/' + idCommande;
+            
+            // Set default date to now
+            const now = new Date();
+            const dateString = now.toISOString().slice(0, 16);
+            document.getElementById('modalDateLivraison').value = dateString;
+            
+            // Reset depot selection
+            document.getElementById('modalIdDepot').value = '';
+        }
+    </script>
 </section>

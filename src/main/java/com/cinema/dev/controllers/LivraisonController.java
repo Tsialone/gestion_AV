@@ -8,6 +8,7 @@ import com.cinema.dev.repositories.CommandeRepository;
 import com.cinema.dev.repositories.ProformaRepository;
 import com.cinema.dev.repositories.ClientRepository;
 import com.cinema.dev.repositories.FournisseurRepository;
+import com.cinema.dev.repositories.DepotRepository;
 import com.cinema.dev.services.AuthorizationService;
 import com.cinema.dev.services.SessionService;
 import com.cinema.dev.utils.BreadcrumbItem;
@@ -43,6 +44,9 @@ public class LivraisonController {
     
     @Autowired
     private FournisseurRepository fournisseurRepository;
+    
+    @Autowired
+    private DepotRepository depotRepository;
     
     @Autowired
     private AuthorizationService authorizationService;
@@ -177,6 +181,7 @@ public class LivraisonController {
         model.addAttribute("filterType", type);
         model.addAttribute("filterStartDate", startDate);
         model.addAttribute("filterEndDate", endDate);
+        model.addAttribute("depots", depotRepository.findAll());
         
         // Page title and breadcrumbs
         model.addAttribute("pageTitle", "Livraisons");
