@@ -106,34 +106,47 @@
             </div>
 
             <!-- État du stock par dépôt -->
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header">
-                        <h4>État du Stock par Dépôt</h4>
+            <!-- État du stock par dépôt -->
+<div class="col-12">
+    <div class="card">
+        <div class="card-header">
+            <h4>État du Stock par Dépôt</h4>
+        </div>
+        
+        <div class="card-body">
+            <div class="mb-3" th:each="r : ${etatStockRecap}">
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <span class="font-weight-bold">[[${r.nom}]]</span>
+                    <span th:if="${(r.pourcentage ?: 0) lt 25}" 
+                          style="background-color: #dc3545; color: white; padding: 5px 12px; border-radius: 5px; font-size: 0.85rem;">
+                        🔴 Urgent
+                    </span>
+                    <span th:if="${(r.pourcentage ?: 0) ge 25 and (r.pourcentage ?: 0) le 75}" 
+                          style="background-color: #28a745; color: white; padding: 5px 12px; border-radius: 5px; font-size: 0.85rem;">
+                        ✓ Normal
+                    </span>
+                    <span th:if="${(r.pourcentage ?: 0) gt 75}" 
+                          style="background-color: #fd7e14; color: white; padding: 5px 12px; border-radius: 5px; font-size: 0.85rem;">
+                        ⚠️ Surstock
+                    </span>
+                </div>
+                
+                <div class="progress" style="height: 25px;">
+                    <div class="progress-bar" role="progressbar"
+                         th:classappend="${(r.pourcentage ?: 0) lt 25} ? 'bg-danger' : (${(r.pourcentage ?: 0) le 75} ? 'bg-success' : 'bg-warning')"
+                         th:style="|width: ${(r.pourcentage ?: 0)}%|"
+                         th:aria-valuenow="${r.pourcentage ?: 0}" 
+                         aria-valuemin="0" 
+                         aria-valuemax="100">
+                        <span style="font-weight: bold; font-size: 0.9rem;">
+                            [[${#numbers.formatDecimal(r.pourcentage ?: 0, 1, 0)}]]%
+                        </span>
                     </div>
-                    
-                    <div class="card-body">
-                        <div class="mb-3" th:each="r : ${etatStockRecap}">
-                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                <span class="font-weight-bold">[[${r.nom}]]</span>
-                                <span class="badge"
-                                    th:classappend="${r.pourcentage} &lt; 20 ? 'bg-danger' : (${r.pourcentage} &lt; 50 ? 'bg-warning' : 'bg-success')">
-                                    [[${#numbers.formatDecimal(r.pourcentage, 1, 0, 'COMMA')}]]%
-                                    <span th:if="${r.pourcentage} &lt; 20">🔴 RAVITAILLEMENT URGENT</span>
-                                    <span th:if="${r.pourcentage} &gt;= 20 and r.pourcentage &lt; 50">⚠️ ALERTE</span>
-                                    <span th:if="${r.pourcentage} &gt;= 50">✓ OK</span>
-                                    <span th:if="${r.pourcentage} &gt; 100">🚨 SURPRODUCTION</span>
-                                    
-                                </span>
-                            </div>
-                            <div class="progress" style="height: 20px;">
-                                <div class="progress-bar" role="progressbar"
-                                    th:classappend="${r.pourcentage} &lt; 20 ? 'bg-danger' : (${r.pourcentage} &lt; 50 ? 'bg-warning' : 'bg-success')"
-                                    th:style="'width:' + ${r.pourcentage} + '%'"
-                                    th:aria-valuenow="${r.pourcentage}" aria-valuemin="0" aria-valuemax="100">
-                                    [[${#numbers.formatDecimal(r.pourcentage, 1, 0, 'COMMA')}]]%
-                                </div>
-                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
                         </div>
                     </div>
                 </div>

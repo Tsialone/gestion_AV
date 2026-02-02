@@ -28,7 +28,7 @@ public class MvtStockService {
 
     @Transactional(rollbackFor = Exception.class)
     public MvtStock creeerMvtStockSortie(MvtStockForm mvtStockForm) throws Exception {
-        List<Lot> lotsCree = lotService.creeLots(mvtStockForm.getArticleQte().size(), mvtStockForm.getArticleQte());
+        // List<Lot> lotsCree = lotService.creeLots(mvtStockForm.getArticleQte().size(), mvtStockForm.getArticleQte());
         MvtStock mvtStock = new MvtStock();
 
         mvtStock.setDate(mvtStockForm.getDate().atTime(0, 0));
@@ -37,9 +37,10 @@ public class MvtStockService {
         mvtStock.setEntrant(false);
         mvtStock.setIdDepot(mvtStockForm.getIdDepot());
         mvtStock.setIdLivraison(mvtStockForm.getIdLivraison());
-
+        System.out.println(mvtStock.toString());
+        System.out.println("xxxxxxxxxx ");
         MvtStock savedMvtStock = mvtStockRepository.save(mvtStock);
-        mvtStockLotService.creerListeMvtStockEntreeLot(savedMvtStock.getIdMvt(), lotsCree);
+        // mvtStockLotService.creerListeMvtStockSortieLot(savedMvtStock.getIdMvt(), lotsCree);
 
         for (Integer idArticle : mvtStockForm.getArticleQte().keySet()) {
             Integer qte = mvtStockForm.getArticleQte().get(idArticle);
