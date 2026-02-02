@@ -17,7 +17,7 @@
                                 <h6 class="text-muted font-semibold">CA Ventes <i
                                         class="bi bi-arrow-up-circle-fill text-success" style="font-size: 0.9rem;"></i>
                                 </h6>
-                                <h6 class="font-extrabold mb-0" th:text="${#numbers.formatDecimal(caVente, 1, 'POINT', 2, 'COMMA')} + ' Ar'">125 450 000 Ar</h6>
+                                <h6 class="font-extrabold mb-0" th:text="${#numbers.formatDecimal(caVente, 3, 'POINT', 2, 'COMMA')} + ' Ar'">125.450.000 Ar</h6>
                             </div>
                         </div>
                     </div>
@@ -36,7 +36,7 @@
                                 <h6 class="text-muted font-semibold">Coûts Achats <i
                                         class="bi bi-arrow-down-circle-fill text-danger" style="font-size: 0.9rem;"></i>
                                 </h6>
-                                <h6 class="font-extrabold mb-0" th:text="${#numbers.formatDecimal(depense,  1, 'POINT', 2, 'COMMA')} + ' Ar'">87 320 000 Ar</h6>
+                                <h6 class="font-extrabold mb-0" th:text="${#numbers.formatDecimal(depense, 3, 'POINT', 2, 'COMMA')} + ' Ar'">87.320.000 Ar</h6>
                             </div>
                         </div>
                     </div>
@@ -147,11 +147,6 @@
         </div>
     </div>
 </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
 
         <div class="row">
             <!-- Top 3 Fournisseurs -->
@@ -176,7 +171,7 @@
                                             <span class="badge" th:classappend="${stat.index == 0} ? 'bg-success' : (${stat.index == 1} ? 'bg-primary' : 'bg-warning')">[[${stat.index + 1}]]</span>
                                         </td>
                                         <td>[[${f.nom}]]</td>
-                                        <td class="text-bold-500" th:text="${#numbers.formatDecimal(f.montant, 1, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
+                                        <td class="text-bold-500" th:text="${#numbers.formatDecimal(f.montant, 3, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -207,7 +202,7 @@
                                             <span class="badge" th:classappend="${stat.index == 0} ? 'bg-success' : (${stat.index == 1} ? 'bg-primary' : 'bg-warning')">[[${stat.index + 1}]]</span>
                                         </td>
                                         <td>[[${c.nom}]]</td>
-                                        <td class="text-bold-500" th:text="${#numbers.formatDecimal(c.montant, 1, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
+                                        <td class="text-bold-500" th:text="${#numbers.formatDecimal(c.montant, 3, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
                                     </tr>
                                 </tbody>
                             </table>

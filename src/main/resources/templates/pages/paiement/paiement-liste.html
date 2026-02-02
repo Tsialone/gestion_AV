@@ -97,7 +97,7 @@
                                 <span th:if="${paiementTypes[p.idPaiement] == 'fournisseur'}" class="badge bg-info">Fournisseur</span>
                             </td>
                             <td th:text="${partenaireNames[p.idPaiement] != null ? partenaireNames[p.idPaiement] : '-'}"></td>
-                            <td th:text="${p.montant} + ' Ar'"></td>
+                            <td th:text="${#numbers.formatDecimal(p.montant, 3, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
                             <td th:text="${p.date != null ? #temporals.format(p.date, 'dd/MM/yyyy HH:mm') : '-'}"></td>
                         </tr>
                     </tbody>
