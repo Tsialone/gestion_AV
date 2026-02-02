@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -44,28 +45,34 @@ public class LotService {
     }
 
     public List<Lot> creeLots(Integer nombre, HashMap<Integer, Integer> articleQt) throws Exception {
+    List<Lot> resp = new ArrayList<>();
 
-        List<Lot> resp = new ArrayList<>();
-        for (int i = 0; i < nombre; i++) {
-            Lot lot = new Lot();
-            Integer idArticle = articleQt.keySet().iterator().next();
-            Integer qte = articleQt.get(idArticle);
-            Article article = articleRepository.findById(idArticle)
-                    .orElseThrow(() -> new Exception("Article non trouvé: " + idArticle));
-            if (qte <= 0) {
-                throw new Exception("Quantité invalide pour l'article: " + idArticle);
-            }
+    // On boucle sur chaque entrée (ArticleID -> Quantité) de la Map
+    for (Map.Entry<Integer, Integer> entry : articleQt.entrySet()) {
+        Integer idArticle = entry.getKey();
+        Integer qte = entry.getValue();
 
-            lot.setIdArticle(idArticle);
-            lot.setQte(qte);
-            lot.setQteInitiale(qte);
-            lot.setLibelle(article.getLibelle() + " - Lot " + (i + 1));
-            resp.add(lotRepository.save(lot));
+        System.out.println("Traitement : idArticle = " + idArticle + " | qte = " + qte);
+
+        Article article = articleRepository.findById(idArticle)
+                .orElseThrow(() -> new Exception("Article non trouvé: " + idArticle));
+
+        if (qte <= 0) {
+            throw new Exception("Quantité invalide pour l'article: " + idArticle);
         }
 
-        return resp;
-
+        Lot lot = new Lot();
+        lot.setIdArticle(idArticle);
+        lot.setQte(qte);
+        lot.setQteInitiale(qte);
+        // On utilise le libellé de l'article pour le lot
+        lot.setLibelle(article.getLibelle() + " - Lot automatique");
+        
+        resp.add(lotRepository.save(lot));
     }
+
+    return resp;
+}
 
     public List<Lot> getAllLots() {
         return lotRepository.findAll();

@@ -211,7 +211,7 @@ public class CommandeService {
      * - Must be in 'Ventes' department
      * @throws Exception 
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public Livraison livrerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateLivraison) throws Exception {
         //* -- Authorization check
         authorizationService.authorizeLivraison(idUtilisateur);
@@ -247,11 +247,16 @@ public class CommandeService {
         return saved;
     }
 
-    @jakarta.transaction.Transactional(rollbackOn = Exception.class)
     public MvtStock faireMouvoirStockApresLivraison(Livraison livraison, Commande commande) throws Exception {
         MvtStockForm mvtStockForm = new MvtStockForm();
             List<ProformaDetail> listeArticlesDetails = this.proformaDetailRepository.findDetailsByCommandeId(commande.getIdCommande());
             HashMap<Integer, Integer> articleQte =  (HashMap<Integer, Integer>) ProformaDetail.mapQuantiteParArticleStream(listeArticlesDetails);
+            System.out.println("----------------"); 
+            for (Integer idArticle : articleQte.keySet()) {
+            //    Integer qte = mvtStockForm.getArticleQte().get(idArticle);
+               System.out.println("id  = " + idArticle);
+             }
+
             mvtStockForm.setArticleQte(articleQte);
             mvtStockForm.setDate(livraison.getDate().toLocalDate());
             mvtStockForm.setDescriptionQualite("OK");
@@ -261,10 +266,13 @@ public class CommandeService {
             mvtStockForm.setDesignation(null);
             mvtStockForm.setIdDepot(1);
             MvtStock mvtStock = null;
-        if(estCommandeEntrante(livraison.getIdCommande())) {
-            // Entreante
+            if(estCommandeEntrante(livraison.getIdCommande())) {
+                // Entreante
+                System.out.println("entrante");
+                mvtStockForm.setEntrant(true);
             mvtStock = this.mvtStockService.creerMvtStockEntree(mvtStockForm);
         } else {
+            mvtStockForm.setEntrant(false);
             mvtStock = this.mvtStockService.creeerMvtStockSortie(mvtStockForm);
         }
         return mvtStock;

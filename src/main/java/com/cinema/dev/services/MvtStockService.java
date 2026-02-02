@@ -11,10 +11,10 @@ import com.cinema.dev.repositories.LotRepository;
 import com.cinema.dev.repositories.MvtStockLotRepository;
 import com.cinema.dev.repositories.MvtStockRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.beans.Transient;
 import java.time.LocalDate;
@@ -29,9 +29,9 @@ public class MvtStockService {
     private final LotService lotService;
     private final MvtStockLotService mvtStockLotService;
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public MvtStock creeerMvtStockSortie(MvtStockForm mvtStockForm) throws Exception {
-        List<Lot> lotsCree = lotService.creeLots(1, mvtStockForm.getArticleQte());
+        List<Lot> lotsCree = lotService.creeLots(mvtStockForm.getArticleQte().size(), mvtStockForm.getArticleQte());
         MvtStock mvtStock = new MvtStock();
 
         mvtStock.setDate(mvtStockForm.getDate().atTime(0, 0));
@@ -52,9 +52,9 @@ public class MvtStockService {
         return savedMvtStock;
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public MvtStock creerMvtStockEntree(MvtStockForm mvtStockForm) throws Exception {
-        List<Lot> lotsCree = lotService.creeLots(1, mvtStockForm.getArticleQte());
+        List<Lot> lotsCree = lotService.creeLots(mvtStockForm.getArticleQte().size(), mvtStockForm.getArticleQte());
         MvtStock mvtStock = new MvtStock();
 
         mvtStock.setDate(mvtStockForm.getDate().atTime(0, 0));
@@ -65,6 +65,7 @@ public class MvtStockService {
         mvtStock.setIdLivraison(mvtStockForm.getIdLivraison());
 
         MvtStock savedMvtStock = mvtStockRepository.save(mvtStock);
+        
         mvtStockLotService.creerListeMvtStockEntreeLot(savedMvtStock.getIdMvt(), lotsCree);
 
         return savedMvtStock;

@@ -10,10 +10,10 @@ import com.cinema.dev.repositories.LotRepository;
 import com.cinema.dev.repositories.MvtStockLotRepository;
 import com.cinema.dev.repositories.MvtStockRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.AllArgsConstructor;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -41,7 +41,7 @@ public class MvtStockLotService {
         return nombreMax - nombreASortir;
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public void faireSortirDesProduitsLeLotImportePeu(Integer idArticle, Integer nombre,
             Integer idMvtStock) throws Exception {
         List<Lot> lots = lotService.getLotsByArticleWithPositiveStock(idArticle);
@@ -62,7 +62,7 @@ public class MvtStockLotService {
         }
     }
 
-    @Transactional(rollbackOn = Exception.class)
+    @Transactional(rollbackFor = Exception.class)
     public MvtStockLot faireSortirDansLot(Integer idLot, Integer nombre, Integer idMvtStock) throws Exception {
         Lot lot = lotRepository.findById(idLot)
                 .orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
