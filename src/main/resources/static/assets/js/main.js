@@ -48,4 +48,7 @@ if(typeof PerfectScrollbar == 'function') {
 }
 
 // Scroll into active sidebar
-document.querySelector('.sidebar-item.active').scrollIntoView(false)
+var activeItem = document.querySelector('.sidebar-item.active');
+if (activeItem) {
+    activeItem.scrollIntoView(false);
+}

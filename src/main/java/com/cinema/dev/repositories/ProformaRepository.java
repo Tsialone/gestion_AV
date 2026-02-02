@@ -1,5 +1,6 @@
 package com.cinema.dev.repositories;
 
+import com.cinema.dev.dtos.VenteEvolutionDto;
 import com.cinema.dev.models.Proforma;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -23,4 +24,6 @@ public interface ProformaRepository extends JpaRepository<Proforma, Integer> {
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
+
+    
 }

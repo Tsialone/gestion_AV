@@ -70,6 +70,27 @@
                                 <i class="bi bi-bar-chart me-1"></i> Niveau: <span th:text="${currentUser.roleNiveau}">0</span>
                             </span>
                         </li>
+                        <!-- Show restrictions if user has any -->
+                        <li th:if="${currentUser.hasRestrictions()}">
+                            <hr class="dropdown-divider">
+                        </li>
+                        <li th:if="${currentUser.hasRestrictions()}">
+                            <h6 class="dropdown-header text-warning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>Restrictions
+                            </h6>
+                        </li>
+                        <li th:if="${currentUser.restrictedCategories != null and !currentUser.restrictedCategories.isEmpty()}">
+                            <span class="dropdown-item-text small">
+                                <i class="bi bi-tag me-1 text-info"></i> Catégories:
+                                <span class="text-muted" th:text="${#strings.listJoin(currentUser.restrictedCategories, ', ')}">Cat1, Cat2</span>
+                            </span>
+                        </li>
+                        <li th:if="${currentUser.restrictedFournisseurs != null and !currentUser.restrictedFournisseurs.isEmpty()}">
+                            <span class="dropdown-item-text small">
+                                <i class="bi bi-truck me-1 text-info"></i> Fournisseurs:
+                                <span class="text-muted" th:text="${#strings.listJoin(currentUser.restrictedFournisseurs, ', ')}">Fourn1, Fourn2</span>
+                            </span>
+                        </li>
                         <li><hr class="dropdown-divider"></li>
                         <li>
                             <h6 class="dropdown-header">

@@ -303,3 +303,17 @@ CREATE TABLE restriction_fournisseur(
    FOREIGN KEY(id_fournisseur) REFERENCES fournisseur(id_fournisseur),
    FOREIGN KEY(id_utilisateur) REFERENCES utilisateur(id_utilisateur)
 );
+
+CREATE TABLE IF NOT EXISTS validation_step (
+    id_validation_step SERIAL PRIMARY KEY,
+    entity_type VARCHAR(20) NOT NULL,              -- 'proforma' or 'commande'
+    entity_id INTEGER NOT NULL,                     -- id_proforma or id_commande
+    step_number INTEGER NOT NULL,                   -- 1 or 2
+    id_utilisateur INTEGER NOT NULL,                -- who validated
+    validated_at TIMESTAMP NOT NULL,
+    FOREIGN KEY (id_utilisateur) REFERENCES utilisateur(id_utilisateur),
+    UNIQUE (entity_type, entity_id, step_number)    -- one validation per step per entity
+);
+
+-- Index for faster lookups
+CREATE INDEX IF NOT EXISTS idx_validation_step_entity ON validation_step(entity_type, entity_id);

@@ -3,6 +3,7 @@ package com.cinema.dev.controllers;
 import com.cinema.dev.models.Paiement;
 import com.cinema.dev.models.Commande;
 import com.cinema.dev.models.Proforma;
+import com.cinema.dev.services.AuthorizationService;
 import com.cinema.dev.services.PaiementService;
 import com.cinema.dev.services.SessionService;
 import com.cinema.dev.utils.BreadcrumbItem;
@@ -49,14 +50,31 @@ public class PaiementController {
     @Autowired
     private SessionService sessionService;
     
+    @Autowired
+    private AuthorizationService authorizationService;
+    
+    private String checkVentesAccess(HttpSession session, RedirectAttributes redirectAttributes) {
+        Integer userId = sessionService.getCurrentUserId(session);
+        if (userId == null) return "redirect:/login";
+        if (!authorizationService.isInVentesOrDirection(userId)) {
+            redirectAttributes.addFlashAttribute("toastMessage", "Accès refusé: Section Ventes/Direction uniquement");
+            redirectAttributes.addFlashAttribute("toastType", "error");
+            return "redirect:/";
+        }
+        return null;
+    }
+    
     @GetMapping("/liste")
-    public String getListe(@RequestParam(required = false) Integer idCommande,
+    public String getListe(HttpSession session, RedirectAttributes redirectAttributes,
+                          @RequestParam(required = false) Integer idCommande,
                           @RequestParam(required = false) String type,
                           @RequestParam(required = false) String startDate,
                           @RequestParam(required = false) String endDate,
                           @RequestParam(required = false, defaultValue = "idPaiement") String sortBy,
                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
                           Model model) {
+        String accessCheck = checkVentesAccess(session, redirectAttributes);
+        if (accessCheck != null) return accessCheck;
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
