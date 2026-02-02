@@ -61,7 +61,7 @@ public class CommandeService {
      * - Must be in 'Ventes' department
      */
     @Transactional
-    public Commande creerCommande(Integer idUtilisateur, Integer idProforma, LocalDateTime dateCommande) {
+    public Commande creerCommande(Integer idUtilisateur, Integer idProforma, LocalDateTime dateCommande ) {
         //* -- Authorization check
         authorizationService.authorizeCreerCommande(idUtilisateur);
         
@@ -212,7 +212,7 @@ public class CommandeService {
      * @throws Exception 
      */
     @Transactional(rollbackFor = Exception.class)
-    public Livraison livrerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateLivraison) throws Exception {
+    public Livraison livrerCommande(Integer idUtilisateur, Integer idCommande, LocalDateTime dateLivraison , Integer idDepot) throws Exception {
         //* -- Authorization check
         authorizationService.authorizeLivraison(idUtilisateur);
         
@@ -240,14 +240,14 @@ public class CommandeService {
         
         Livraison saved = livraisonRepository.save(livraison);
         
-        faireMouvoirStockApresLivraison(saved, commande);
+        faireMouvoirStockApresLivraison(saved, commande , idDepot);
         //* -- Log to historique
         authorizationService.logAction(idUtilisateur, "livraison", "Livraison commande", saved.getIdLivraison(), date);
         
         return saved;
     }
 
-    public MvtStock faireMouvoirStockApresLivraison(Livraison livraison, Commande commande) throws Exception {
+    public MvtStock faireMouvoirStockApresLivraison(Livraison livraison, Commande commande  , Integer idDepot) throws Exception {
         MvtStockForm mvtStockForm = new MvtStockForm();
             List<ProformaDetail> listeArticlesDetails = this.proformaDetailRepository.findDetailsByCommandeId(commande.getIdCommande());
             HashMap<Integer, Integer> articleQte =  (HashMap<Integer, Integer>) ProformaDetail.mapQuantiteParArticleStream(listeArticlesDetails);
@@ -264,7 +264,7 @@ public class CommandeService {
             mvtStockForm.setIdDepot(null);
             mvtStockForm.setIdAjustement(null);
             mvtStockForm.setDesignation(null);
-            mvtStockForm.setIdDepot(2);
+            mvtStockForm.setIdDepot(idDepot);
             MvtStock mvtStock = null;
             if(estCommandeEntrante(livraison.getIdCommande())) {
                 // Entreante
