@@ -30,9 +30,14 @@ public class HistoriqueController {
                           @RequestParam(required = false) Integer idUtilisateur,
                           @RequestParam(required = false) String startDate,
                           @RequestParam(required = false) String endDate,
-                          @RequestParam(required = false, defaultValue = "dateHistorique") String sortBy,
+                          @RequestParam(required = false, defaultValue = "idHg") String sortBy,
                           @RequestParam(required = false, defaultValue = "desc") String sortDir,
                           Model model) {
+        
+        // Clean up null string values from URL parameters
+        if ("null".equals(nomTable) || "".equals(nomTable)) nomTable = null;
+        if ("null".equals(startDate) || "".equals(startDate)) startDate = null;
+        if ("null".equals(endDate) || "".equals(endDate)) endDate = null;
         
         LocalDateTime start = (startDate != null && !startDate.isEmpty()) ? LocalDateTime.parse(startDate) : null;
         LocalDateTime end = (endDate != null && !endDate.isEmpty()) ? LocalDateTime.parse(endDate) : null;
