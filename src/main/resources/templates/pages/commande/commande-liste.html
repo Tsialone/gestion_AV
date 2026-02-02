@@ -208,9 +208,12 @@
                     .then(response => response.json())
                     .then(data => {
                         if (data.success) {
-                            document.querySelector(`.montant-total[data-commande-id="${commandeId}"]`).textContent = data.total + ' Ar';
-                            document.querySelector(`.montant-paye[data-commande-id="${commandeId}"]`).textContent = data.paye + ' Ar';
-                            document.querySelector(`.montant-reste[data-commande-id="${commandeId}"]`).textContent = data.reste + ' Ar';
+                            const formatNumber = (num) => {
+                                return num.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+                            };
+                            document.querySelector(`.montant-total[data-commande-id="${commandeId}"]`).textContent = formatNumber(data.total) + ' Ar';
+                            document.querySelector(`.montant-paye[data-commande-id="${commandeId}"]`).textContent = formatNumber(data.paye) + ' Ar';
+                            document.querySelector(`.montant-reste[data-commande-id="${commandeId}"]`).textContent = formatNumber(data.reste) + ' Ar';
                             
                             // Hide Payer button if reste is 0
                             if (data.reste == 0) {

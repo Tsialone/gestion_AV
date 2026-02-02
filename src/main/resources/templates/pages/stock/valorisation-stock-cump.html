@@ -64,9 +64,9 @@
                             <td class="text-center" th:text="${row.quantiteInitialeLot}"></td>
                             <td class="text-center fw-bold" th:text="${row.quantiteMouvement}"></td>
                             <td class="text-center" th:text="${row.stockRestantLot}"></td>
-                            <td class="text-end" th:text="${#numbers.formatDecimal(row.prixUnitaire, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
-                            <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(row.valeurMouvement, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
-                            <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.valeurStockLot, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                            <td class="text-end" th:text="${#numbers.formatDecimal(row.prixUnitaire, 3, 'POINT', 2, 'COMMA')}"></td>
+                            <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(row.valeurMouvement, 3, 'POINT', 2, 'COMMA')}"></td>
+                            <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.valeurStockLot, 3, 'POINT', 2, 'COMMA')}"></td>
                             <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.cump, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(valeursStock)}">

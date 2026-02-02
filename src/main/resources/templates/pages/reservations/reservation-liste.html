@@ -24,7 +24,7 @@
 
                             <td th:text="${reservation.client != null ? reservation.client.nom : '—'}"></td>
                             <td th:text="${reservation.nbrTicket}"></td>
-                            <td th:text="${reservation.montant} + ' AR'"></td>
+                            <td th:text="${#numbers.formatDecimal(reservation.montant, 3, 'POINT', 2, 'COMMA')} + ' AR'"></td>
                             <td>
                                 <div class="dropdown">
                                     <button class="btn btn-sm btn-link" type="button" data-bs-toggle="dropdown">
