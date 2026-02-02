@@ -119,6 +119,10 @@
     <script th:fragment="script">
         let currentResteAmount = 0;
         
+        function formatNumber(num) {
+            return num.toLocaleString('fr-FR', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+        
         function openPaiementModal(idCommande) {
             // Reset form
             document.getElementById('paiementForm').reset();
@@ -181,10 +185,10 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        document.getElementById('modalPaiementTotal').textContent = data.total.toFixed(2) + ' Ar';
-                        document.getElementById('modalPaiementPaye').textContent = data.paye.toFixed(2) + ' Ar';
-                        document.getElementById('modalPaiementReste').textContent = data.reste.toFixed(2) + ' Ar';
-                        document.getElementById('modalPaiementMaxAmount').textContent = data.reste.toFixed(2);
+                        document.getElementById('modalPaiementTotal').textContent = formatNumber(data.total) + ' Ar';
+                        document.getElementById('modalPaiementPaye').textContent = formatNumber(data.paye) + ' Ar';
+                        document.getElementById('modalPaiementReste').textContent = formatNumber(data.reste) + ' Ar';
+                        document.getElementById('modalPaiementMaxAmount').textContent = formatNumber(data.reste);
                         
                         currentResteAmount = data.reste;
                         
@@ -209,7 +213,7 @@
             const montant = parseFloat(document.getElementById('modalPaiementMontant').value);
             if (montant > currentResteAmount) {
                 e.preventDefault();
-                alert('Le montant ne peut pas dépasser le reste à payer (' + currentResteAmount.toFixed(2) + ' Ar)');
+                alert('Le montant ne peut pas dépasser le reste à payer (' + formatNumber(currentResteAmount) + ' Ar)');
                 return false;
             }
             if (montant <= 0) {
