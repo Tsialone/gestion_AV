@@ -1,0 +1,371 @@
+<section class="section" th:fragment="page">
+
+
+    <!-- Statistiques en haut -->
+    <div class="page-content">
+        <div class="row">
+            <div class="col-6 col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body px-4 py-4-5">
+                        <div class="row">
+                            <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                <div class="mb-3 d-flex align-items-center">
+                                    <i class="bi bi-cash-stack fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                <h6 class="text-muted font-semibold">CA Ventes <i
+                                        class="bi bi-arrow-up-circle-fill text-success" style="font-size: 0.9rem;"></i>
+                                </h6>
+                                <h6 class="font-extrabold mb-0" th:text="${#numbers.formatDecimal(caVente, 1, 'POINT', 2, 'COMMA')} + ' Ar'">125 450 000 Ar</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body px-4 py-4-5">
+                        <div class="row">
+                            <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                <div class="mb-3 d-flex align-items-center">
+                                    <i class="bi bi-bag-check fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                <h6 class="text-muted font-semibold">Coûts Achats <i
+                                        class="bi bi-arrow-down-circle-fill text-danger" style="font-size: 0.9rem;"></i>
+                                </h6>
+                                <h6 class="font-extrabold mb-0" th:text="${#numbers.formatDecimal(depense,  1, 'POINT', 2, 'COMMA')} + ' Ar'">87 320 000 Ar</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body px-4 py-4-5">
+                        <div class="row">
+                            <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                <div class="mb-3 d-flex align-items-center">
+                                    <i class="bi bi-eye fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                <h6 class="text-muted font-semibold">Articles Vendus <i
+                                        class="bi bi-bag-check-fill text-info" style="font-size: 0.9rem;"></i></h6>
+                                <h6 class="font-extrabold mb-0" th:text="${articleVendue}">1 245</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6 col-lg-3 col-md-6">
+                <div class="card">
+                    <div class="card-body px-4 py-4-5">
+                        <div class="row">
+                            <div class="col-md-4 col-lg-12 col-xl-12 col-xxl-5 d-flex justify-content-start">
+                                <div class="mb-4 d-flex align-items-center">
+                                    <i class="bi bi-box-seam fs-4"></i>
+                                </div>
+                            </div>
+                            <div class="col-md-8 col-lg-12 col-xl-12 col-xxl-7">
+                                <h6 class="text-muted font-semibold">Articles en Stock</h6>
+                                <h6 class="font-extrabold mb-0" th:text="${articleStock}">3 567</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Graphiques et statistiques -->
+        <div class="row">
+            <!-- Histogramme ventes par catégorie -->
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Ventes par Catégorie</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="chart-ventes-categorie"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Courbe ventes par date -->
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Évolution des Ventes</h4>
+                    </div>
+                    <div class="card-body">
+                        <div id="chart-ventes-evolution"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- État du stock par dépôt -->
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>État du Stock par Dépôt</h4>
+                    </div>
+                    
+                    <div class="card-body">
+                        <div class="mb-3" th:each="r : ${etatStockRecap}">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="font-weight-bold">[[${r.nom}]]</span>
+                                <span class="badge"
+                                    th:classappend="${r.pourcentage} &lt; 20 ? 'bg-danger' : (${r.pourcentage} &lt; 50 ? 'bg-warning' : 'bg-success')">
+                                    [[${#numbers.formatDecimal(r.pourcentage, 1, 0, 'COMMA')}]]%
+                                    <span th:if="${r.pourcentage} &lt; 20">🔴 RAVITAILLEMENT URGENT</span>
+                                    <span th:if="${r.pourcentage} &gt;= 20 and r.pourcentage &lt; 50">⚠️ ALERTE</span>
+                                    <span th:if="${r.pourcentage} &gt;= 50">✓ OK</span>
+                                    <span th:if="${r.pourcentage} &gt; 100">🚨 SURPRODUCTION</span>
+                                    
+                                </span>
+                            </div>
+                            <div class="progress" style="height: 20px;">
+                                <div class="progress-bar" role="progressbar"
+                                    th:classappend="${r.pourcentage} &lt; 20 ? 'bg-danger' : (${r.pourcentage} &lt; 50 ? 'bg-warning' : 'bg-success')"
+                                    th:style="'width:' + ${r.pourcentage} + '%'"
+                                    th:aria-valuenow="${r.pourcentage}" aria-valuemin="0" aria-valuemax="100">
+                                    [[${#numbers.formatDecimal(r.pourcentage, 1, 0, 'COMMA')}]]%
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <!-- Top 3 Fournisseurs -->
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Top 3 Fournisseurs</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Fournisseur</th>
+                                        <th>Montant Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="f, stat : ${bestFournisseurs}">
+                                        <td class="text-bold-500">
+                                            <span class="badge" th:classappend="${stat.index == 0} ? 'bg-success' : (${stat.index == 1} ? 'bg-primary' : 'bg-warning')">[[${stat.index + 1}]]</span>
+                                        </td>
+                                        <td>[[${f.nom}]]</td>
+                                        <td class="text-bold-500" th:text="${#numbers.formatDecimal(f.montant, 1, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Top 3 Clients -->
+            <div class="col-12 col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Top 3 Clients</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Client</th>
+                                        <th>Montant Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr th:each="c, stat : ${bestClients}">
+                                        <td class="text-bold-500">
+                                            <span class="badge" th:classappend="${stat.index == 0} ? 'bg-success' : (${stat.index == 1} ? 'bg-primary' : 'bg-warning')">[[${stat.index + 1}]]</span>
+                                        </td>
+                                        <td>[[${c.nom}]]</td>
+                                        <td class="text-bold-500" th:text="${#numbers.formatDecimal(c.montant, 1, 'POINT', 2, 'COMMA')} + ' Ar'"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:inline="javascript">
+        var chartsInitialized = false; // Flag pour éviter la duplication
+
+        function initCharts() {
+            if (chartsInitialized) return; // Sortir si déjà initialisé
+            chartsInitialized = true;
+
+            console.log('=== INIT CHARTS START ===');
+            console.log('Script dashboard chargé');
+            console.log('ApexCharts disponible?', typeof ApexCharts);
+
+            // Graphique Ventes par Catégorie (Histogramme)
+            var elementCategorie = document.querySelector("#chart-ventes-categorie");
+            console.log('Element chart-ventes-categorie trouvé?', elementCategorie);
+
+            // Récupération des données depuis le serveur
+            var articleCategorieStats = /*[[${articleCategorieStats}]]*/ [];
+            var categories = [];
+            var dataVentes = [];
+            
+            articleCategorieStats.forEach(function(stat) {
+                categories.push(stat.categorie);
+                dataVentes.push(stat.nbrArticlesVendus);
+            });
+
+            var optionsCategorie = {
+                series: [{
+                    name: 'Ventes',
+                    data: dataVentes
+                }],
+                chart: {
+                    type: 'bar',
+                    height: 350
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: false,
+                        columnWidth: '55%',
+                        endingShape: 'rounded'
+                    },
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    show: true,
+                    width: 0.5,
+                    colors: ['transparent']
+                },
+                xaxis: {
+                    categories: categories,
+                },
+                yaxis: {
+                    title: {
+                        text: 'Nombre de ventes'
+                    }
+                },
+                fill: {
+                    opacity: 1
+                },
+                tooltip: {
+                    y: {
+                        formatter: function (val) {
+                            return val + " ventes"
+                        }
+                    }
+                },
+                colors: ['#435ebe']
+            };
+
+            if (elementCategorie && typeof ApexCharts !== 'undefined') {
+                console.log('Création chart catégorie...');
+                try {
+                    var chartCategorie = new ApexCharts(elementCategorie, optionsCategorie);
+                    chartCategorie.render();
+                    console.log('✓ Chart catégorie rendu avec succès');
+                } catch (e) {
+                    console.error('Erreur création chart catégorie:', e);
+                }
+            } else {
+                console.error('Impossible de créer chart catégorie', { element: !!elementCategorie, ApexCharts: typeof ApexCharts });
+            }
+
+            // Graphique Évolution des Ventes (Courbe)
+            var elementEvolution = document.querySelector("#chart-ventes-evolution");
+            console.log('Element chart-ventes-evolution trouvé?', elementEvolution);
+
+            // Récupération des données depuis le serveur
+            var venteEvolutionData = /*[[${venteEvolution}]]*/ [];
+            var dateLabels = [];
+            var ventesData = [];
+            
+            venteEvolutionData.forEach(function(vente) {
+                dateLabels.push(vente.date);
+                ventesData.push(vente.nbrVente);
+            });
+
+            var optionsEvolution = {
+                series: [{
+                    name: "Ventes",
+                    data: ventesData
+                }],
+                chart: {
+                    height: 350,
+                    type: 'line',
+                    zoom: {
+                        enabled: false
+                    }
+                },
+                dataLabels: {
+                    enabled: false
+                },
+                stroke: {
+                    curve: 'smooth',
+                    width: 3
+                },
+                grid: {
+                    row: {
+                        colors: ['#f3f3f3', 'transparent'],
+                        opacity: 0.5
+                    },
+                },
+                xaxis: {
+                    categories: dateLabels,
+                },
+                yaxis: {
+                    title: {
+                        text: 'Nombre de ventes'
+                    }
+                },
+                colors: ['#28c76f']
+            };
+
+            if (elementEvolution && typeof ApexCharts !== 'undefined') {
+                console.log('Création chart évolution...');
+                try {
+                    var chartEvolution = new ApexCharts(elementEvolution, optionsEvolution);
+                    chartEvolution.render();
+                    console.log('✓ Chart évolution rendu avec succès');
+                } catch (e) {
+                    console.error('Erreur création chart évolution:', e);
+                }
+            } else {
+                console.error('Impossible de créer chart évolution', { element: !!elementEvolution, ApexCharts: typeof ApexCharts });
+            }
+
+            console.log('=== INIT CHARTS END ===');
+        }
+
+        // Attendre que le DOM soit complètement chargé
+        if (document.readyState === 'loading') {
+            console.log('DOM pas encore chargé, attente...');
+            document.addEventListener('DOMContentLoaded', initCharts);
+        } else {
+            console.log('DOM déjà chargé, initialisation des charts');
+            initCharts();
+        }
+
+        // Fallback si DOMContentLoaded ne s'est pas déclenché
+        window.addEventListener('load', function () {
+            console.log('Page chargée complètement');
+            initCharts();
+        });
+    </script>
+</section>

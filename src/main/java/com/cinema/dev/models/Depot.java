@@ -18,4 +18,7 @@ public class Depot {
 
     @Column(name = "nom", length = 256)
     private String nom;
+
+    @Column(name = "capacite")
+    private Integer capacite;
 }
