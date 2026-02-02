@@ -19,3 +19,9 @@ Just replace the port/password with yours
 
 # REGLE DATA:
 -Tsy maintsy misy depot avec id = 1
+
+pg_dump -U postgres -h localhost gestion_db > dump1.sql
+
+
+psql -U postgres -h localhost -d gestion_db -f dump1.sql
+

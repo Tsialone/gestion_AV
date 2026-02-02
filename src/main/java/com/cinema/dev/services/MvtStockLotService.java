@@ -52,14 +52,15 @@ public class MvtStockLotService {
             if (reste <= 0) {
                 break;
             }
-            Integer resteASortir = faireSortirMaxDansUnLotEtRetournerReste(lot.getIdLot(), reste,
+            reste = faireSortirMaxDansUnLotEtRetournerReste(lot.getIdLot(), reste,
                     idMvtStock);
-            if (resteASortir != 0) {
-                throw new Exception("il manque " + resteASortir + " dans le stock");
+            
+        }
+        if (reste != 0) {
+                throw new Exception("il manque " + reste + " dans le stock");
             } else {
                 return;
             }
-        }
     }
 
     @Transactional(rollbackFor = Exception.class)
@@ -67,7 +68,8 @@ public class MvtStockLotService {
         Lot lot = lotRepository.findById(idLot)
                 .orElseThrow(() -> new Exception("Lot non trouvé: " + idLot));
         Integer qteRestant = lotService.getQttRestantDansLotApresSortie(idLot, nombre);
-        if (qteRestant <= 0) {
+        System.out.println("qte restante = " + qteRestant + " nombre = " + nombre);
+        if (qteRestant < 0) {
             throw new Exception("Quantité insuffisante dans le lot: " + idLot);
         }
         lot.setQte(qteRestant);

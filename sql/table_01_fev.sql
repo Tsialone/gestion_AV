@@ -31,6 +31,7 @@ CREATE TABLE fournisseur(
 CREATE TABLE depot(
    id_depot SERIAL,
    nom VARCHAR(256) ,
+   capacite INTEGER NOT NULL DEFAULT 100,
    PRIMARY KEY(id_depot)
 );
 

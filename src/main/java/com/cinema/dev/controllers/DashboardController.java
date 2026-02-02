@@ -58,11 +58,10 @@ public class DashboardController {
             for (EtatStockDto dto : etatStockDtos) {
                 if (depot.getIdDepot().equals(dto.getIdDepot())) {
                     total += dto.getStockADate();
-                    
                 }
-
             }
-            Double pourcentage =  (double)total / (depot.getCapacite()   ) * 100;
+            Double pourcentage =  (double)total / (depot.getCapacite()) * 100;
+            // Double pourcentage =  0d;
             System.out.println("total: " + total);
             System.out.println("capacite: " + depot.getCapacite());
             System.out.println("pourcentage: " + pourcentage);

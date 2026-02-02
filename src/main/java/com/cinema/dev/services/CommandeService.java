@@ -270,12 +270,13 @@ public class CommandeService {
                 // Entreante
                 System.out.println("entrante");
                 mvtStockForm.setEntrant(true);
-            mvtStock = this.mvtStockService.creerMvtStockEntree(mvtStockForm);
-        } else {
-            mvtStockForm.setEntrant(false);
-            mvtStock = this.mvtStockService.creeerMvtStockSortie(mvtStockForm);
-        }
-        return mvtStock;
+                mvtStock = this.mvtStockService.creerMvtStockEntree(mvtStockForm);
+            } else {
+                System.out.println("sortante");
+                mvtStockForm.setEntrant(false);
+                mvtStock = this.mvtStockService.creeerMvtStockSortie(mvtStockForm);
+            }
+            return mvtStock;
     }
 
     /**

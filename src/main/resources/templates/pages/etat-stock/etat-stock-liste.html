@@ -41,10 +41,10 @@
                         <label for="idDepotFilter" class="form-label">Dépôt</label>
                         <select class="form-select" id="idDepotFilter" name="idDepot">
                             <option value="">-- Tous les dépôts --</option>
-                            <option th:each="etat : ${etatStocks}" 
-                                    th:value="${etat.idDepot}"
-                                    th:text="${etat.depot}"
-                                    th:selected="${idDepot == etat.idDepot}"></option>
+                            <option th:each="depot : ${depots}" 
+                                    th:value="${depot.idDepot}"
+                                    th:text="${depot.nom}">
+                                </option>
                         </select>
                     </div>
                     <div class="col-md-3">

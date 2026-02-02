@@ -35,7 +35,7 @@ def main() -> None:
     parser.add_argument('--host', default='localhost', help='Postgres host (default: localhost)')
     parser.add_argument('--port', default=5432, type=int, help='Postgres port (default: 5432)')
     # parser.add_argument('--port', default=1112, type=int, help='Postgres port (default: 1112)')
-    parser.add_argument('--password', default='snow', help='Postgres password (default: snow)')
+    parser.add_argument('--password', default='admin', help='Postgres password (default: snow)')
     # parser.add_argument('--password', default='admin', help='Postgres password (default: admin)')
     parser.add_argument('--skip-views', action='store_true', help='Skip loading views.sql')
 

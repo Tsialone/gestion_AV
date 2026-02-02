@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import com.cinema.dev.dtos.EtatStockDto;
+import com.cinema.dev.repositories.DepotRepository;
 import com.cinema.dev.repositories.EtatStockRepository;
 import com.cinema.dev.services.AuthorizationService;
 import com.cinema.dev.services.SessionService;
@@ -30,6 +31,9 @@ public class EtatStockController {
 
     @Autowired
     private AuthorizationService authorizationService;
+    
+    @Autowired
+    private DepotRepository depotRepository;
 
     @Autowired
     private SessionService sessionService;
@@ -87,6 +91,7 @@ public class EtatStockController {
         model.addAttribute("date", dateFormatted);
         model.addAttribute("idDepot", idDepot);
         model.addAttribute("idArticle", idArticle);
+        model.addAttribute("depots", this.depotRepository.findAll());
         model.addAttribute("content", "pages/etat-stock/etat-stock-liste");
         return "admin-layout";
     }
