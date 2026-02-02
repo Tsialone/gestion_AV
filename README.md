@@ -16,3 +16,6 @@ Just replace the port/password with yours
 4. dataV3B.sql          -- Transaction data (demandes, proformas, commandes, stock)
 5. dataV3C.sql          -- Validation data
 ```
+
+# REGLE DATA:
+-Tsy maintsy misy depot avec id = 1

@@ -5,14 +5,23 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.Immutable;
+
 @Entity
+@Immutable
 @Data
 @Table(name = "v_journal_mvt_stock")
+@IdClass(JournalMvtStockId.class) // On lie la clé ici
 public class JournalMvtStock {
 
     @Id
     @Column(name = "id_mvt")
     private Integer idMvt;
+
+    @Id
+    @Column(name = "id_lot")
+    private Integer idLot;
+  
 
     @Column(name = "date_mouvement")
     private LocalDateTime dateMouvement;
@@ -47,11 +56,9 @@ public class JournalMvtStock {
     @Column(name = "article")
     private String article;
 
-    @Column(name = "id_lot")
-    private Integer idLot;
-
     @Column(name = "lot")
     private String lot;
+  
 
     @Column(name = "quantite")
     private Integer quantite;

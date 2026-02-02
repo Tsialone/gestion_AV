@@ -64,22 +64,27 @@ public class JournalMvtStockController {
         String dateFormatted = filterDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm"));
         
         List<JournalMvtStock> journalMvts = journalMvtStockRepository.findJournalFiltered(filterDate);
+        for(int i  = 0; i < journalMvts.size(); i ++) {
+            System.out.println("lot = " + journalMvts.get(i).getLot() + " artcile = " + journalMvts.get(i).getArticle());
+        }
+
+        // // Calculer les totaux par type
+        // Integer totalEntrees = journalMvts.stream()
+        //     .filter(j -> j.getEntrant())
+        //     .mapToInt(JournalMvtStock::getQuantite)
+        //     .sum();
         
-        // Calculer les totaux par type
-        Integer totalEntrees = journalMvts.stream()
-            .filter(j -> j.getEntrant())
-            .mapToInt(JournalMvtStock::getQuantite)
-            .sum();
-        
-        Integer totalSorties = journalMvts.stream()
-            .filter(j -> !j.getEntrant())
-            .mapToInt(JournalMvtStock::getQuantite)
-            .sum();
+        // Integer totalSorties = journalMvts.stream()
+        //     .filter(j -> !j.getEntrant())
+        //     .mapToInt(JournalMvtStock::getQuantite)
+        //     .sum();
         
         model.addAttribute("journalMvts", journalMvts);
-        model.addAttribute("totalEntrees", totalEntrees);
-        model.addAttribute("totalSorties", totalSorties);
-        model.addAttribute("date", dateFormatted);
+        // model.addAttribute("totalEntrees", totalEntrees);
+        // model.addAttribute("totalSorties", totalSorties);
+          model.addAttribute("totalEntrees", 0);
+        // model.addAttribute("totalSorties", totalSorties);
+        model.addAttribute("date", 0);
         model.addAttribute("content", "pages/journal-mvt/journal-mvt-liste");
         return "admin-layout";
     }

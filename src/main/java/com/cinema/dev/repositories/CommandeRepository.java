@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface CommandeRepository extends JpaRepository<Commande, Integer> {
@@ -21,4 +22,9 @@ public interface CommandeRepository extends JpaRepository<Commande, Integer> {
         @Param("startDate") LocalDateTime startDate,
         @Param("endDate") LocalDateTime endDate
     );
+
+    // On joint Commande et Proforma via l'ID numérique
+    @Query("SELECT p.idClient, p.idFournisseur FROM Commande c, Proforma p " +
+           "WHERE c.idProforma = p.idProforma AND c.idCommande = :idCommande")
+    List<Object[]> findProformaDetailsByCommandeId(@Param("idCommande") Integer idCommande);
 }
