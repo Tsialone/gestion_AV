@@ -5,7 +5,7 @@
                     <div class="card border-primary h-100">
                         <div class="card-body">
                             <p class="text-muted mb-1">Valorisation CUMP</p>
-                            <h4 class="mb-0" th:text="${valeurStock != null ? valeurStock : 0} + Ar ">0 AR</h4>
+                            <h4 class="mb-0" th:text="${#numbers.formatDecimal(valeurStock != null ? valeurStock : 0, 3, 'POINT', 2, 'COMMA')} + ' Ar'">0 AR</h4>
                         </div>
                     </div>
                 </div>
@@ -67,7 +67,7 @@
                             <td class="text-end" th:text="${#numbers.formatDecimal(row.prixUnitaire, 3, 'POINT', 2, 'COMMA')}"></td>
                             <td class="text-end fw-bold" th:text="${#numbers.formatDecimal(row.valeurMouvement, 3, 'POINT', 2, 'COMMA')}"></td>
                             <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.valeurStockLot, 3, 'POINT', 2, 'COMMA')}"></td>
-                            <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.cump, 1, 'WHITESPACE', 2, 'COMMA')}"></td>
+                            <td class="text-end text-primary fw-bold" th:text="${#numbers.formatDecimal(row.cump, 3, 'POINT', 2, 'COMMA')}"></td>
                         </tr>
                         <tr th:if="${#lists.isEmpty(valeursStock)}">
                             <td colspan="12" class="text-center py-4 text-muted">Aucune donnée disponible.</td>
